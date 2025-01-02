@@ -2,6 +2,13 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -11,11 +18,11 @@ const LoginForm = () => {
     captcha: "",
     remember: false,
   });
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // 这里添加表单验证逻辑
     if (!formData.tenantId || !formData.username || !formData.password || !formData.captcha) {
       toast({
         title: "错误",
@@ -26,6 +33,10 @@ const LoginForm = () => {
     }
     // TODO: 实现登录逻辑
     console.log("登录信息:", formData);
+  };
+
+  const handleForgotPassword = () => {
+    setShowForgotPassword(true);
   };
 
   return (
@@ -42,7 +53,6 @@ const LoginForm = () => {
             placeholder="租户编号"
             value={formData.tenantId}
             onChange={(e) => setFormData({ ...formData, tenantId: e.target.value })}
-            className="w-full"
           />
         </div>
         
@@ -52,7 +62,6 @@ const LoginForm = () => {
             placeholder="用户名/手机号"
             value={formData.username}
             onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-            className="w-full"
           />
         </div>
         
@@ -62,7 +71,6 @@ const LoginForm = () => {
             placeholder="密码"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            className="w-full"
           />
         </div>
         
@@ -72,7 +80,6 @@ const LoginForm = () => {
             placeholder="验证码"
             value={formData.captcha}
             onChange={(e) => setFormData({ ...formData, captcha: e.target.value })}
-            className="w-full"
           />
           <div className="w-32 h-10 bg-gray-100 flex items-center justify-center">
             验证码图片
@@ -90,21 +97,44 @@ const LoginForm = () => {
           />
           <span className="text-text-secondary">记住密码</span>
         </label>
-        <a href="#" className="text-primary hover:text-primary-hover">
+        <button
+          type="button"
+          onClick={handleForgotPassword}
+          className="text-primary hover:text-primary-hover"
+        >
           忘记密码？
-        </a>
+        </button>
       </div>
 
-      <Button type="submit" className="w-full bg-primary hover:bg-primary-hover">
+      <Button type="submit" className="w-full">
         登录
       </Button>
 
       <div className="text-center text-sm text-text-secondary">
         还没有账号？{" "}
-        <a href="#" className="text-primary hover:text-primary-hover">
+        <a href="/register" className="text-primary hover:text-primary-hover">
           去注册一个
         </a>
       </div>
+
+      <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>忘记密码</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="flex items-center gap-2">
+              <span className="text-yellow-500">⚠️</span>
+              <p>请联系您的业务经理以找回密码！</p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowForgotPassword(false)}>
+              知道了
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </form>
   );
 };
