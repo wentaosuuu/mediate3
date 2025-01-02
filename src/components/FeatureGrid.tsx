@@ -1,5 +1,5 @@
 import { MessageCircle, Smartphone, PhoneCall, Mail, FileText, Bell, Users, BookOpen, Star } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const features = [
   {
@@ -58,7 +58,7 @@ const FeatureGrid = () => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   // 自动切换动画效果
-  useState(() => {
+  useEffect(() => {
     let currentIndex = 0;
     const interval = setInterval(() => {
       setActiveIndex(currentIndex);
