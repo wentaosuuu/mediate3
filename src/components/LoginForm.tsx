@@ -3,6 +3,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { AlertCircle } from "lucide-react";
+import { Tooltip } from "@/components/ui/tooltip";
+import {
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -69,27 +76,40 @@ const LoginForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6">
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-text-primary">欢迎使用法调云</h1>
-        <p className="text-text-secondary mt-2">请登录您的账号</p>
+      <div className="text-left mb-8">
+        <h1 className="text-4xl font-bold text-primary mb-2">法调云</h1>
+        <h2 className="text-2xl font-bold text-text-primary mb-2">欢迎使用法调云</h2>
+        <p className="text-text-secondary">为调解中心、律所、清收公司等提供金融贷后处置解智能化解决方案</p>
       </div>
       
       <div className="space-y-4">
         <div className="flex items-center gap-4">
           <label className="w-24 text-left text-sm font-medium text-text-primary">租户编号</label>
-          <Input
-            type="text"
-            className="flex-1 rounded-lg border-gray-300 focus:border-primary focus:ring-primary"
-            value={formData.tenantId}
-            onChange={(e) => setFormData({ ...formData, tenantId: e.target.value })}
-          />
+          <div className="flex-1 flex items-center gap-2">
+            <Input
+              type="text"
+              className="flex-1 rounded-full border-gray-300 focus:border-primary focus:ring-primary"
+              value={formData.tenantId}
+              onChange={(e) => setFormData({ ...formData, tenantId: e.target.value })}
+            />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <AlertCircle className="w-5 h-5 text-primary" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>如忘记租户编号，请联系业务经理找回</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </div>
         
         <div className="flex items-center gap-4">
           <label className="w-24 text-left text-sm font-medium text-text-primary">用户名/手机号</label>
           <Input
             type="text"
-            className="flex-1 rounded-lg border-gray-300 focus:border-primary focus:ring-primary"
+            className="flex-1 rounded-full border-gray-300 focus:border-primary focus:ring-primary"
             value={formData.username}
             onChange={(e) => setFormData({ ...formData, username: e.target.value })}
           />
@@ -99,7 +119,7 @@ const LoginForm = () => {
           <label className="w-24 text-left text-sm font-medium text-text-primary">密码</label>
           <Input
             type="password"
-            className="flex-1 rounded-lg border-gray-300 focus:border-primary focus:ring-primary"
+            className="flex-1 rounded-full border-gray-300 focus:border-primary focus:ring-primary"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
           />
@@ -110,7 +130,7 @@ const LoginForm = () => {
           <div className="flex-1 flex gap-4">
             <Input
               type="text"
-              className="flex-1 rounded-lg border-gray-300 focus:border-primary focus:ring-primary"
+              className="flex-1 rounded-full border-gray-300 focus:border-primary focus:ring-primary"
               value={formData.captcha}
               onChange={(e) => setFormData({ ...formData, captcha: e.target.value })}
             />
@@ -140,7 +160,7 @@ const LoginForm = () => {
         </button>
       </div>
 
-      <Button type="submit" className="w-full mt-6">
+      <Button type="submit" className="w-full mt-6 rounded-full bg-primary hover:bg-primary-hover">
         登录
       </Button>
 

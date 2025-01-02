@@ -65,7 +65,7 @@ const FeatureGrid = () => {
       
       setTimeout(() => {
         setActiveIndex(null);
-      }, 1000); // 增加动画持续时间
+      }, 1500);
     }, 3000);
 
     return () => clearInterval(interval);
@@ -73,9 +73,12 @@ const FeatureGrid = () => {
 
   return (
     <div className="w-full max-w-3xl">
-      <h2 className="text-2xl font-bold text-text-primary mb-8 text-center">
+      <h2 className="text-3xl font-bold text-text-primary mb-4 text-center">
         开始体验司法调解云平台
       </h2>
+      <p className="text-lg text-text-secondary mb-8 text-center">
+        为调解中心、律所、清收公司等提供金融贷后处置解智能化解决方案
+      </p>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
         {features.map((feature, index) => (
           <div
