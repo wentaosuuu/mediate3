@@ -25,9 +25,9 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#9b87f5",
-          hover: "#7E69AB",
-          light: "#D6BCFA",
+          DEFAULT: "#0EA5E9",
+          hover: "#0284C7",
+          light: "#D3E4FD",
         },
         text: {
           primary: "#333333",
@@ -48,6 +48,9 @@ export default {
       animation: {
         "card-hover": "card-hover 0.3s ease-out forwards",
         "card-pulse": "card-pulse 2s ease-in-out infinite",
+      },
+      borderRadius: {
+        'elliptical': '9999px',
       },
     },
   },
