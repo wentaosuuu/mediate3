@@ -7,7 +7,7 @@ const Index = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
           <div className="w-full lg:w-1/2">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg p-8 md:p-12">
+            <div className="bg-blue-50/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 md:p-12">
               <LoginForm />
             </div>
           </div>
