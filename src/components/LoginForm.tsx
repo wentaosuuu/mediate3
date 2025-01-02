@@ -26,7 +26,6 @@ const LoginForm = () => {
       });
       return;
     }
-    // TODO: 实现登录逻辑
     console.log("登录信息:", formData);
   };
 
@@ -76,53 +75,59 @@ const LoginForm = () => {
       </div>
       
       <div className="space-y-4">
-        <div>
+        <div className="flex items-center gap-4">
+          <label className="w-24 text-left text-sm font-medium text-text-primary">租户编号</label>
           <Input
             type="text"
-            placeholder="租户编号"
+            className="flex-1 rounded-lg border-gray-300 focus:border-primary focus:ring-primary"
             value={formData.tenantId}
             onChange={(e) => setFormData({ ...formData, tenantId: e.target.value })}
           />
         </div>
         
-        <div>
+        <div className="flex items-center gap-4">
+          <label className="w-24 text-left text-sm font-medium text-text-primary">用户名/手机号</label>
           <Input
             type="text"
-            placeholder="用户名/手机号"
+            className="flex-1 rounded-lg border-gray-300 focus:border-primary focus:ring-primary"
             value={formData.username}
             onChange={(e) => setFormData({ ...formData, username: e.target.value })}
           />
         </div>
         
-        <div>
+        <div className="flex items-center gap-4">
+          <label className="w-24 text-left text-sm font-medium text-text-primary">密码</label>
           <Input
             type="password"
-            placeholder="密码"
+            className="flex-1 rounded-lg border-gray-300 focus:border-primary focus:ring-primary"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
           />
         </div>
         
-        <div className="flex gap-4">
-          <Input
-            type="text"
-            placeholder="验证码"
-            value={formData.captcha}
-            onChange={(e) => setFormData({ ...formData, captcha: e.target.value })}
-          />
-          <div className="w-32 h-10 bg-gray-100 flex items-center justify-center">
-            验证码图片
+        <div className="flex items-center gap-4">
+          <label className="w-24 text-left text-sm font-medium text-text-primary">验证码</label>
+          <div className="flex-1 flex gap-4">
+            <Input
+              type="text"
+              className="flex-1 rounded-lg border-gray-300 focus:border-primary focus:ring-primary"
+              value={formData.captcha}
+              onChange={(e) => setFormData({ ...formData, captcha: e.target.value })}
+            />
+            <div className="w-32 h-10 bg-gray-100 flex items-center justify-center rounded-lg">
+              验证码图片
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-sm">
+      <div className="flex items-center justify-between text-sm mt-4">
         <label className="flex items-center space-x-2">
           <input
             type="checkbox"
             checked={formData.remember}
             onChange={(e) => setFormData({ ...formData, remember: e.target.checked })}
-            className="rounded border-gray-300"
+            className="rounded border-gray-300 text-primary focus:ring-primary"
           />
           <span className="text-text-secondary">记住密码</span>
         </label>
@@ -135,11 +140,11 @@ const LoginForm = () => {
         </button>
       </div>
 
-      <Button type="submit" className="w-full">
+      <Button type="submit" className="w-full mt-6">
         登录
       </Button>
 
-      <div className="text-center text-sm text-text-secondary">
+      <div className="text-center text-sm text-text-secondary mt-4">
         还没有账号？{" "}
         <button
           type="button"

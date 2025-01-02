@@ -57,17 +57,15 @@ const features = [
 const FeatureGrid = () => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  // 自动切换动画效果
   useEffect(() => {
     let currentIndex = 0;
     const interval = setInterval(() => {
       setActiveIndex(currentIndex);
       currentIndex = (currentIndex + 1) % features.length;
       
-      // 重置动画
       setTimeout(() => {
         setActiveIndex(null);
-      }, 500);
+      }, 1000); // 增加动画持续时间
     }, 3000);
 
     return () => clearInterval(interval);
@@ -82,8 +80,8 @@ const FeatureGrid = () => {
         {features.map((feature, index) => (
           <div
             key={index}
-            className={`bg-white p-6 rounded-lg shadow-md cursor-pointer transition-all duration-300 hover:shadow-lg ${
-              activeIndex === index ? 'scale-110' : ''
+            className={`bg-white p-6 rounded-lg shadow-md cursor-pointer transition-all duration-500 ${
+              activeIndex === index ? 'scale-125 z-10 shadow-xl' : ''
             }`}
           >
             <div className="text-primary mb-4">{feature.icon}</div>

@@ -25,9 +25,9 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#1EAEDB",
-          hover: "#33C3F0",
-          light: "#E6F7FF",
+          DEFAULT: "#9b87f5",
+          hover: "#7E69AB",
+          light: "#D6BCFA",
         },
         text: {
           primary: "#333333",
@@ -41,8 +41,8 @@ export default {
           "100%": { transform: "translateY(-5px)" },
         },
         "card-pulse": {
-          "0%, 100%": { transform: "scale(1)" },
-          "50%": { transform: "scale(1.05)" },
+          "0%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.25)" },
         },
       },
       animation: {
