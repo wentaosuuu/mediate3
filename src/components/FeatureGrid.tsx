@@ -1,4 +1,5 @@
 import { MessageCircle, Smartphone, PhoneCall, Mail, FileText, Bell, Users, BookOpen, Star } from "lucide-react";
+import { useState } from "react";
 
 const features = [
   {
@@ -54,6 +55,24 @@ const features = [
 ];
 
 const FeatureGrid = () => {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  // 自动切换动画效果
+  useState(() => {
+    let currentIndex = 0;
+    const interval = setInterval(() => {
+      setActiveIndex(currentIndex);
+      currentIndex = (currentIndex + 1) % features.length;
+      
+      // 重置动画
+      setTimeout(() => {
+        setActiveIndex(null);
+      }, 500);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="w-full max-w-3xl">
       <h2 className="text-2xl font-bold text-text-primary mb-8 text-center">
@@ -63,7 +82,9 @@ const FeatureGrid = () => {
         {features.map((feature, index) => (
           <div
             key={index}
-            className="bg-white p-6 rounded-lg shadow-md hover:animate-card-hover cursor-pointer transition-all duration-300 hover:shadow-lg"
+            className={`bg-white p-6 rounded-lg shadow-md cursor-pointer transition-all duration-300 hover:shadow-lg ${
+              activeIndex === index ? 'scale-110' : ''
+            }`}
           >
             <div className="text-primary mb-4">{feature.icon}</div>
             <h3 className="font-semibold text-text-primary mb-2">{feature.title}</h3>

@@ -40,9 +40,14 @@ export default {
           "0%": { transform: "translateY(0)" },
           "100%": { transform: "translateY(-5px)" },
         },
+        "card-pulse": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.05)" },
+        },
       },
       animation: {
         "card-hover": "card-hover 0.3s ease-out forwards",
+        "card-pulse": "card-pulse 2s ease-in-out infinite",
       },
     },
   },
