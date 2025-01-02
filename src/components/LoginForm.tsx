@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { AlertCircle } from "lucide-react";
 import {
@@ -74,7 +73,7 @@ const LoginForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6 text-center">
+    <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-primary mb-2">法调云</h1>
         <h2 className="text-2xl font-bold text-text-primary">欢迎使用法调云</h2>
@@ -82,9 +81,9 @@ const LoginForm = () => {
       
       <div className="space-y-4">
         <div className="flex items-center gap-4">
-          <label className="w-24 text-center text-sm font-medium text-text-primary">
+          <label className="w-24 text-left text-sm font-medium text-text-primary flex items-center">
             租户编号
-            <TooltipProvider>
+            <TooltipProvider delayDuration={0}>
               <Tooltip>
                 <TooltipTrigger>
                   <AlertCircle className="inline-block ml-1 w-4 h-4 text-primary" />
@@ -104,7 +103,7 @@ const LoginForm = () => {
         </div>
         
         <div className="flex items-center gap-4">
-          <label className="w-24 text-center text-sm font-medium text-text-primary">用户名/手机号</label>
+          <label className="w-24 text-left text-sm font-medium text-text-primary">用户名/手机号</label>
           <Input
             type="text"
             className="flex-1 rounded-full border-gray-300 focus:border-primary focus:ring-primary"
@@ -114,7 +113,7 @@ const LoginForm = () => {
         </div>
         
         <div className="flex items-center gap-4">
-          <label className="w-24 text-center text-sm font-medium text-text-primary">密码</label>
+          <label className="w-24 text-left text-sm font-medium text-text-primary">密码</label>
           <Input
             type="password"
             className="flex-1 rounded-full border-gray-300 focus:border-primary focus:ring-primary"
@@ -124,7 +123,7 @@ const LoginForm = () => {
         </div>
         
         <div className="flex items-center gap-4">
-          <label className="w-24 text-center text-sm font-medium text-text-primary">验证码</label>
+          <label className="w-24 text-left text-sm font-medium text-text-primary">验证码</label>
           <div className="flex-1 flex gap-4">
             <Input
               type="text"
