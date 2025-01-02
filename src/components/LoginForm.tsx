@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { AlertCircle } from "lucide-react";
-import { Tooltip } from "@/components/ui/tooltip";
 import {
+  Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { toast } from "sonner";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -20,16 +21,14 @@ const LoginForm = () => {
     remember: false,
   });
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.tenantId || !formData.username || !formData.password || !formData.captcha) {
-      toast({
-        title: "错误",
+      toast("错误", {
         description: "请填写完整信息",
-        variant: "destructive",
+        position: "top-center",
       });
       return;
     }
@@ -75,38 +74,37 @@ const LoginForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6">
-      <div className="text-left mb-8">
+    <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6 text-center">
+      <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-primary mb-2">法调云</h1>
-        <h2 className="text-2xl font-bold text-text-primary mb-2">欢迎使用法调云</h2>
-        <p className="text-text-secondary">为调解中心、律所、清收公司等提供金融贷后处置解智能化解决方案</p>
+        <h2 className="text-2xl font-bold text-text-primary">欢迎使用法调云</h2>
       </div>
       
       <div className="space-y-4">
         <div className="flex items-center gap-4">
-          <label className="w-24 text-left text-sm font-medium text-text-primary">租户编号</label>
-          <div className="flex-1 flex items-center gap-2">
-            <Input
-              type="text"
-              className="flex-1 rounded-full border-gray-300 focus:border-primary focus:ring-primary"
-              value={formData.tenantId}
-              onChange={(e) => setFormData({ ...formData, tenantId: e.target.value })}
-            />
+          <label className="w-24 text-center text-sm font-medium text-text-primary">
+            租户编号
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <AlertCircle className="w-5 h-5 text-primary" />
+                  <AlertCircle className="inline-block ml-1 w-4 h-4 text-primary" />
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>如忘记租户编号，请联系业务经理找回</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          </div>
+          </label>
+          <Input
+            type="text"
+            className="flex-1 rounded-full border-gray-300 focus:border-primary focus:ring-primary"
+            value={formData.tenantId}
+            onChange={(e) => setFormData({ ...formData, tenantId: e.target.value })}
+          />
         </div>
         
         <div className="flex items-center gap-4">
-          <label className="w-24 text-left text-sm font-medium text-text-primary">用户名/手机号</label>
+          <label className="w-24 text-center text-sm font-medium text-text-primary">用户名/手机号</label>
           <Input
             type="text"
             className="flex-1 rounded-full border-gray-300 focus:border-primary focus:ring-primary"
@@ -116,7 +114,7 @@ const LoginForm = () => {
         </div>
         
         <div className="flex items-center gap-4">
-          <label className="w-24 text-left text-sm font-medium text-text-primary">密码</label>
+          <label className="w-24 text-center text-sm font-medium text-text-primary">密码</label>
           <Input
             type="password"
             className="flex-1 rounded-full border-gray-300 focus:border-primary focus:ring-primary"
@@ -126,7 +124,7 @@ const LoginForm = () => {
         </div>
         
         <div className="flex items-center gap-4">
-          <label className="w-24 text-left text-sm font-medium text-text-primary">验证码</label>
+          <label className="w-24 text-center text-sm font-medium text-text-primary">验证码</label>
           <div className="flex-1 flex gap-4">
             <Input
               type="text"
