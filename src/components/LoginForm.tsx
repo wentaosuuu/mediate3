@@ -2,13 +2,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +14,7 @@ const LoginForm = () => {
   });
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +33,40 @@ const LoginForm = () => {
   const handleForgotPassword = () => {
     setShowForgotPassword(true);
   };
+
+  const handleBackToLogin = () => {
+    setShowForgotPassword(false);
+  };
+
+  if (showForgotPassword) {
+    return (
+      <div className="w-full max-w-md space-y-6">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-text-primary">找回密码</h1>
+          <p className="text-text-secondary mt-2">请联系您的业务经理</p>
+        </div>
+
+        <div className="space-y-4">
+          <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+            <div className="flex items-center gap-2 text-yellow-700">
+              <span>⚠️</span>
+              <p>为了保证您的账号安全，请联系您的业务经理重置密码。</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center gap-4">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleBackToLogin}
+            >
+              返回登录
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6">
@@ -112,29 +141,14 @@ const LoginForm = () => {
 
       <div className="text-center text-sm text-text-secondary">
         还没有账号？{" "}
-        <a href="/register" className="text-primary hover:text-primary-hover">
+        <button
+          type="button"
+          onClick={() => navigate("/register")}
+          className="text-primary hover:text-primary-hover"
+        >
           去注册一个
-        </a>
+        </button>
       </div>
-
-      <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>忘记密码</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <div className="flex items-center gap-2">
-              <span className="text-yellow-500">⚠️</span>
-              <p>请联系您的业务经理以找回密码！</p>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button onClick={() => setShowForgotPassword(false)}>
-              知道了
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </form>
   );
 };
