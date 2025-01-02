@@ -11,19 +11,32 @@ import {
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 
+/**
+ * 登录表单组件
+ * 处理用户登录流程，包括表单验证和提交
+ */
 const LoginForm = () => {
+  // 表单数据状态
   const [formData, setFormData] = useState({
-    tenantId: "",
-    username: "",
-    password: "",
-    captcha: "",
-    remember: false,
+    tenantId: "",      // 租户ID
+    username: "",      // 用户名
+    password: "",      // 密码
+    captcha: "",       // 验证码
+    remember: false,   // 记住密码
   });
+
+  // 控制忘记密码页面显示状态
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  // 路由导航hook
   const navigate = useNavigate();
 
+  /**
+   * 处理表单提交
+   * @param e 表单提交事件
+   */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // 验证必填字段
     if (!formData.tenantId || !formData.username || !formData.password || !formData.captcha) {
       toast("错误", {
         description: "请填写完整信息",
@@ -34,14 +47,21 @@ const LoginForm = () => {
     console.log("登录信息:", formData);
   };
 
+  /**
+   * 处理点击忘记密码
+   */
   const handleForgotPassword = () => {
     setShowForgotPassword(true);
   };
 
+  /**
+   * 处理返回登录页面
+   */
   const handleBackToLogin = () => {
     setShowForgotPassword(false);
   };
 
+  // 显示忘记密码页面
   if (showForgotPassword) {
     return (
       <div className="w-full max-w-md space-y-6">
@@ -72,14 +92,18 @@ const LoginForm = () => {
     );
   }
 
+  // 显示登录表单
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6 mx-auto">
+      {/* 标题 */}
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-primary mb-2">法调云</h1>
         <h2 className="text-2xl font-bold text-text-primary">欢迎使用法调云</h2>
       </div>
       
+      {/* 表单字段 */}
       <div className="space-y-4">
+        {/* 租户编号输入框 */}
         <div className="flex items-center gap-4">
           <label className="w-24 text-left text-sm font-medium text-text-primary flex items-center">
             租户编号
@@ -102,6 +126,7 @@ const LoginForm = () => {
           />
         </div>
         
+        {/* 用户名输入框 */}
         <div className="flex items-center gap-4">
           <label className="w-24 text-left text-sm font-medium text-text-primary">用户名/手机号</label>
           <Input
@@ -112,6 +137,7 @@ const LoginForm = () => {
           />
         </div>
         
+        {/* 密码输入框 */}
         <div className="flex items-center gap-4">
           <label className="w-24 text-left text-sm font-medium text-text-primary">密码</label>
           <Input
@@ -122,6 +148,7 @@ const LoginForm = () => {
           />
         </div>
         
+        {/* 验证码输入框 */}
         <div className="flex items-center gap-4">
           <label className="w-24 text-left text-sm font-medium text-text-primary">验证码</label>
           <div className="flex-1 flex gap-4">
@@ -138,6 +165,7 @@ const LoginForm = () => {
         </div>
       </div>
 
+      {/* 记住密码和忘记密码 */}
       <div className="flex items-center justify-between text-sm mt-4">
         <label className="flex items-center space-x-2">
           <input
@@ -157,10 +185,12 @@ const LoginForm = () => {
         </button>
       </div>
 
+      {/* 登录按钮 */}
       <Button type="submit" className="w-full mt-6 rounded-full bg-primary hover:bg-primary-hover">
         登录
       </Button>
 
+      {/* 注册链接 */}
       <div className="text-center text-sm text-text-secondary mt-4">
         还没有账号？{" "}
         <button

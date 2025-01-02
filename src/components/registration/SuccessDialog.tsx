@@ -9,15 +9,25 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 
+/**
+ * 注册成功对话框组件的属性接口
+ */
 interface SuccessDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  tenantId: string;
+  open: boolean;                          // 对话框是否打开
+  onOpenChange: (open: boolean) => void;  // 对话框状态变更处理函数
+  tenantId: string;                       // 租户ID
 }
 
+/**
+ * 注册成功对话框组件
+ * 显示注册成功信息和租户ID
+ */
 export const SuccessDialog = ({ open, onOpenChange, tenantId }: SuccessDialogProps) => {
   const { toast } = useToast();
 
+  /**
+   * 复制租户ID到剪贴板
+   */
   const copyTenantId = () => {
     navigator.clipboard.writeText(tenantId);
     toast({
@@ -34,6 +44,7 @@ export const SuccessDialog = ({ open, onOpenChange, tenantId }: SuccessDialogPro
         </DialogHeader>
         <div className="py-4">
           <p className="mb-4">您的租户号是：</p>
+          {/* 租户ID显示和复制按钮 */}
           <div className="flex items-center gap-2 p-2 bg-muted rounded">
             <span className="font-mono">{tenantId}</span>
             <Button variant="outline" size="icon" onClick={copyTenantId}>

@@ -1,14 +1,22 @@
 import { Input } from "@/components/ui/input";
 import { RegistrationFormData } from "@/types/registration";
 
+/**
+ * 注册表单字段组件的属性接口
+ */
 interface RegistrationFieldsProps {
-  formData: RegistrationFormData;
-  onChange: (field: keyof RegistrationFormData, value: string) => void;
+  formData: RegistrationFormData;  // 表单数据
+  onChange: (field: keyof RegistrationFormData, value: string) => void;  // 字段变更处理函数
 }
 
+/**
+ * 注册表单字段组件
+ * 包含所有注册所需的输入字段
+ */
 export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsProps) => {
   return (
     <div className="space-y-4">
+      {/* 联系人输入框 */}
       <div>
         <Input
           type="text"
@@ -18,6 +26,7 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
+      {/* 联系电话输入框 */}
       <div>
         <Input
           type="tel"
@@ -27,6 +36,7 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
+      {/* 企业名称输入框 */}
       <div>
         <Input
           type="text"
@@ -36,6 +46,7 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
+      {/* 邀请码输入框 */}
       <div>
         <Input
           type="text"
@@ -45,6 +56,7 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
+      {/* 用户名输入框 */}
       <div>
         <Input
           type="text"
@@ -54,6 +66,7 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
+      {/* 密码输入框 */}
       <div>
         <Input
           type="password"
@@ -63,6 +76,7 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
+      {/* 确认密码输入框 */}
       <div>
         <Input
           type="password"
@@ -72,6 +86,7 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
+      {/* 统一社会信用代码输入框 */}
       <div>
         <Input
           type="text"
@@ -81,6 +96,7 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
+      {/* 地址输入框（选填） */}
       <div>
         <Input
           type="text"
@@ -90,6 +106,7 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
+      {/* 公司简介输入框（选填） */}
       <div>
         <Input
           type="text"
@@ -99,6 +116,7 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
+      {/* 备注输入框（选填） */}
       <div>
         <Input
           type="text"
@@ -108,6 +126,7 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
+      {/* 企业邮箱输入框（选填） */}
       <div>
         <Input
           type="email"
