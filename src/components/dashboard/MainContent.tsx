@@ -3,6 +3,7 @@ import { Home } from 'lucide-react';
 import NotFound from '@/components/NotFound';
 import { PageTabs } from './PageTabs';
 import { useNavigate } from 'react-router-dom';
+import { menuItems } from '@/config/menuItems';
 
 interface Tab {
   path: string;
@@ -16,20 +17,24 @@ interface MainContentProps {
 }
 
 const getTabLabel = (path: string): string => {
-  switch (path) {
-    case '/dashboard':
-      return '首页';
-    case '/mediation/case-info':
-      return '案件公示信息';
-    case '/mediation/case-info-manage':
-      return '案件公示信息管理';
-    case '/account/manage':
-      return '账户管理';
-    case '/global':
-      return '全局管理';
-    default:
-      return '未知页面';
-  }
+  // 递归查找菜单项
+  const findMenuLabel = (items: any[]): string | null => {
+    for (const item of items) {
+      if (item.path === path) {
+        return item.label;
+      }
+      if (item.children) {
+        const label = findMenuLabel(item.children);
+        if (label) return label;
+      }
+    }
+    return null;
+  };
+
+  if (path === '/dashboard') return '首页';
+  
+  const label = findMenuLabel(menuItems);
+  return label || '未知页面';
 };
 
 export const MainContent = ({ username, currentPath }: MainContentProps) => {
@@ -54,7 +59,6 @@ export const MainContent = ({ username, currentPath }: MainContentProps) => {
   const handleTabClose = (path: string) => {
     setTabs(prev => {
       const newTabs = prev.filter(tab => tab.path !== path);
-      // If we're closing the current tab, navigate to the last remaining tab
       if (path === currentPath) {
         const lastTab = newTabs[newTabs.length - 1];
         navigate(lastTab.path);
