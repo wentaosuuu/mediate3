@@ -93,18 +93,18 @@ export const MainContent = ({ username, currentPath }: MainContentProps) => {
   };
 
   return (
-    <main className="flex-1 flex flex-col bg-gray-50">
+    <div className="flex-1 flex flex-col bg-gray-50">
       <PageTabs
         tabs={tabs}
         currentPath={currentPath}
         onClose={handleTabClose}
         onTabClick={handleTabClick}
       />
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-6 overflow-auto">
         <div className="max-w-7xl mx-auto">
           {renderContent()}
         </div>
       </div>
-    </main>
+    </div>
   );
 };
