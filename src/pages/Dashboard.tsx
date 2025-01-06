@@ -27,18 +27,23 @@ import {
   Activity,
   TestTube2,
   UserRound,
-  GitFlow,
+  Network,
   ClipboardList,
   Settings,
   Search,
   LogOut,
   ChevronDown,
+  Home,
+  MessageSquare,
+  Star,
+  Briefcase,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const menuItems = [
+  { icon: Home, label: "首页", path: "/dashboard" },
   { icon: FileText, label: "案件管理", path: "/cases" },
-  { icon: Users, label: "调解管理", path: "/mediation" },
+  { icon: MessageSquare, label: "调解管理", path: "/mediation" },
   { icon: BarChart2, label: "仪表盘", path: "/stats" },
   { icon: Bell, label: "通知中心", path: "/notifications" },
   { icon: BookOpen, label: "调解记录", path: "/records" },
@@ -46,7 +51,9 @@ const menuItems = [
   { icon: Activity, label: "系统监控", path: "/monitoring" },
   { icon: TestTube2, label: "测试菜单", path: "/test" },
   { icon: UserRound, label: "账户中心", path: "/account" },
-  { icon: GitFlow, label: "工作流", path: "/workflow" },
+  { icon: Network, label: "工作流", path: "/workflow" },
+  { icon: Star, label: "流程草单", path: "/drafts" },
+  { icon: Briefcase, label: "PLUS专区", path: "/plus" },
   { icon: ClipboardList, label: "我的任务", path: "/tasks" },
   { icon: Settings, label: "系统管理", path: "/settings" },
 ];
@@ -98,23 +105,23 @@ const Dashboard = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-white">
+      <div className="flex min-h-screen w-full bg-gray-100">
         <Sidebar className="border-r border-gray-200">
-          <SidebarHeader className="p-4 border-b border-gray-200">
+          <SidebarHeader className="p-4 border-b border-gray-200 bg-nav">
             <img
               src="/lovable-uploads/345b6c78-cf53-428b-8148-2d5243378f46.png"
               alt="Logo"
               className="h-8"
             />
           </SidebarHeader>
-          <SidebarContent className="py-2">
+          <SidebarContent className="py-2 bg-nav">
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton asChild>
                     <a 
                       href={item.path} 
-                      className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg mx-2"
+                      className="flex items-center gap-3 px-3 py-2 text-gray-300 hover:bg-nav-hover hover:text-white rounded-lg mx-2 transition-colors"
                     >
                       <item.icon className="h-5 w-5" />
                       <span className="text-sm">{item.label}</span>
@@ -128,7 +135,7 @@ const Dashboard = () => {
 
         <div className="flex-1 flex flex-col">
           {/* Top toolbar */}
-          <header className="h-16 border-b border-gray-200 bg-white px-6 flex items-center justify-between">
+          <header className="h-16 border-b border-gray-200 bg-white px-6 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-4 flex-1 max-w-xl">
               <Search className="h-5 w-5 text-gray-400" />
               <Input
@@ -148,7 +155,7 @@ const Dashboard = () => {
               
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-lg">
-                  <div className="h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm">
+                  <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center text-white text-sm">
                     {username?.[0]?.toUpperCase() || 'U'}
                   </div>
                   <span className="text-sm text-gray-700">{username || '用户'}</span>
@@ -171,10 +178,13 @@ const Dashboard = () => {
           {/* Main content */}
           <main className="flex-1 p-6 bg-gray-50">
             <div className="max-w-7xl mx-auto">
-              <h1 className="text-2xl font-semibold text-gray-900 mb-6">
-                欢迎回来, {username || '用户'}
-              </h1>
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <Home className="h-6 w-6 text-primary" />
+                <h1 className="text-2xl font-semibold text-gray-900">
+                  欢迎回来, {username || '用户'}
+                </h1>
+              </div>
+              <div className="bg-white rounded-lg shadow-sm p-6">
                 <p className="text-gray-600">
                   选择左侧菜单以开始使用系统功能。
                 </p>
