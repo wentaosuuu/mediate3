@@ -41,7 +41,7 @@ export const useLoginForm = () => {
     }
 
     try {
-      // 1. First check if the tenant registration exists
+      // 1. First check if the tenant registration exists and get the email
       const { data: registrationData, error: registrationError } = await supabase
         .from("tenant_registrations")
         .select("business_email")
@@ -61,12 +61,6 @@ export const useLoginForm = () => {
         return;
       }
 
-      console.log("Found registration data:", {
-        email: registrationData.business_email,
-        username: formData.username,
-        tenantId: formData.tenantId
-      });
-
       // 2. Try to sign in with email and password
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: registrationData.business_email,
@@ -74,20 +68,41 @@ export const useLoginForm = () => {
       });
 
       if (signInError) {
-        console.error("Login error details:", signInError);
+        console.error("Sign in error:", signInError);
         
-        // More specific error messages based on the error type
-        if (signInError.message.includes("Invalid login credentials")) {
-          toast.error("密码错误，请重试");
-        } else {
-          toast.error("登录失败: " + signInError.message);
+        // Check if the user exists in Supabase Auth
+        const { data: userExists } = await supabase.auth.admin.getUserByEmail(registrationData.business_email);
+        
+        if (!userExists) {
+          console.error("User does not exist in Supabase Auth");
+          toast.error("账户未激活，请联系管理员");
+          return;
         }
+
+        toast.error("密码错误，请重试");
         return;
       }
 
       if (!signInData.user) {
         toast.error("登录失败，未能获取用户信息");
         return;
+      }
+
+      // 3. After successful login, check if we need to create/update the users record
+      const { error: userError } = await supabase
+        .from("users")
+        .upsert({
+          id: signInData.user.id,
+          tenant_id: formData.tenantId,
+          username: formData.username,
+          email: registrationData.business_email,
+        }, {
+          onConflict: 'id'
+        });
+
+      if (userError) {
+        console.error("Error updating user record:", userError);
+        // Don't block login if this fails
       }
 
       toast.success("登录成功");
