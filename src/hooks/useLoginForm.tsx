@@ -60,10 +60,9 @@ export const useLoginForm = () => {
     try {
       const cleanUsername = formData.username.toLowerCase().trim();
       const cleanTenantId = formData.tenantId.toLowerCase().trim();
-      const email = `${cleanUsername}.${cleanTenantId}@tenant.com`;
-
+      
       // 先检查租户是否存在
-      const { data: tenantExists, error: tenantError } = await supabase
+      let { data: tenantExists, error: tenantError } = await supabase
         .from('tenant_registrations')
         .select('tenant_id')
         .eq('tenant_id', cleanTenantId)
@@ -81,7 +80,7 @@ export const useLoginForm = () => {
       }
 
       // 检查用户是否存在于该租户下
-      const { data: userExists, error: userError } = await supabase
+      let { data: userExists, error: userError } = await supabase
         .from('users')
         .select('username')
         .eq('tenant_id', cleanTenantId)
@@ -99,6 +98,9 @@ export const useLoginForm = () => {
         return;
       }
 
+      // 构造登录邮箱
+      const email = `${cleanUsername}.${cleanTenantId}@tenant.com`;
+
       // 尝试登录
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
@@ -107,7 +109,11 @@ export const useLoginForm = () => {
 
       if (signInError) {
         console.error('登录错误:', signInError);
-        toast.error("密码错误", { position: "top-center" });
+        if (signInError.message.includes("Invalid login credentials")) {
+          toast.error("密码错误", { position: "top-center" });
+        } else {
+          toast.error("登录失败，请稍后重试", { position: "top-center" });
+        }
         return;
       }
 
