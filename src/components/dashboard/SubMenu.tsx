@@ -31,7 +31,7 @@ export const SubMenu = ({ isExpanded, children, currentPath, onMenuClick }: SubM
               isActive={currentPath === child.path}
               onClick={() => onMenuClick(child.path)}
               className={`
-                pl-14 pr-4 py-3.5 transition-all duration-300 linear text-sm
+                pl-14 pr-8 py-3.5 transition-all duration-300 linear text-sm w-[calc(100%-16px)] mx-2
                 ${currentPath === child.path
                   ? 'text-primary bg-nav-active'
                   : 'text-gray-300 hover:text-white hover:bg-nav-hover'
