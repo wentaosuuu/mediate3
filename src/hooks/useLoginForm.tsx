@@ -89,18 +89,6 @@ export const useLoginForm = () => {
         return;
       }
 
-      // Check if auth user exists
-      const { data: authData, error: authError } = await supabase.auth.admin.listUsers({
-        filters: {
-          email: email
-        }
-      });
-
-      if (authError || !authData?.users?.length) {
-        toast.error("用户未完成注册，请联系管理员", { position: "top-center" });
-        return;
-      }
-
       // Attempt to sign in
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
