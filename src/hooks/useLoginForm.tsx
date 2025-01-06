@@ -41,23 +41,23 @@ export const useLoginForm = () => {
     }
 
     try {
-      // 1. First get the user record to find their email
-      const { data: userData, error: userError } = await supabase
-        .from("users")
-        .select("email")
+      // 1. First check if the tenant registration exists
+      const { data: registrationData, error: registrationError } = await supabase
+        .from("tenant_registrations")
+        .select("business_email")
         .eq("tenant_id", formData.tenantId)
         .eq("username", formData.username)
         .single();
 
-      if (userError || !userData?.email) {
-        console.error("User fetch error:", userError);
+      if (registrationError || !registrationData) {
+        console.error("Registration check error:", registrationError);
         toast.error("用户名或租户编号不正确");
         return;
       }
 
       // 2. Try to sign in with email and password
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: userData.email,
+        email: registrationData.business_email,
         password: formData.password,
       });
 
