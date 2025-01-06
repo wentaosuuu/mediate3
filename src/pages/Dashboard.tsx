@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { MainContent } from '@/components/dashboard/MainContent';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,26 +31,28 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-100">
-      <Navigation
-        currentPath={location.pathname}
-        onMenuClick={handleMenuClick}
-      />
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        <TopBar
-          username={mockUser.username}
-          department={mockUser.department}
-          role={mockUser.role}
-          onLogout={handleLogout}
-          onSearch={handleSearch}
-          searchQuery={searchQuery}
-        />
-        <MainContent
-          username={mockUser.username}
+    <SidebarProvider>
+      <div className="flex h-screen overflow-hidden bg-gray-100">
+        <Navigation
           currentPath={location.pathname}
+          onMenuClick={handleMenuClick}
         />
+        <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+          <TopBar
+            username={mockUser.username}
+            department={mockUser.department}
+            role={mockUser.role}
+            onLogout={handleLogout}
+            onSearch={handleSearch}
+            searchQuery={searchQuery}
+          />
+          <MainContent
+            username={mockUser.username}
+            currentPath={location.pathname}
+          />
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
