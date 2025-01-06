@@ -48,7 +48,7 @@ export const useLoginForm = () => {
         .from("tenant_registrations")
         .select("tenant_id")
         .eq("tenant_id", formData.tenantId)
-        .maybeSingle();
+        .single();
 
       if (tenantError || !tenantData) {
         toast.error("租户编号不存在", {
@@ -63,17 +63,10 @@ export const useLoginForm = () => {
         .select("*")
         .eq("tenant_id", formData.tenantId)
         .eq("username", formData.username)
-        .maybeSingle();
+        .single();
 
-      if (userError) {
+      if (userError || !userData) {
         console.error("User fetch error:", userError);
-        toast.error("获取用户信息失败", {
-          position: "top-center",
-        });
-        return;
-      }
-
-      if (!userData) {
         toast.error("用户名不存在", {
           position: "top-center",
         });
@@ -88,7 +81,7 @@ export const useLoginForm = () => {
 
       if (signInError) {
         console.error("Login error:", signInError);
-        toast.error("用户名或密码错误", {
+        toast.error("密码错误", {
           position: "top-center",
         });
         return;
@@ -97,6 +90,8 @@ export const useLoginForm = () => {
       toast.success("登录成功", {
         position: "top-center",
       });
+      
+      // 登录成功后导航到首页
       navigate("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
