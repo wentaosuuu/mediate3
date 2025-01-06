@@ -1,5 +1,12 @@
 import { Input } from "@/components/ui/input";
 import { VerificationCode } from "./VerificationCode";
+import { AlertCircle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface LoginFieldsProps {
   formData: {
@@ -25,12 +32,24 @@ export const LoginFields = ({
         <label className="w-24 text-left text-sm font-medium text-text-primary">
           租户编号
         </label>
-        <Input
-          type="text"
-          className="flex-1 rounded-full border-gray-300 focus:border-primary focus:ring-primary"
-          value={formData.tenantId}
-          onChange={(e) => onChange("tenantId", e.target.value)}
-        />
+        <div className="flex-1 flex items-center">
+          <Input
+            type="text"
+            className="flex-1 rounded-full border-gray-300 focus:border-primary focus:ring-primary"
+            value={formData.tenantId}
+            onChange={(e) => onChange("tenantId", e.target.value)}
+          />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <AlertCircle className="h-4 w-4 ml-2 text-gray-400" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>如忘记租户编号，请联系业务经理找回</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </div>
 
       <div className="flex items-center gap-4">

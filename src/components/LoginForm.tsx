@@ -1,13 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { AlertCircle } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { LoginHeader } from "./login/LoginHeader";
@@ -45,13 +38,17 @@ const LoginForm = () => {
 
     // Validate required fields
     if (!formData.tenantId || !formData.username || !formData.password || !formData.captcha) {
-      toast.error("请填写完整信息");
+      toast.error("请填写完整信息", {
+        position: "top-center",
+      });
       return;
     }
 
     // Validate verification code
     if (formData.captcha !== verificationCode) {
-      toast.error("验证码错误");
+      toast.error("验证码错误", {
+        position: "top-center",
+      });
       return;
     }
 
@@ -64,7 +61,9 @@ const LoginForm = () => {
         .single();
 
       if (tenantError || !tenantData) {
-        toast.error("租户编号不存在");
+        toast.error("租户编号不存在", {
+          position: "top-center",
+        });
         return;
       }
 
@@ -75,16 +74,22 @@ const LoginForm = () => {
       });
 
       if (error) {
-        toast.error("用户名或密码错误");
+        toast.error("用户名或密码错误", {
+          position: "top-center",
+        });
         return;
       }
 
       // Login successful
-      toast.success("登录成功");
+      toast.success("登录成功", {
+        position: "top-center",
+      });
       navigate("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("登录失败，请稍后重试");
+      toast.error("登录失败，请稍后重试", {
+        position: "top-center",
+      });
     }
   };
 
