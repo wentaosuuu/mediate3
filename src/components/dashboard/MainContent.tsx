@@ -87,8 +87,6 @@ export const MainContent = ({ username, currentPath }: MainContentProps) => {
       );
     }
 
-    // 这里可以根据不同的路径返回不同的组件
-    // 暂时返回 NotFound，后续可以根据需求添加实际的页面组件
     return <NotFound />;
   };
 
@@ -101,7 +99,7 @@ export const MainContent = ({ username, currentPath }: MainContentProps) => {
         onTabClick={handleTabClick}
       />
       <div className="flex-1 p-6 overflow-auto">
-        <div className="max-w-7xl mx-auto">
+        <div className="h-full">
           {renderContent()}
         </div>
       </div>
