@@ -32,12 +32,12 @@ const Dashboard = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen overflow-hidden bg-gray-100">
+      <div className="flex w-full h-screen bg-gray-100">
         <Navigation
           currentPath={location.pathname}
           onMenuClick={handleMenuClick}
         />
-        <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+        <div className="flex flex-col flex-1 min-w-0">
           <TopBar
             username={mockUser.username}
             department={mockUser.department}

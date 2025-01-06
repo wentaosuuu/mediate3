@@ -85,15 +85,11 @@ export const MainContent = ({ username, currentPath }: MainContentProps) => {
       );
     }
 
-    return (
-      <div className="flex items-center justify-center h-full">
-        <NotFound />
-      </div>
-    );
+    return <NotFound />;
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-50 overflow-hidden">
+    <div className="flex-1 flex flex-col bg-gray-50">
       <PageTabs
         tabs={tabs}
         currentPath={currentPath}
@@ -101,9 +97,7 @@ export const MainContent = ({ username, currentPath }: MainContentProps) => {
         onTabClick={handleTabClick}
       />
       <div className="flex-1 p-6 overflow-auto">
-        <div className="h-full">
-          {renderContent()}
-        </div>
+        {renderContent()}
       </div>
     </div>
   );
