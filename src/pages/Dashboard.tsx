@@ -9,10 +9,14 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Logo } from "@/components/dashboard/Logo";
 import { Input } from "@/components/ui/input";
+import NotFound from "@/components/NotFound";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,27 +24,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  FileText,
-  Users,
-  BarChart2,
   Bell,
-  BookOpen,
-  UserCog,
-  Activity,
-  TestTube2,
-  UserRound,
-  Network,
-  ClipboardList,
-  Settings,
-  Search,
-  LogOut,
   ChevronDown,
-  Home,
-  MessageSquare,
-  Star,
-  Briefcase,
   ChevronRight,
+  Home,
   LayoutDashboard,
+  LogOut,
+  Search,
+  UserRound,
+  FileText,
+  MessageSquare,
+  BarChart2,
+  MessageCircle,
+  PhoneCall,
+  BookOpen,
+  LineChart,
+  Building2,
+  UserCircle,
+  Settings,
+  Globe,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -49,26 +51,122 @@ const menuItems = [
   { 
     icon: Home, 
     label: "首页", 
-    path: "/dashboard",
+    path: "/dashboard"
+  },
+  { 
+    icon: FileText, 
+    label: "案件管理", 
+    path: "/case",
     children: [
-      { label: "工作台", path: "/dashboard/workspace" },
-      { label: "分析页", path: "/dashboard/analysis" },
+      { label: "分案管理", path: "/case/distribution" }
     ]
   },
-  { icon: FileText, label: "案件管理", path: "/cases" },
-  { icon: MessageSquare, label: "调解管理", path: "/mediation" },
-  { icon: BarChart2, label: "仪表盘", path: "/stats" },
-  { icon: Bell, label: "通知中心", path: "/notifications" },
-  { icon: BookOpen, label: "调解记录", path: "/records" },
-  { icon: UserCog, label: "超用户管理", path: "/super-admin" },
-  { icon: Activity, label: "系统监控", path: "/monitoring" },
-  { icon: TestTube2, label: "测试菜单", path: "/test" },
-  { icon: UserRound, label: "账户中心", path: "/account" },
-  { icon: Network, label: "工作流", path: "/workflow" },
-  { icon: Star, label: "流程草单", path: "/drafts" },
-  { icon: Briefcase, label: "PLUS专区", path: "/plus" },
-  { icon: ClipboardList, label: "我的任务", path: "/tasks" },
-  { icon: Settings, label: "系统管理", path: "/settings" },
+  { 
+    icon: MessageSquare, 
+    label: "调解管理", 
+    path: "/mediation",
+    children: [
+      { label: "调解中心", path: "/mediation/center" },
+      { label: "债务人管理", path: "/mediation/debtor" },
+      { label: "案件公示信息", path: "/mediation/case-info" },
+      { label: "案件公示信息管理", path: "/mediation/case-info-manage" }
+    ]
+  },
+  { 
+    icon: BarChart2, 
+    label: "仪表盘", 
+    path: "/dashboard-stats",
+    children: [
+      { label: "短信数据看板", path: "/dashboard-stats/sms" },
+      { label: "通信数据看板", path: "/dashboard-stats/communication" }
+    ]
+  },
+  { 
+    icon: MessageCircle, 
+    label: "短信管理", 
+    path: "/sms",
+    children: [
+      { label: "短信类型配置", path: "/sms/type-config" },
+      { label: "短信模板配置", path: "/sms/template-config" }
+    ]
+  },
+  { 
+    icon: PhoneCall, 
+    label: "呼叫中心", 
+    path: "/call-center",
+    children: [
+      { label: "主叫管理", path: "/call-center/caller" },
+      { label: "坐席管理", path: "/call-center/seat" },
+      { label: "工号坐席管理", path: "/call-center/work-number-seat" },
+      { label: "工号管理", path: "/call-center/work-number" },
+      { label: "信修虚拟号管理", path: "/call-center/virtual-number" },
+      { label: "信修坐席管理", path: "/call-center/credit-seat" }
+    ]
+  },
+  { 
+    icon: BookOpen, 
+    label: "调解记录", 
+    path: "/mediation-records",
+    children: [
+      { label: "修复批次", path: "/mediation-records/repair-batch" },
+      { label: "信修通话记录", path: "/mediation-records/credit-call" },
+      { label: "修复记录", path: "/mediation-records/repair" },
+      { label: "通话记录", path: "/mediation-records/call" },
+      { label: "短信批次", path: "/mediation-records/sms-batch" },
+      { label: "短信记录", path: "/mediation-records/sms" }
+    ]
+  },
+  { 
+    icon: LineChart, 
+    label: "运营中心", 
+    path: "/operation",
+    children: [
+      { label: "隐私设置", path: "/operation/privacy" },
+      { label: "短信触达批次", path: "/operation/sms-reach" }
+    ]
+  },
+  { 
+    icon: Building2, 
+    label: "租户管理", 
+    path: "/tenant",
+    children: [
+      { label: "租户管理", path: "/tenant/manage" },
+      { label: "租户套餐管理", path: "/tenant/package" }
+    ]
+  },
+  { 
+    icon: UserCircle, 
+    label: "账户中心", 
+    path: "/account",
+    children: [
+      { label: "账户管理", path: "/account/manage" },
+      { label: "账户消费总表", path: "/account/consumption" },
+      { label: "充值记录", path: "/account/recharge" }
+    ]
+  },
+  { 
+    icon: Settings, 
+    label: "系统管理", 
+    path: "/system",
+    children: [
+      { label: "用户管理", path: "/system/users" },
+      { label: "角色管理", path: "/system/roles" },
+      { label: "菜单管理", path: "/system/menus" },
+      { label: "部门管理", path: "/system/departments" },
+      { label: "岗位管理", path: "/system/positions" },
+      { label: "字典管理", path: "/system/dictionaries" },
+      { label: "参数设置", path: "/system/parameters" },
+      { label: "通知公告", path: "/system/notifications" },
+      { label: "日志管理", path: "/system/logs" },
+      { label: "文件管理", path: "/system/files" },
+      { label: "客户端管理", path: "/system/clients" }
+    ]
+  },
+  { 
+    icon: Globe, 
+    label: "全局管理", 
+    path: "/global"
+  }
 ];
 
 const Dashboard = () => {
@@ -76,8 +174,9 @@ const Dashboard = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [username, setUsername] = useState<string | null>(null);
-  const [department, setDepartment] = useState("技术部"); // 临时部门数据
-  const [role, setRole] = useState("系统管理员"); // 临时角色数据
+  const [department, setDepartment] = useState("技术部");
+  const [role, setRole] = useState("系统管理员");
+  const [currentPath, setCurrentPath] = useState("/dashboard");
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -87,7 +186,6 @@ const Dashboard = () => {
         return;
       }
 
-      // Fetch user data
       const { data: userData } = await supabase
         .from('users')
         .select('username')
@@ -118,6 +216,11 @@ const Dashboard = () => {
     }
   };
 
+  const handleMenuClick = (path: string) => {
+    setCurrentPath(path);
+    // 这里可以添加实际的路由导航逻辑
+  };
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-gray-100">
@@ -129,11 +232,12 @@ const Dashboard = () => {
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.label}>
-                  <SidebarMenuButton asChild>
-                    <a 
-                      href={item.path} 
-                      className="flex items-center justify-between px-3 py-2 text-gray-300 hover:bg-nav-hover hover:text-white rounded-lg mx-2 transition-colors group"
-                    >
+                  <SidebarMenuButton
+                    asChild
+                    isActive={currentPath === item.path}
+                    onClick={() => handleMenuClick(item.path)}
+                  >
+                    <div className="flex items-center justify-between px-3 py-2 text-gray-300 hover:bg-nav-hover hover:text-white rounded-lg mx-2 transition-colors group cursor-pointer">
                       <div className="flex items-center gap-3">
                         <item.icon className="h-5 w-5" />
                         <span className="text-sm">{item.label}</span>
@@ -141,20 +245,21 @@ const Dashboard = () => {
                       {item.children && (
                         <ChevronRight className="h-4 w-4 transition-transform group-hover:rotate-90" />
                       )}
-                    </a>
+                    </div>
                   </SidebarMenuButton>
                   {item.children && (
-                    <div className="ml-11 mt-1 space-y-1">
+                    <SidebarMenuSub>
                       {item.children.map((child) => (
-                        <a
-                          key={child.label}
-                          href={child.path}
-                          className="block px-3 py-1 text-sm text-gray-400 hover:text-white hover:bg-nav-hover rounded-lg transition-colors"
-                        >
-                          {child.label}
-                        </a>
+                        <SidebarMenuSubItem key={child.path}>
+                          <SidebarMenuSubButton
+                            isActive={currentPath === child.path}
+                            onClick={() => handleMenuClick(child.path)}
+                          >
+                            {child.label}
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
                       ))}
-                    </div>
+                    </SidebarMenuSub>
                   )}
                 </SidebarMenuItem>
               ))}
@@ -199,11 +304,11 @@ const Dashboard = () => {
                   <ChevronDown className="h-4 w-4 text-gray-500" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => navigate('/account/profile')}>
+                  <DropdownMenuItem onClick={() => handleMenuClick('/account/profile')}>
                     <UserRound className="h-4 w-4 mr-2" />
                     个人中心
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/account/settings')}>
+                  <DropdownMenuItem onClick={() => handleMenuClick('/account/layout')}>
                     <LayoutDashboard className="h-4 w-4 mr-2" />
                     布局设置
                   </DropdownMenuItem>
@@ -219,17 +324,16 @@ const Dashboard = () => {
           {/* Main content */}
           <main className="flex-1 p-6 bg-gray-50">
             <div className="max-w-7xl mx-auto">
-              <div className="flex items-center gap-2 mb-6">
-                <Home className="h-6 w-6 text-primary" />
-                <h1 className="text-2xl font-semibold text-gray-900">
-                  欢迎回来, {username || '用户'}
-                </h1>
-              </div>
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <p className="text-gray-600">
-                  选择左侧菜单以开始使用系统功能。
-                </p>
-              </div>
+              {currentPath === '/dashboard' ? (
+                <div className="flex items-center gap-2 mb-6">
+                  <Home className="h-6 w-6 text-primary" />
+                  <h1 className="text-2xl font-semibold text-gray-900">
+                    欢迎回来, {username || '用户'}
+                  </h1>
+                </div>
+              ) : (
+                <NotFound />
+              )}
             </div>
           </main>
         </div>
