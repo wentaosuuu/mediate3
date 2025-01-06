@@ -55,15 +55,12 @@ export const useLoginForm = () => {
         return;
       }
 
-      if (!registrationData.business_email) {
-        console.error("No business email found for user");
-        toast.error("账户邮箱未设置，请联系管理员");
-        return;
-      }
+      // Generate default email if business_email is not set
+      const email = registrationData.business_email || `${formData.username}@${formData.tenantId}.com`;
 
       // 2. Try to sign in with email and password
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: registrationData.business_email,
+        email,
         password: formData.password,
       });
 
@@ -85,7 +82,7 @@ export const useLoginForm = () => {
           id: signInData.user.id,
           tenant_id: formData.tenantId,
           username: formData.username,
-          email: registrationData.business_email,
+          email,
         }, {
           onConflict: 'id'
         });
