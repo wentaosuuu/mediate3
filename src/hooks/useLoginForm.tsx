@@ -55,7 +55,7 @@ export const useLoginForm = () => {
         return;
       }
 
-      console.log("Attempting login with:", {
+      console.log("Found registration data:", {
         email: registrationData.business_email,
         username: formData.username,
         tenantId: formData.tenantId
@@ -68,7 +68,7 @@ export const useLoginForm = () => {
       });
 
       if (signInError) {
-        console.error("Login error:", signInError);
+        console.error("Login error details:", signInError);
         toast.error("密码错误");
         return;
       }
@@ -77,7 +77,7 @@ export const useLoginForm = () => {
       navigate("/dashboard");
       
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Login attempt failed:", error);
       toast.error("登录失败，请稍后重试");
     }
   };
