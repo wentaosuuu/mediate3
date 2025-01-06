@@ -16,17 +16,22 @@ export const useRegistrationSubmit = () => {
         .from('tenant_registrations')
         .select('username')
         .eq('username', username)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('Username check error:', error);
-        return true;
+        throw error;
       }
 
       return data !== null;
     } catch (error) {
       console.error('Username check error:', error);
-      return true;
+      toast({
+        title: "检查用户名时出错",
+        description: "请稍后重试",
+        variant: "destructive",
+      });
+      throw error;
     }
   };
 
@@ -47,13 +52,18 @@ export const useRegistrationSubmit = () => {
       }
 
       // 检查用户名是否已存在
-      const usernameExists = await checkUsernameExists(formData.username);
-      if (usernameExists) {
-        toast({
-          title: "用户名已存在",
-          description: "该用户名已被使用，请选择其他用户名",
-          variant: "destructive",
-        });
+      try {
+        const usernameExists = await checkUsernameExists(formData.username);
+        if (usernameExists) {
+          toast({
+            title: "用户名已存在",
+            description: "该用户名已被使用，请选择其他用户名",
+            variant: "destructive",
+          });
+          return;
+        }
+      } catch (error) {
+        // 用户名检查出错时直接返回，不继续注册流程
         return;
       }
 
