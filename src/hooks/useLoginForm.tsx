@@ -66,22 +66,7 @@ export const useLoginForm = () => {
 
       if (signInError) {
         console.error("Sign in error:", signInError);
-        
-        // Handle specific error cases
-        if (signInError.message.includes("Email not confirmed")) {
-          toast.error("邮箱未验证。请检查您的邮箱并点击验证链接，或联系管理员禁用邮箱验证。", {
-            duration: 6000,
-          });
-          return;
-        }
-        
-        if (signInError.message.includes("Invalid login credentials")) {
-          toast.error("密码错误，请重试");
-          return;
-        }
-        
-        // Generic error handling
-        toast.error("登录失败，请稍后重试");
+        toast.error("密码错误，请重试");
         return;
       }
 
@@ -104,7 +89,6 @@ export const useLoginForm = () => {
 
       if (userError) {
         console.error("Error updating user record:", userError);
-        // Don't block login if this fails
       }
 
       toast.success("登录成功");
@@ -112,7 +96,7 @@ export const useLoginForm = () => {
       
     } catch (error) {
       console.error("Login attempt failed:", error);
-      toast.error("登录失败，请稍后重试");
+      toast.error("登录失败，请重试");
     }
   };
 
