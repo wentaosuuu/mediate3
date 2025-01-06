@@ -164,8 +164,14 @@ interface NavigationProps {
 export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
 
-  const toggleMenu = (path: string) => {
-    setExpandedMenu(prev => prev === path ? null : path);
+  const handleMenuClick = (item: MenuItem) => {
+    if (item.children) {
+      // 如果有子菜单，只切换展开状态
+      setExpandedMenu(prev => prev === item.path ? null : item.path);
+    } else {
+      // 如果是叶子节点，才进行页面跳转
+      onMenuClick(item.path);
+    }
   };
 
   return (
@@ -180,12 +186,7 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
               <SidebarMenuButton
                 asChild
                 isActive={currentPath === item.path}
-                onClick={() => {
-                  onMenuClick(item.path);
-                  if (item.children) {
-                    toggleMenu(item.path);
-                  }
-                }}
+                onClick={() => handleMenuClick(item)}
               >
                 <div className={`
                   flex items-center justify-between px-4 py-3.5 mx-2 rounded-lg 
