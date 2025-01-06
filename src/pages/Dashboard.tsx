@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -10,62 +10,95 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
+import { Input } from "@/components/ui/input";
 import {
-  Home,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   FileText,
-  Phone,
-  MessageSquare,
-  Bell,
   Users,
-  Settings,
   BarChart2,
+  Bell,
   BookOpen,
-  Building2,
-  LogOut,
-  Cog,
+  UserCog,
+  Activity,
+  TestTube2,
   UserRound,
-  Building,
-  ArrowRight,
+  GitFlow,
+  ClipboardList,
+  Settings,
+  Search,
+  LogOut,
+  ChevronDown,
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+const menuItems = [
+  { icon: FileText, label: "案件管理", path: "/cases" },
+  { icon: Users, label: "调解管理", path: "/mediation" },
+  { icon: BarChart2, label: "仪表盘", path: "/stats" },
+  { icon: Bell, label: "通知中心", path: "/notifications" },
+  { icon: BookOpen, label: "调解记录", path: "/records" },
+  { icon: UserCog, label: "超用户管理", path: "/super-admin" },
+  { icon: Activity, label: "系统监控", path: "/monitoring" },
+  { icon: TestTube2, label: "测试菜单", path: "/test" },
+  { icon: UserRound, label: "账户中心", path: "/account" },
+  { icon: GitFlow, label: "工作流", path: "/workflow" },
+  { icon: ClipboardList, label: "我的任务", path: "/tasks" },
+  { icon: Settings, label: "系统管理", path: "/settings" },
+];
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [username, setUsername] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         navigate("/");
+        return;
+      }
+
+      // Fetch user data
+      const { data: userData } = await supabase
+        .from('users')
+        .select('username')
+        .eq('id', session.user.id)
+        .single();
+
+      if (userData) {
+        setUsername(userData.username);
       }
     };
     checkAuth();
   }, [navigate]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "退出成功",
+        description: "您已成功退出登录",
+      });
+      navigate("/");
+    } catch (error) {
+      toast({
+        title: "退出失败",
+        description: "请稍后重试",
+        variant: "destructive",
+      });
+    }
   };
-
-  const menuItems = [
-    { icon: Home, label: "首页", path: "/dashboard" },
-    { icon: FileText, label: "案件管理", path: "/cases" },
-    { icon: Users, label: "调解管理", path: "/mediation" },
-    { icon: Phone, label: "呼叫中心", path: "/calls" },
-    { icon: MessageSquare, label: "短信管理", path: "/messages" },
-    { icon: Bell, label: "通知管理", path: "/notifications" },
-    { icon: Building2, label: "租户管理", path: "/tenants" },
-    { icon: BarChart2, label: "仪表盘", path: "/stats" },
-    { icon: BookOpen, label: "调解记录", path: "/records" },
-    { icon: Cog, label: "系统工具", path: "/tools" },
-    { icon: ArrowRight, label: "游记菜单", path: "/menu" },
-    { icon: UserRound, label: "账户中心", path: "/account" },
-    { icon: Building, label: "工作台", path: "/workspace" },
-    { icon: Settings, label: "系统管理", path: "/settings" },
-  ];
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-[#F5F6FA]">
+      <div className="flex min-h-screen w-full bg-white">
         <Sidebar className="border-r border-gray-200">
           <SidebarHeader className="p-4 border-b border-gray-200">
             <img
@@ -89,24 +122,66 @@ const Dashboard = () => {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-              <SidebarMenuItem>
-                <SidebarMenuButton 
-                  onClick={handleLogout} 
-                  className="flex items-center gap-3 px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg mx-2 mt-4"
-                >
-                  <LogOut className="h-5 w-5" />
-                  <span className="text-sm">退出登录</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
         </Sidebar>
-        <main className="flex-1 p-6">
-          <div className="max-w-7xl mx-auto">
-            <h1 className="text-2xl font-bold text-gray-900">欢迎使用法调云2.0</h1>
-            {/* Add your dashboard content here */}
-          </div>
-        </main>
+
+        <div className="flex-1 flex flex-col">
+          {/* Top toolbar */}
+          <header className="h-16 border-b border-gray-200 bg-white px-6 flex items-center justify-between">
+            <div className="flex items-center gap-4 flex-1 max-w-xl">
+              <Search className="h-5 w-5 text-gray-400" />
+              <Input
+                type="search"
+                placeholder="搜索模块、功能..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="max-w-md"
+              />
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <button className="relative p-2 hover:bg-gray-100 rounded-full">
+                <Bell className="h-5 w-5 text-gray-600" />
+                <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+              </button>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-lg">
+                  <div className="h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm">
+                    {username?.[0]?.toUpperCase() || 'U'}
+                  </div>
+                  <span className="text-sm text-gray-700">{username || '用户'}</span>
+                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => navigate('/account')}>
+                    <UserRound className="h-4 w-4 mr-2" />
+                    账户设置
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    退出登录
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </header>
+
+          {/* Main content */}
+          <main className="flex-1 p-6 bg-gray-50">
+            <div className="max-w-7xl mx-auto">
+              <h1 className="text-2xl font-semibold text-gray-900 mb-6">
+                欢迎回来, {username || '用户'}
+              </h1>
+              <div className="bg-white rounded-lg shadow p-6">
+                <p className="text-gray-600">
+                  选择左侧菜单以开始使用系统功能。
+                </p>
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
     </SidebarProvider>
   );

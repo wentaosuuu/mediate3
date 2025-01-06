@@ -25,29 +25,38 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#0EA5E9",
-          hover: "#0284C7",
-          light: "#D3E4FD",
+          DEFAULT: "#409EFF",
+          hover: "#66B1FF",
+          light: "#ECF5FF",
+        },
+        nav: {
+          DEFAULT: "#2C3E50",
+          hover: "#34495E",
         },
         text: {
-          primary: "#333333",
-          secondary: "#666666",
-          light: "#999999",
+          primary: "#303133",
+          regular: "#606266",
+          secondary: "#909399",
+          placeholder: "#C0C4CC",
         },
       },
+      fontSize: {
+        title: "16px",
+        content: "14px",
+      },
       keyframes: {
-        "card-hover": {
-          "0%": { transform: "translateY(0)" },
-          "100%": { transform: "translateY(-5px)" },
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
-        "card-pulse": {
-          "0%": { transform: "scale(1)" },
-          "50%": { transform: "scale(1.25)" },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
-        "card-hover": "card-hover 0.3s ease-out forwards",
-        "card-pulse": "card-pulse 2s ease-in-out infinite",
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
   },
