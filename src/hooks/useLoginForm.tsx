@@ -28,20 +28,20 @@ export const useLoginForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Basic form validation
+    // 基础表单验证
     if (!formData.tenantId || !formData.username || !formData.password || !formData.captcha) {
       toast.error("请填写完整信息");
       return;
     }
 
-    // Verify captcha
+    // 验证码验证
     if (formData.captcha !== verificationCode) {
       toast.error("验证码错误");
       return;
     }
 
     try {
-      // 1. First check if the tenant registration exists and get the email
+      // 1. 首先检查租户注册信息
       const { data: registrationData, error: registrationError } = await supabase
         .from("tenant_registrations")
         .select("business_email")
@@ -55,10 +55,10 @@ export const useLoginForm = () => {
         return;
       }
 
-      // Generate default email if business_email is not set
+      // 生成登录邮箱
       const email = registrationData.business_email || `${formData.username}@${formData.tenantId}.com`;
 
-      // 2. Try to sign in with email and password
+      // 2. 使用邮箱和密码登录
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password: formData.password,
@@ -66,29 +66,17 @@ export const useLoginForm = () => {
 
       if (signInError) {
         console.error("Sign in error:", signInError);
-        toast.error("密码错误，请重试");
+        if (signInError.message === "Invalid login credentials") {
+          toast.error("密码错误，请重试");
+        } else {
+          toast.error("登录失败，请稍后重试");
+        }
         return;
       }
 
       if (!signInData.user) {
         toast.error("登录失败，未能获取用户信息");
         return;
-      }
-
-      // 3. After successful login, check if we need to create/update the users record
-      const { error: userError } = await supabase
-        .from("users")
-        .upsert({
-          id: signInData.user.id,
-          tenant_id: formData.tenantId,
-          username: formData.username,
-          email,
-        }, {
-          onConflict: 'id'
-        });
-
-      if (userError) {
-        console.error("Error updating user record:", userError);
       }
 
       toast.success("登录成功");
