@@ -23,7 +23,7 @@ export const MenuItem = ({ item, currentPath, isExpanded, onMenuClick }: MenuIte
         onClick={() => onMenuClick(item)}
       >
         <div className={`
-          flex items-center justify-between px-4 py-3.5 mx-2 rounded-lg 
+          flex items-center justify-between px-4 py-4 mx-2 rounded-lg 
           transition-all duration-300 linear cursor-pointer text-base
           ${currentPath === item.path 
             ? 'bg-nav-active text-primary' 
