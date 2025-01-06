@@ -67,8 +67,17 @@ export const useLoginForm = () => {
 
       if (signInError) {
         console.error("Sign in error:", signInError);
-        // 提供更具体的错误信息
-        if (signInError.message.includes("Invalid login credentials")) {
+        
+        // 处理特定的错误情况
+        if (signInError.message.includes("Email not confirmed")) {
+          toast.error("账号邮箱未验证，请联系管理员开通账号", {
+            description: "或者您可以重新注册一个账号",
+            action: {
+              label: "去注册",
+              onClick: () => navigate("/register")
+            }
+          });
+        } else if (signInError.message.includes("Invalid login credentials")) {
           toast.error("用户名或密码错误，请重试");
         } else {
           toast.error(`登录失败: ${signInError.message}`);
