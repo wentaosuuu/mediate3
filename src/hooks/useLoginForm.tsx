@@ -49,7 +49,7 @@ export const useLoginForm = () => {
         .eq("username", formData.username)
         .single();
 
-      if (registrationError || !registrationData) {
+      if (registrationError) {
         console.error("Registration check error:", registrationError);
         toast.error("用户名或租户编号不正确");
         return;
@@ -66,7 +66,22 @@ export const useLoginForm = () => {
 
       if (signInError) {
         console.error("Sign in error:", signInError);
-        toast.error("密码错误，请重试");
+        
+        // Handle specific error cases
+        if (signInError.message.includes("Email not confirmed")) {
+          toast.error("邮箱未验证。请检查您的邮箱并点击验证链接，或联系管理员禁用邮箱验证。", {
+            duration: 6000,
+          });
+          return;
+        }
+        
+        if (signInError.message.includes("Invalid login credentials")) {
+          toast.error("密码错误，请重试");
+          return;
+        }
+        
+        // Generic error handling
+        toast.error("登录失败，请稍后重试");
         return;
       }
 
