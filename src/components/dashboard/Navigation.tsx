@@ -189,7 +189,7 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
               >
                 <div className={`
                   flex items-center justify-between px-4 py-3.5 mx-2 rounded-lg 
-                  transition-all duration-300 ease-in-out cursor-pointer text-base
+                  transition-all duration-200 linear cursor-pointer text-base
                   ${currentPath === item.path 
                     ? 'bg-nav-active text-primary' 
                     : 'text-gray-300 hover:bg-nav-hover hover:text-white'
@@ -201,7 +201,7 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
                   </div>
                   {item.children && (
                     <ChevronRight 
-                      className={`h-4 w-4 transition-transform duration-500 ease-in-out ${
+                      className={`h-4 w-4 transition-transform duration-200 linear ${
                         expandedMenu === item.path ? 'rotate-90' : ''
                       }`}
                     />
@@ -211,7 +211,7 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
               {item.children && (
                 <SidebarMenuSub 
                   className={`
-                    overflow-hidden transition-all duration-500 ease-in-out
+                    overflow-hidden transition-all duration-200 linear
                     ${expandedMenu === item.path 
                       ? 'max-h-[800px] opacity-100 mt-3' 
                       : 'max-h-0 opacity-0'
@@ -225,7 +225,7 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
                           isActive={currentPath === child.path}
                           onClick={() => onMenuClick(child.path)}
                           className={`
-                            pl-14 pr-4 py-3.5 transition-all duration-300 ease-in-out text-sm
+                            pl-14 pr-4 py-3.5 transition-all duration-200 linear text-sm
                             ${currentPath === child.path
                               ? 'text-primary bg-nav-active'
                               : 'text-gray-300 hover:text-white hover:bg-nav-hover'
