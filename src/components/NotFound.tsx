@@ -2,7 +2,7 @@ import React from "react";
 
 const NotFound = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] p-4">
+    <div className="flex flex-col items-center justify-center p-4">
       <img
         src="https://images.unsplash.com/photo-1535268647677-300dbf3d78d1"
         alt="404 Cat"
