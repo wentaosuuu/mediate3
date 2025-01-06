@@ -55,9 +55,9 @@ export const useLoginForm = () => {
         return;
       }
 
-      // 生成登录邮箱
+      // 生成登录邮箱 - 优先使用注册时的business_email
       const email = registrationData.business_email || `${formData.username}@${formData.tenantId}.com`;
-      console.log("Attempting login with email:", email); // 添加日志
+      console.log("Attempting login with email:", email);
 
       // 2. 使用邮箱和密码登录
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -67,7 +67,12 @@ export const useLoginForm = () => {
 
       if (signInError) {
         console.error("Sign in error:", signInError);
-        toast.error("登录失败，请检查密码是否正确");
+        // 提供更具体的错误信息
+        if (signInError.message.includes("Invalid login credentials")) {
+          toast.error("用户名或密码错误，请重试");
+        } else {
+          toast.error(`登录失败: ${signInError.message}`);
+        }
         return;
       }
 
