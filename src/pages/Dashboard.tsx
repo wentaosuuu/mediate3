@@ -22,10 +22,10 @@ import {
   BookOpen,
   Building2,
   LogOut,
-  Tool,
-  Star,
-  UserCircle,
-  Briefcase,
+  Cog,
+  UserRound,
+  Building,
+  ArrowRight,
 } from "lucide-react";
 
 const Dashboard = () => {
@@ -56,10 +56,10 @@ const Dashboard = () => {
     { icon: Building2, label: "租户管理", path: "/tenants" },
     { icon: BarChart2, label: "仪表盘", path: "/stats" },
     { icon: BookOpen, label: "调解记录", path: "/records" },
-    { icon: Tool, label: "系统工具", path: "/tools" },
-    { icon: Star, label: "游记菜单", path: "/menu" },
-    { icon: UserCircle, label: "账户中心", path: "/account" },
-    { icon: Briefcase, label: "工作台", path: "/workspace" },
+    { icon: Cog, label: "系统工具", path: "/tools" },
+    { icon: ArrowRight, label: "游记菜单", path: "/menu" },
+    { icon: UserRound, label: "账户中心", path: "/account" },
+    { icon: Building, label: "工作台", path: "/workspace" },
     { icon: Settings, label: "系统管理", path: "/settings" },
   ];
 
