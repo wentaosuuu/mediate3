@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useToast } from "@/hooks/use-toast";
@@ -9,12 +9,13 @@ import { MainContent } from "@/components/dashboard/MainContent";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [username, setUsername] = useState<string | null>(null);
   const [department, setDepartment] = useState("技术部");
   const [role, setRole] = useState("系统管理员");
-  const [currentPath, setCurrentPath] = useState("/dashboard");
+  const [currentPath, setCurrentPath] = useState(location.pathname);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -37,6 +38,10 @@ const Dashboard = () => {
     checkAuth();
   }, [navigate]);
 
+  useEffect(() => {
+    setCurrentPath(location.pathname);
+  }, [location.pathname]);
+
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
@@ -55,8 +60,23 @@ const Dashboard = () => {
   };
 
   const handleMenuClick = (path: string) => {
-    setCurrentPath(path);
+    navigate(path);
   };
+
+  // 如果路径不是以 /dashboard 开头，重定向到仪表板
+  if (!location.pathname.startsWith('/dashboard') && 
+      !location.pathname.startsWith('/case') && 
+      !location.pathname.startsWith('/mediation') && 
+      !location.pathname.startsWith('/sms') && 
+      !location.pathname.startsWith('/call-center') && 
+      !location.pathname.startsWith('/mediation-records') && 
+      !location.pathname.startsWith('/operation') && 
+      !location.pathname.startsWith('/tenant') && 
+      !location.pathname.startsWith('/account') && 
+      !location.pathname.startsWith('/system') && 
+      !location.pathname.startsWith('/global')) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   return (
     <SidebarProvider>
