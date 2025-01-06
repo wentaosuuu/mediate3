@@ -62,6 +62,8 @@ export const useLoginForm = () => {
       const cleanTenantId = formData.tenantId.toLowerCase().trim();
       const email = `${cleanUsername}.${cleanTenantId}@tenant.com`;
 
+      console.log("Debug - Attempting login with email:", email);
+
       // First check if the tenant exists
       const { data: tenantData, error: tenantError } = await supabase
         .from('tenant_registrations')
@@ -84,6 +86,18 @@ export const useLoginForm = () => {
 
       if (userError || !userData) {
         toast.error("用户名不存在，请检查后重试", { position: "top-center" });
+        return;
+      }
+
+      // Check if auth user exists
+      const { data: authData, error: authError } = await supabase.auth.admin.listUsers({
+        filters: {
+          email: email
+        }
+      });
+
+      if (authError || !authData?.users?.length) {
+        toast.error("用户未完成注册，请联系管理员", { position: "top-center" });
         return;
       }
 
