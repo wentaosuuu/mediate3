@@ -62,39 +62,57 @@ export const useLoginForm = () => {
       const cleanTenantId = formData.tenantId.toLowerCase().trim();
       const email = `${cleanUsername}.${cleanTenantId}@tenant.com`;
 
-      // 检查租户是否存在
-      const { data: tenantData, error: tenantError } = await supabase
+      // 先检查租户是否存在
+      const { data: tenantExists, error: tenantError } = await supabase
         .from('tenant_registrations')
         .select('tenant_id')
         .eq('tenant_id', cleanTenantId)
-        .single();
+        .maybeSingle();
 
-      if (tenantError || !tenantData) {
-        toast.error("租户编号不存在，请检查后重试", { position: "top-center" });
+      if (tenantError) {
+        console.error('租户查询错误:', tenantError);
+        toast.error("系统错误，请稍后重试", { position: "top-center" });
         return;
       }
 
-      // 检查用户是否存在
-      const { data: userData, error: userError } = await supabase
+      if (!tenantExists) {
+        toast.error("租户编号不存在", { position: "top-center" });
+        return;
+      }
+
+      // 检查用户是否存在于该租户下
+      const { data: userExists, error: userError } = await supabase
         .from('users')
         .select('username')
         .eq('tenant_id', cleanTenantId)
         .eq('username', cleanUsername)
-        .single();
+        .maybeSingle();
 
-      if (userError || !userData) {
-        toast.error("用户名不存在，请检查后重试", { position: "top-center" });
+      if (userError) {
+        console.error('用户查询错误:', userError);
+        toast.error("系统错误，请稍后重试", { position: "top-center" });
+        return;
+      }
+
+      if (!userExists) {
+        toast.error("用户名不存在", { position: "top-center" });
         return;
       }
 
       // 尝试登录
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password: formData.password,
       });
 
       if (signInError) {
-        toast.error("密码错误，请重新输入", { position: "top-center" });
+        console.error('登录错误:', signInError);
+        toast.error("密码错误", { position: "top-center" });
+        return;
+      }
+
+      if (!data.user) {
+        toast.error("登录失败", { position: "top-center" });
         return;
       }
 
@@ -102,7 +120,7 @@ export const useLoginForm = () => {
       navigate("/dashboard");
       
     } catch (error) {
-      console.error("登录尝试失败:", error);
+      console.error("登录失败:", error);
       toast.error("系统错误，请稍后重试", { position: "top-center" });
     }
   };
