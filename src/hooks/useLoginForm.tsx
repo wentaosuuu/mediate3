@@ -55,8 +55,14 @@ export const useLoginForm = () => {
         return;
       }
 
+      console.log("Attempting login with:", {
+        email: registrationData.business_email,
+        username: formData.username,
+        tenantId: formData.tenantId
+      });
+
       // 2. Try to sign in with email and password
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: registrationData.business_email,
         password: formData.password,
       });
