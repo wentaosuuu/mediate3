@@ -67,13 +67,29 @@ const LoginForm = () => {
         return;
       }
 
+      // Check if user exists in users table
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("tenant_id", formData.tenantId)
+        .eq("username", formData.username)
+        .single();
+
+      if (userError || !userData) {
+        toast.error("用户名不存在", {
+          position: "top-center",
+        });
+        return;
+      }
+
       // Attempt to sign in
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: `${formData.username}@${formData.tenantId}.com`,
+        email: userData.email || `${formData.username}@${formData.tenantId}.com`,
         password: formData.password,
       });
 
       if (error) {
+        console.error("Login error:", error);
         toast.error("用户名或密码错误", {
           position: "top-center",
         });
