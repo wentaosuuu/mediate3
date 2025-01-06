@@ -25,109 +25,92 @@ export const useLoginForm = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const validateForm = () => {
-    if (!formData.tenantId.trim()) {
-      toast.error("请输入租户编号", { position: "top-center" });
-      return false;
-    }
-    if (!formData.username.trim()) {
-      toast.error("请输入用户名", { position: "top-center" });
-      return false;
-    }
-    if (!formData.password) {
-      toast.error("请输入密码", { position: "top-center" });
-      return false;
-    }
-    if (!formData.captcha) {
-      toast.error("请输入验证码", { position: "top-center" });
-      return false;
-    }
-    return true;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
+    // 基础表单验证
+    if (!formData.tenantId || !formData.username || !formData.password || !formData.captcha) {
+      toast.error("请填写完整信息");
       return;
     }
 
+    // 验证码验证
     if (formData.captcha !== verificationCode) {
-      toast.error("验证码错误，请重新输入", { position: "top-center" });
+      toast.error("验证码错误");
       return;
     }
 
     try {
-      const cleanUsername = formData.username.toLowerCase().trim();
-      const cleanTenantId = formData.tenantId.toLowerCase().trim();
-      
-      // 先检查租户是否存在
-      let { data: tenantExists, error: tenantError } = await supabase
-        .from('tenant_registrations')
-        .select('tenant_id')
-        .eq('tenant_id', cleanTenantId)
-        .maybeSingle();
+      // 1. 首先检查租户注册信息
+      const { data: registrationData, error: registrationError } = await supabase
+        .from("tenant_registrations")
+        .select("business_email")
+        .eq("tenant_id", formData.tenantId)
+        .eq("username", formData.username)
+        .single();
 
-      if (tenantError) {
-        console.error('租户查询错误:', tenantError);
-        toast.error("系统错误，请稍后重试", { position: "top-center" });
+      if (registrationError) {
+        console.error("Registration check error:", registrationError);
+        toast.error("用户名或租户编号不正确");
         return;
       }
 
-      if (!tenantExists) {
-        toast.error("租户编号不存在", { position: "top-center" });
-        return;
-      }
+      // 生成登录邮箱 - 优先使用注册时的business_email
+      const email = registrationData.business_email || `${formData.username}@${formData.tenantId}.com`;
+      console.log("Attempting login with email:", email);
 
-      // 检查用户是否存在于该租户下
-      let { data: userExists, error: userError } = await supabase
-        .from('users')
-        .select('username')
-        .eq('tenant_id', cleanTenantId)
-        .eq('username', cleanUsername)
-        .maybeSingle();
-
-      if (userError) {
-        console.error('用户查询错误:', userError);
-        toast.error("系统错误，请稍后重试", { position: "top-center" });
-        return;
-      }
-
-      if (!userExists) {
-        toast.error("用户名不存在", { position: "top-center" });
-        return;
-      }
-
-      // 构造登录邮箱
-      const email = `${cleanUsername}.${cleanTenantId}@tenant.com`;
-
-      // 尝试登录
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      // 2. 使用邮箱和密码登录
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password: formData.password,
       });
 
       if (signInError) {
-        console.error('登录错误:', signInError);
-        if (signInError.message.includes("Invalid login credentials")) {
-          toast.error("密码错误", { position: "top-center" });
+        console.error("Sign in error:", signInError);
+        
+        // 处理特定的错误情况
+        if (signInError.message.includes("Email not confirmed")) {
+          toast.error("账号邮箱未验证，请联系管理员开通账号", {
+            description: "或者您可以重新注册一个账号",
+            action: {
+              label: "去注册",
+              onClick: () => navigate("/register")
+            }
+          });
+        } else if (signInError.message.includes("Invalid login credentials")) {
+          toast.error("用户名或密码错误，请重试");
         } else {
-          toast.error("登录失败，请稍后重试", { position: "top-center" });
+          toast.error(`登录失败: ${signInError.message}`);
         }
         return;
       }
 
-      if (!data.user) {
-        toast.error("登录失败", { position: "top-center" });
+      if (!signInData.user) {
+        toast.error("登录失败，未能获取用户信息");
         return;
       }
 
-      toast.success("登录成功", { position: "top-center" });
+      // 3. 登录成功后更新用户记录
+      const { error: userError } = await supabase
+        .from("users")
+        .upsert({
+          id: signInData.user.id,
+          tenant_id: formData.tenantId,
+          username: formData.username,
+          email: email,
+        });
+
+      if (userError) {
+        console.error("Error updating user record:", userError);
+        // 继续执行，不影响登录流程
+      }
+
+      toast.success("登录成功");
       navigate("/dashboard");
       
     } catch (error) {
-      console.error("登录失败:", error);
-      toast.error("系统错误，请稍后重试", { position: "top-center" });
+      console.error("Login attempt failed:", error);
+      toast.error("登录失败，请重试");
     }
   };
 
