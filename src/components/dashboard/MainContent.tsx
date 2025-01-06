@@ -85,11 +85,15 @@ export const MainContent = ({ username, currentPath }: MainContentProps) => {
       );
     }
 
-    return <NotFound />;
+    return (
+      <div className="flex items-center justify-center h-full">
+        <NotFound />
+      </div>
+    );
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-50">
+    <div className="flex-1 flex flex-col bg-gray-50 overflow-hidden">
       <PageTabs
         tabs={tabs}
         currentPath={currentPath}

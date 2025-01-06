@@ -30,12 +30,12 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen overflow-hidden bg-gray-100">
       <Navigation
         currentPath={location.pathname}
         onMenuClick={handleMenuClick}
       />
-      <div className="flex flex-col flex-1 min-w-0">
+      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <TopBar
           username={mockUser.username}
           department={mockUser.department}
