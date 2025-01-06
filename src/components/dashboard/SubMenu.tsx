@@ -4,6 +4,7 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
+import { MenuItem } from '@/types/navigation';
 
 interface SubMenuProps {
   isExpanded: boolean;
@@ -23,7 +24,7 @@ export const SubMenu = ({ isExpanded, children, currentPath, onMenuClick }: SubM
         }
       `}
     >
-      <div className="py-3 bg-nav-active/30 mx-2 rounded-lg">
+      <div className="py-3 bg-nav-active/30 mx-4 rounded-lg">
         {children.map((child) => (
           <SidebarMenuSubItem key={child.path} className="mb-2 last:mb-0">
             <SidebarMenuSubButton
