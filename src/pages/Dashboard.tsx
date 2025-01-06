@@ -39,9 +39,11 @@ import {
   Star,
   Briefcase,
   ChevronRight,
+  LayoutDashboard,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+// 将菜单项移到单独的数组中以提高可维护性
 const menuItems = [
   { 
     icon: Home, 
@@ -119,11 +121,11 @@ const Dashboard = () => {
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-gray-100">
         <Sidebar className="border-r border-gray-200">
-          <SidebarHeader className="p-4 border-b border-gray-200 bg-nav">
+          <SidebarHeader className="p-4 border-b border-gray-200 bg-nav flex items-center justify-center">
             <img
               src="/lovable-uploads/4b6c2cac-5597-4e26-bfde-a2902643b26a.png"
               alt="Logo"
-              className="h-8"
+              className="h-8 w-auto object-contain"
             />
           </SidebarHeader>
           <SidebarContent className="py-2 bg-nav">
@@ -200,9 +202,13 @@ const Dashboard = () => {
                   <ChevronDown className="h-4 w-4 text-gray-500" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => navigate('/account')}>
+                  <DropdownMenuItem onClick={() => navigate('/account/profile')}>
                     <UserRound className="h-4 w-4 mr-2" />
-                    账户设置
+                    个人中心
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/account/settings')}>
+                    <LayoutDashboard className="h-4 w-4 mr-2" />
+                    布局设置
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="h-4 w-4 mr-2" />
