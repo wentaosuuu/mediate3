@@ -43,29 +43,30 @@ export const useLoginForm = () => {
     }
 
     try {
-      // 1. 首先验证租户ID是否存在
-      const { data: tenantData, error: tenantError } = await supabase
+      // 1. 首先检查用户名是否存在于租户注册表中
+      const { data: registrationData, error: registrationError } = await supabase
         .from("tenant_registrations")
-        .select("tenant_id")
+        .select("*")
         .eq("tenant_id", formData.tenantId)
+        .eq("username", formData.username)
         .maybeSingle();
 
-      if (tenantError) {
-        console.error("Tenant fetch error:", tenantError);
-        toast.error("验证租户信息失败", {
+      if (registrationError) {
+        console.error("Registration fetch error:", registrationError);
+        toast.error("验证用户信息失败", {
           position: "top-center",
         });
         return;
       }
 
-      if (!tenantData) {
-        toast.error("租户编号不存在", {
+      if (!registrationData) {
+        toast.error("用户名或租户编号不存在", {
           position: "top-center",
         });
         return;
       }
 
-      // 2. 然后验证用户名是否存在于该租户下
+      // 2. 然后获取用户记录
       const { data: userData, error: userError } = await supabase
         .from("users")
         .select("*")
@@ -82,7 +83,8 @@ export const useLoginForm = () => {
       }
 
       if (!userData) {
-        toast.error("用户名不存在", {
+        console.error("User not found in users table");
+        toast.error("用户数据不完整，请联系管理员", {
           position: "top-center",
         });
         return;
@@ -106,7 +108,6 @@ export const useLoginForm = () => {
         position: "top-center",
       });
       
-      // 登录成功后导航到首页
       navigate("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
