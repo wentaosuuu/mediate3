@@ -11,6 +11,7 @@ import {
   SidebarMenuButton,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Logo } from "@/components/dashboard/Logo";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
@@ -121,12 +122,8 @@ const Dashboard = () => {
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-gray-100">
         <Sidebar className="border-r border-gray-200">
-          <SidebarHeader className="p-4 border-b border-gray-200 bg-nav flex items-center justify-center">
-            <img
-              src="/lovable-uploads/4b6c2cac-5597-4e26-bfde-a2902643b26a.png"
-              alt="Logo"
-              className="h-8 w-auto object-contain"
-            />
+          <SidebarHeader className="p-4 border-b border-gray-200 bg-nav">
+            <Logo />
           </SidebarHeader>
           <SidebarContent className="py-2 bg-nav">
             <SidebarMenu>
