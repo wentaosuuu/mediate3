@@ -56,7 +56,7 @@ export const useRegistrationSubmit = () => {
       const generatedTenantId = Math.floor(10000 + Math.random() * 90000).toString();
       const email = formData.businessEmail || `${formData.username}@${generatedTenantId}.com`;
 
-      // 1. 创建认证用户
+      // 1. 创建认证用户并等待完成
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password: formData.password,
@@ -71,6 +71,9 @@ export const useRegistrationSubmit = () => {
         });
         return;
       }
+
+      // 等待一小段时间确保auth用户创建完成
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       // 2. 创建租户注册记录
       const { error: registrationError } = await createTenantRegistration(
