@@ -91,10 +91,11 @@ const RegisterForm = () => {
 
     try {
       const generatedTenantId = Math.floor(10000 + Math.random() * 90000).toString();
+      const email = formData.businessEmail || `${formData.username}@${generatedTenantId}.com`;
       
       // 1. 创建 Supabase Auth 用户
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.businessEmail || `${formData.username}@${generatedTenantId}.com`,
+        email: email,
         password: formData.password,
       });
 
@@ -108,31 +109,39 @@ const RegisterForm = () => {
         return;
       }
 
-      const registrationData = {
-        tenant_id: generatedTenantId,
-        contact_person: formData.contactPerson,
-        phone: formData.phone,
-        company_name: formData.companyName,
-        username: formData.username,
-        social_credit_code: formData.socialCreditCode,
-        address: formData.address || null,
-        company_intro: formData.companyIntro || null,
-        remarks: formData.remarks || null,
-        business_email: formData.businessEmail || null,
-      };
+      if (!authData.user) {
+        console.error('No user data returned from auth signup');
+        toast({
+          title: "注册失败",
+          description: "创建用户账户时发生错误",
+          variant: "destructive",
+        });
+        return;
+      }
 
       // 2. 创建租户注册记录
       const { error: registrationError } = await supabase
         .from('tenant_registrations')
-        .insert([registrationData]);
+        .insert([{
+          tenant_id: generatedTenantId,
+          contact_person: formData.contactPerson,
+          phone: formData.phone,
+          company_name: formData.companyName,
+          username: formData.username,
+          social_credit_code: formData.socialCreditCode,
+          address: formData.address || null,
+          company_intro: formData.companyIntro || null,
+          remarks: formData.remarks || null,
+          business_email: formData.businessEmail || null,
+        }]);
 
       if (registrationError) {
         console.error('Registration error:', registrationError);
         // 如果租户注册失败，删除已创建的 auth 用户
-        await supabase.auth.admin.deleteUser(authData.user!.id);
+        await supabase.auth.admin.deleteUser(authData.user.id);
         toast({
           title: "注册失败",
-          description: registrationError.message,
+          description: "创建租户信息时发生错误",
           variant: "destructive",
         });
         return;
@@ -142,17 +151,17 @@ const RegisterForm = () => {
       const { error: userError } = await supabase
         .from('users')
         .insert([{
-          id: authData.user!.id,
+          id: authData.user.id,
           tenant_id: generatedTenantId,
           username: formData.username,
           phone: formData.phone,
-          email: formData.businessEmail || `${formData.username}@${generatedTenantId}.com`
+          email: email
         }]);
 
       if (userError) {
         console.error('User creation error:', userError);
         // 如果用户创建失败，回滚所有更改
-        await supabase.auth.admin.deleteUser(authData.user!.id);
+        await supabase.auth.admin.deleteUser(authData.user.id);
         await supabase
           .from('tenant_registrations')
           .delete()
@@ -168,6 +177,23 @@ const RegisterForm = () => {
 
       setTenantId(generatedTenantId);
       setShowSuccessDialog(true);
+      
+      // 清空表单
+      setFormData({
+        contactPerson: "",
+        phone: "",
+        companyName: "",
+        inviteCode: "",
+        username: "",
+        password: "",
+        confirmPassword: "",
+        socialCreditCode: "",
+        address: "",
+        companyIntro: "",
+        remarks: "",
+        businessEmail: "",
+      });
+      
     } catch (error) {
       console.error('Registration error:', error);
       toast({
