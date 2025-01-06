@@ -39,8 +39,14 @@ export const useLoginForm = () => {
     }
 
     try {
-      // 生成登录邮箱
-      const email = `${formData.username}@${formData.tenantId}.com`;
+      // 确保用户名和租户ID都是小写的
+      const cleanUsername = formData.username.toLowerCase().trim();
+      const cleanTenantId = formData.tenantId.toLowerCase().trim();
+      
+      // 构建登录邮箱
+      const email = `${cleanUsername}.${cleanTenantId}@tenant.com`;
+
+      console.log("Attempting login with email:", email); // Debug log
 
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
@@ -48,16 +54,24 @@ export const useLoginForm = () => {
       });
 
       if (signInError) {
+        console.error("Sign in error:", signInError); // Debug log
+        
         if (signInError.message.includes("Invalid login credentials")) {
-          toast.error("用户名或密码错误");
+          toast.error("用户名或密码错误", {
+            position: "top-center",
+          });
         } else {
-          toast.error("登录失败，请重试");
+          toast.error("登录失败，请重试", {
+            position: "top-center",
+          });
         }
         return;
       }
 
       if (!signInData.user) {
-        toast.error("登录失败，未能获取用户信息");
+        toast.error("登录失败，未能获取用户信息", {
+          position: "top-center",
+        });
         return;
       }
 
@@ -68,7 +82,9 @@ export const useLoginForm = () => {
       navigate("/dashboard");
     } catch (error) {
       console.error("Login attempt failed:", error);
-      toast.error("登录失败，请重试");
+      toast.error("登录失败，请重试", {
+        position: "top-center",
+      });
     }
   };
 
