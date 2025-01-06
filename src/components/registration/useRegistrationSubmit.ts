@@ -49,7 +49,7 @@ export const useRegistrationSubmit = () => {
       const generatedTenantId = Math.floor(10000 + Math.random() * 90000).toString();
       const email = formData.businessEmail || `${formData.username}@${generatedTenantId}.com`;
       
-      // 1. 创建 Supabase Auth 用户
+      // 1. Create Supabase Auth user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: email,
         password: formData.password,
@@ -75,7 +75,7 @@ export const useRegistrationSubmit = () => {
         return;
       }
 
-      // 2. 创建租户注册记录
+      // 2. Create tenant registration record
       const { error: registrationError } = await supabase
         .from('tenant_registrations')
         .insert([{
@@ -93,7 +93,6 @@ export const useRegistrationSubmit = () => {
 
       if (registrationError) {
         console.error('Registration error:', registrationError);
-        await supabase.auth.admin.deleteUser(authData.user.id);
         toast({
           title: "注册失败",
           description: "创建租户信息时发生错误",
@@ -102,7 +101,7 @@ export const useRegistrationSubmit = () => {
         return;
       }
 
-      // 3. 创建用户记录
+      // 3. Create user record
       const { error: userError } = await supabase
         .from('users')
         .insert([{
@@ -115,12 +114,6 @@ export const useRegistrationSubmit = () => {
 
       if (userError) {
         console.error('User creation error:', userError);
-        await supabase.auth.admin.deleteUser(authData.user.id);
-        await supabase
-          .from('tenant_registrations')
-          .delete()
-          .eq('tenant_id', generatedTenantId);
-
         toast({
           title: "注册失败",
           description: "创建用户记录时发生错误",
@@ -132,7 +125,7 @@ export const useRegistrationSubmit = () => {
       setTenantId(generatedTenantId);
       setShowSuccessDialog(true);
       
-      // 清空表单
+      // Clear form
       setFormData({
         contactPerson: "",
         phone: "",
