@@ -28,69 +28,34 @@ export const useLoginForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Basic form validation
     if (!formData.tenantId || !formData.username || !formData.password || !formData.captcha) {
-      toast.error("请填写完整信息", {
-        position: "top-center",
-      });
+      toast.error("请填写完整信息");
       return;
     }
 
+    // Verify captcha
     if (formData.captcha !== verificationCode) {
-      toast.error("验证码错误", {
-        position: "top-center",
-      });
+      toast.error("验证码错误");
       return;
     }
 
     try {
-      // 1. 首先检查用户名是否存在于租户注册表中
-      const { data: registrationData, error: registrationError } = await supabase
-        .from("tenant_registrations")
-        .select("*")
-        .eq("tenant_id", formData.tenantId)
-        .eq("username", formData.username)
-        .maybeSingle();
-
-      if (registrationError) {
-        console.error("Registration fetch error:", registrationError);
-        toast.error("验证用户信息失败", {
-          position: "top-center",
-        });
-        return;
-      }
-
-      if (!registrationData) {
-        toast.error("用户名或租户编号不存在", {
-          position: "top-center",
-        });
-        return;
-      }
-
-      // 2. 然后获取用户记录
+      // 1. First get the user record to find their email
       const { data: userData, error: userError } = await supabase
         .from("users")
-        .select("*")
+        .select("email")
         .eq("tenant_id", formData.tenantId)
         .eq("username", formData.username)
-        .maybeSingle();
+        .single();
 
-      if (userError) {
+      if (userError || !userData?.email) {
         console.error("User fetch error:", userError);
-        toast.error("验证用户信息失败", {
-          position: "top-center",
-        });
+        toast.error("用户名或租户编号不正确");
         return;
       }
 
-      if (!userData) {
-        console.error("User not found in users table");
-        toast.error("用户数据不完整，请联系管理员", {
-          position: "top-center",
-        });
-        return;
-      }
-
-      // 3. 最后尝试登录
+      // 2. Try to sign in with email and password
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: userData.email,
         password: formData.password,
@@ -98,22 +63,16 @@ export const useLoginForm = () => {
 
       if (signInError) {
         console.error("Login error:", signInError);
-        toast.error("密码错误", {
-          position: "top-center",
-        });
+        toast.error("密码错误");
         return;
       }
 
-      toast.success("登录成功", {
-        position: "top-center",
-      });
-      
+      toast.success("登录成功");
       navigate("/dashboard");
+      
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("登录失败，请稍后重试", {
-        position: "top-center",
-      });
+      toast.error("登录失败，请稍后重试");
     }
   };
 
