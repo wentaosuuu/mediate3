@@ -173,10 +173,10 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
       <SidebarHeader className="flex justify-center items-center p-4 border-b border-gray-200 bg-nav">
         <Logo />
       </SidebarHeader>
-      <SidebarContent className="py-6 bg-nav">
+      <SidebarContent className="py-8 bg-nav">
         <SidebarMenu>
           {menuItems.map((item) => (
-            <SidebarMenuItem key={item.label} className="mb-2">
+            <SidebarMenuItem key={item.label} className="mb-4">
               <SidebarMenuButton
                 asChild
                 isActive={currentPath === item.path}
@@ -189,7 +189,7 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
               >
                 <div className={`
                   flex items-center justify-between px-4 py-3.5 mx-2 rounded-lg 
-                  transition-colors cursor-pointer text-base
+                  transition-all duration-300 ease-in-out cursor-pointer text-base
                   ${currentPath === item.path 
                     ? 'bg-nav-active text-primary' 
                     : 'text-gray-300 hover:bg-nav-hover hover:text-white'
@@ -201,7 +201,7 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
                   </div>
                   {item.children && (
                     <ChevronRight 
-                      className={`h-4 w-4 transition-transform duration-300 ease-in-out ${
+                      className={`h-4 w-4 transition-transform duration-500 ease-in-out ${
                         expandedMenu === item.path ? 'rotate-90' : ''
                       }`}
                     />
@@ -211,21 +211,21 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
               {item.children && (
                 <SidebarMenuSub 
                   className={`
-                    overflow-hidden transition-all duration-300 ease-in-out
+                    overflow-hidden transition-all duration-500 ease-in-out
                     ${expandedMenu === item.path 
-                      ? 'max-h-[500px] opacity-100 mt-2' 
+                      ? 'max-h-[800px] opacity-100 mt-3' 
                       : 'max-h-0 opacity-0'
                     }
                   `}
                 >
-                  <div className="py-2 bg-nav-active/30 mx-2 rounded-lg">
+                  <div className="py-3 bg-nav-active/30 mx-2 rounded-lg">
                     {item.children.map((child) => (
-                      <SidebarMenuSubItem key={child.path} className="mb-1 last:mb-0">
+                      <SidebarMenuSubItem key={child.path} className="mb-2 last:mb-0">
                         <SidebarMenuSubButton
                           isActive={currentPath === child.path}
                           onClick={() => onMenuClick(child.path)}
                           className={`
-                            pl-14 pr-4 py-3 transition-colors text-sm
+                            pl-14 pr-4 py-3.5 transition-all duration-300 ease-in-out text-sm
                             ${currentPath === child.path
                               ? 'text-primary bg-nav-active'
                               : 'text-gray-300 hover:text-white hover:bg-nav-hover'
