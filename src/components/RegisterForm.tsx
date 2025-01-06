@@ -107,15 +107,42 @@ const RegisterForm = () => {
         business_email: formData.businessEmail || null,
       };
 
-      const { error } = await supabase
+      // 1. 首先创建租户注册记录
+      const { error: registrationError } = await supabase
         .from('tenant_registrations')
         .insert([registrationData]);
 
-      if (error) {
-        console.error('Registration error:', error);
+      if (registrationError) {
+        console.error('Registration error:', registrationError);
         toast({
           title: "注册失败",
-          description: error.message,
+          description: registrationError.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // 2. 然后在users表中创建用户记录
+      const { error: userError } = await supabase
+        .from('users')
+        .insert([{
+          tenant_id: generatedTenantId,
+          username: formData.username,
+          phone: formData.phone,
+          email: formData.businessEmail || null
+        }]);
+
+      if (userError) {
+        console.error('User creation error:', userError);
+        // 如果用户创建失败，回滚租户注册
+        await supabase
+          .from('tenant_registrations')
+          .delete()
+          .eq('tenant_id', generatedTenantId);
+
+        toast({
+          title: "注册失败",
+          description: "创建用户记录时发生错误",
           variant: "destructive",
         });
         return;
