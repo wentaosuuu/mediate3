@@ -82,9 +82,12 @@ const LoginForm = () => {
         return;
       }
 
+      // Generate default email if none exists
+      const loginEmail = userData.email || `${formData.username}@${formData.tenantId}.com`;
+
       // Attempt to sign in
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: userData.email || `${formData.username}@${formData.tenantId}.com`,
+        email: loginEmail,
         password: formData.password,
       });
 
