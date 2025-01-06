@@ -1,22 +1,19 @@
 import { Input } from "@/components/ui/input";
 import { RegistrationFormData } from "@/types/registration";
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 
-/**
- * 注册表单字段组件的属性接口
- */
 interface RegistrationFieldsProps {
-  formData: RegistrationFormData;  // 表单数据
-  onChange: (field: keyof RegistrationFormData, value: string) => void;  // 字段变更处理函数
+  formData: RegistrationFormData;
+  onChange: (field: keyof RegistrationFormData, value: string) => void;
 }
 
-/**
- * 注册表单字段组件
- * 包含所有注册所需的输入字段
- */
 export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsProps) => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   return (
     <div className="space-y-4">
-      {/* 联系人输入框 */}
       <div>
         <Input
           type="text"
@@ -26,7 +23,6 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
-      {/* 联系电话输入框 */}
       <div>
         <Input
           type="tel"
@@ -36,7 +32,6 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
-      {/* 企业名称输入框 */}
       <div>
         <Input
           type="text"
@@ -46,7 +41,6 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
-      {/* 邀请码输入框 */}
       <div>
         <Input
           type="text"
@@ -56,7 +50,6 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
-      {/* 用户名输入框 */}
       <div>
         <Input
           type="text"
@@ -66,27 +59,48 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
-      {/* 密码输入框 */}
-      <div>
+      <div className="relative">
         <Input
-          type="password"
+          type={showPassword ? "text" : "password"}
           placeholder="密码*"
           value={formData.password}
           onChange={(e) => onChange("password", e.target.value)}
+          className="pr-10"
         />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+        >
+          {showPassword ? (
+            <EyeOff className="h-5 w-5" />
+          ) : (
+            <Eye className="h-5 w-5" />
+          )}
+        </button>
       </div>
       
-      {/* 确认密码输入框 */}
-      <div>
+      <div className="relative">
         <Input
-          type="password"
+          type={showConfirmPassword ? "text" : "password"}
           placeholder="确认密码*"
           value={formData.confirmPassword}
           onChange={(e) => onChange("confirmPassword", e.target.value)}
+          className="pr-10"
         />
+        <button
+          type="button"
+          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+        >
+          {showConfirmPassword ? (
+            <EyeOff className="h-5 w-5" />
+          ) : (
+            <Eye className="h-5 w-5" />
+          )}
+        </button>
       </div>
       
-      {/* 统一社会信用代码输入框 */}
       <div>
         <Input
           type="text"
@@ -96,7 +110,6 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
-      {/* 地址输入框（选填） */}
       <div>
         <Input
           type="text"
@@ -106,7 +119,6 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
-      {/* 公司简介输入框（选填） */}
       <div>
         <Input
           type="text"
@@ -116,7 +128,6 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
-      {/* 备注输入框（选填） */}
       <div>
         <Input
           type="text"
@@ -126,7 +137,6 @@ export const RegistrationFields = ({ formData, onChange }: RegistrationFieldsPro
         />
       </div>
       
-      {/* 企业邮箱输入框（选填） */}
       <div>
         <Input
           type="email"
