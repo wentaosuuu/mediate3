@@ -57,6 +57,7 @@ export const useLoginForm = () => {
 
       // 生成登录邮箱
       const email = registrationData.business_email || `${formData.username}@${formData.tenantId}.com`;
+      console.log("Attempting login with email:", email); // 添加日志
 
       // 2. 使用邮箱和密码登录
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -66,17 +67,28 @@ export const useLoginForm = () => {
 
       if (signInError) {
         console.error("Sign in error:", signInError);
-        if (signInError.message === "Invalid login credentials") {
-          toast.error("密码错误，请重试");
-        } else {
-          toast.error("登录失败，请稍后重试");
-        }
+        toast.error("登录失败，请检查密码是否正确");
         return;
       }
 
       if (!signInData.user) {
         toast.error("登录失败，未能获取用户信息");
         return;
+      }
+
+      // 3. 登录成功后更新用户记录
+      const { error: userError } = await supabase
+        .from("users")
+        .upsert({
+          id: signInData.user.id,
+          tenant_id: formData.tenantId,
+          username: formData.username,
+          email: email,
+        });
+
+      if (userError) {
+        console.error("Error updating user record:", userError);
+        // 继续执行，不影响登录流程
       }
 
       toast.success("登录成功");
