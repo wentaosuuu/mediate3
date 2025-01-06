@@ -22,23 +22,3 @@ export const createTenantRegistration = async (
 
   return { error };
 };
-
-export const createUserRecord = async (
-  userId: string,
-  tenantId: string,
-  username: string,
-  phone: string,
-  email: string
-) => {
-  const { error } = await supabase
-    .from('users')
-    .insert([{
-      id: userId,
-      tenant_id: tenantId,
-      username,
-      phone,
-      email
-    }]);
-
-  return { error };
-};

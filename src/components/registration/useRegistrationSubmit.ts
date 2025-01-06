@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { RegistrationFormData } from "@/types/registration";
 import { useToast } from "@/hooks/use-toast";
 import { validateForm } from "./RegistrationValidation";
-import { createTenantRegistration, createUserRecord } from "./utils/createUserData";
+import { createTenantRegistration } from "./utils/createUserData";
 
 export const useRegistrationSubmit = () => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -89,13 +89,15 @@ export const useRegistrationSubmit = () => {
       }
 
       // 3. 创建用户记录
-      const { error: userError } = await createUserRecord(
-        authData.user.id,
-        generatedTenantId,
-        formData.username,
-        formData.phone,
-        email
-      );
+      const { error: userError } = await supabase
+        .from('users')
+        .insert([{
+          id: authData.user.id,
+          tenant_id: generatedTenantId,
+          username: formData.username,
+          phone: formData.phone,
+          email
+        }]);
 
       if (userError) {
         console.error('User creation error:', userError);
