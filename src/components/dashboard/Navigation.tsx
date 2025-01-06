@@ -162,14 +162,10 @@ interface NavigationProps {
 }
 
 export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
-  const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
+  const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
 
   const toggleMenu = (path: string) => {
-    setExpandedMenus(prev => 
-      prev.includes(path) 
-        ? prev.filter(p => p !== path)
-        : [...prev, path]
-    );
+    setExpandedMenu(prev => prev === path ? null : path);
   };
 
   return (
@@ -205,8 +201,8 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
                   </div>
                   {item.children && (
                     <ChevronRight 
-                      className={`h-4 w-4 transition-transform duration-200 ${
-                        expandedMenus.includes(item.path) ? 'rotate-90' : ''
+                      className={`h-4 w-4 transition-transform duration-300 ease-in-out ${
+                        expandedMenu === item.path ? 'rotate-90' : ''
                       }`}
                     />
                   )}
@@ -214,9 +210,13 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
               </SidebarMenuButton>
               {item.children && (
                 <SidebarMenuSub 
-                  className={`transition-all duration-200 mt-2 ${
-                    expandedMenus.includes(item.path) ? 'block' : 'hidden'
-                  }`}
+                  className={`
+                    overflow-hidden transition-all duration-300 ease-in-out
+                    ${expandedMenu === item.path 
+                      ? 'max-h-[500px] opacity-100 mt-2' 
+                      : 'max-h-0 opacity-0'
+                    }
+                  `}
                 >
                   <div className="py-2 bg-nav-active/30 mx-2 rounded-lg">
                     {item.children.map((child) => (
