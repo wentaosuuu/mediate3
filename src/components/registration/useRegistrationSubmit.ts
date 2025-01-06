@@ -25,21 +25,6 @@ export const useRegistrationSubmit = () => {
     return data !== null;
   };
 
-  const checkEmailExists = async (email: string) => {
-    const { data, error } = await supabase.auth.admin.listUsers({
-      filters: {
-        email: email
-      }
-    });
-
-    if (error) {
-      console.error('Email check error:', error);
-      return true;
-    }
-
-    return data && data.users && data.users.length > 0;
-  };
-
   const handleSubmit = async (
     formData: RegistrationFormData,
     setFormData: (data: RegistrationFormData) => void
@@ -71,17 +56,6 @@ export const useRegistrationSubmit = () => {
       const generatedTenantId = Math.floor(10000 + Math.random() * 90000).toString();
       const email = formData.businessEmail || `${formData.username}@${generatedTenantId}.com`;
 
-      // 检查邮箱是否已存在
-      const emailExists = await checkEmailExists(email);
-      if (emailExists) {
-        toast({
-          title: "错误",
-          description: "该邮箱已被注册，请使用其他邮箱",
-          variant: "destructive",
-        });
-        return;
-      }
-
       // 1. 创建认证用户
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
@@ -93,21 +67,11 @@ export const useRegistrationSubmit = () => {
 
       if (authError) {
         console.error('Auth error:', authError);
-        
-        // 处理特定错误
-        if (authError.message.includes("User already registered")) {
-          toast({
-            title: "注册失败",
-            description: "该账号已被注册，请直接登录或使用其他账号",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "注册失败",
-            description: "创建用户账户时发生错误",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "注册失败",
+          description: "创建用户账户时发生错误",
+          variant: "destructive",
+        });
         return;
       }
 
