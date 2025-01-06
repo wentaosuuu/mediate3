@@ -62,9 +62,10 @@ export const useLoginForm = () => {
       const cleanTenantId = formData.tenantId.toLowerCase().trim();
       const email = `${cleanUsername}.${cleanTenantId}@tenant.com`;
 
-      console.log("Debug - Attempting login with email:", email);
+      console.log("尝试登录的邮箱:", email);
+      console.log("输入的密码:", formData.password);
 
-      // First check if the tenant exists
+      // 首先检查租户是否存在
       const { data: tenantData, error: tenantError } = await supabase
         .from('tenant_registrations')
         .select('tenant_id')
@@ -76,7 +77,7 @@ export const useLoginForm = () => {
         return;
       }
 
-      // Check if user exists in the users table
+      // 检查用户是否存在
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('username')
@@ -89,14 +90,14 @@ export const useLoginForm = () => {
         return;
       }
 
-      // Attempt to sign in
+      // 尝试登录
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password: formData.password,
       });
 
       if (signInError) {
-        console.error("Sign in error:", signInError);
+        console.error("登录错误:", signInError);
         toast.error("密码错误，请重新输入", { position: "top-center" });
         return;
       }
@@ -110,7 +111,7 @@ export const useLoginForm = () => {
       navigate("/dashboard");
       
     } catch (error) {
-      console.error("Login attempt failed:", error);
+      console.error("登录尝试失败:", error);
       toast.error("系统错误，请稍后重试", { position: "top-center" });
     }
   };
