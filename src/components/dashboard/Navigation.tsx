@@ -174,7 +174,7 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
 
   return (
     <Sidebar className="border-r border-gray-200">
-      <SidebarHeader className="p-4 border-b border-gray-200 bg-nav">
+      <SidebarHeader className="flex justify-center items-center p-4 border-b border-gray-200 bg-nav">
         <Logo />
       </SidebarHeader>
       <SidebarContent className="py-2 bg-nav">
@@ -216,7 +216,7 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
                       <SidebarMenuSubButton
                         isActive={currentPath === child.path}
                         onClick={() => onMenuClick(child.path)}
-                        className="text-gray-300 hover:text-white"
+                        className="pl-12 pr-3 py-2 text-gray-300 hover:text-white hover:bg-nav-hover rounded-lg mx-2 transition-colors"
                       >
                         {child.label}
                       </SidebarMenuSubButton>
