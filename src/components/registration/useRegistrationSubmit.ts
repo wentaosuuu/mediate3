@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { RegistrationFormData } from "@/types/registration";
 import { useToast } from "@/hooks/use-toast";
 import { validateForm } from "./RegistrationValidation";
+import { createTenantRegistration, createUserRecord } from "./utils/createUserData";
 
 export const useRegistrationSubmit = () => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -24,38 +25,44 @@ export const useRegistrationSubmit = () => {
     return data !== null;
   };
 
-  const handleSubmit = async (formData: RegistrationFormData, setFormData: (data: RegistrationFormData) => void) => {
-    const validationError = validateForm(formData);
-    if (validationError) {
-      toast({
-        title: "错误",
-        description: validationError,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const usernameExists = await checkUsernameExists(formData.username);
-    if (usernameExists) {
-      toast({
-        title: "错误",
-        description: "该用户名已被使用，请选择其他用户名",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const handleSubmit = async (
+    formData: RegistrationFormData,
+    setFormData: (data: RegistrationFormData) => void
+  ) => {
     try {
+      // 验证表单
+      const validationError = validateForm(formData);
+      if (validationError) {
+        toast({
+          title: "错误",
+          description: validationError,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // 检查用户名是否已存在
+      const usernameExists = await checkUsernameExists(formData.username);
+      if (usernameExists) {
+        toast({
+          title: "错误",
+          description: "该用户名已被使用，请选择其他用户名",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // 生成租户ID和邮箱
       const generatedTenantId = Math.floor(10000 + Math.random() * 90000).toString();
       const email = formData.businessEmail || `${formData.username}@${generatedTenantId}.com`;
-      
-      // 1. Create Supabase Auth user
+
+      // 1. 创建认证用户
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: email,
+        email,
         password: formData.password,
       });
 
-      if (authError) {
+      if (authError || !authData.user) {
         console.error('Auth error:', authError);
         toast({
           title: "注册失败",
@@ -65,31 +72,11 @@ export const useRegistrationSubmit = () => {
         return;
       }
 
-      if (!authData.user) {
-        console.error('No user data returned from auth signup');
-        toast({
-          title: "注册失败",
-          description: "创建用户账户时发生错误",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // 2. Create tenant registration record
-      const { error: registrationError } = await supabase
-        .from('tenant_registrations')
-        .insert([{
-          tenant_id: generatedTenantId,
-          contact_person: formData.contactPerson,
-          phone: formData.phone,
-          company_name: formData.companyName,
-          username: formData.username,
-          social_credit_code: formData.socialCreditCode,
-          address: formData.address || null,
-          company_intro: formData.companyIntro || null,
-          remarks: formData.remarks || null,
-          business_email: formData.businessEmail || null,
-        }]);
+      // 2. 创建租户注册记录
+      const { error: registrationError } = await createTenantRegistration(
+        formData,
+        generatedTenantId
+      );
 
       if (registrationError) {
         console.error('Registration error:', registrationError);
@@ -101,16 +88,14 @@ export const useRegistrationSubmit = () => {
         return;
       }
 
-      // 3. Create user record
-      const { error: userError } = await supabase
-        .from('users')
-        .insert([{
-          id: authData.user.id,
-          tenant_id: generatedTenantId,
-          username: formData.username,
-          phone: formData.phone,
-          email: email
-        }]);
+      // 3. 创建用户记录
+      const { error: userError } = await createUserRecord(
+        authData.user.id,
+        generatedTenantId,
+        formData.username,
+        formData.phone,
+        email
+      );
 
       if (userError) {
         console.error('User creation error:', userError);
@@ -122,10 +107,11 @@ export const useRegistrationSubmit = () => {
         return;
       }
 
+      // 注册成功，显示成功对话框
       setTenantId(generatedTenantId);
       setShowSuccessDialog(true);
-      
-      // Clear form
+
+      // 清空表单
       setFormData({
         contactPerson: "",
         phone: "",
@@ -140,7 +126,7 @@ export const useRegistrationSubmit = () => {
         remarks: "",
         businessEmail: "",
       });
-      
+
     } catch (error) {
       console.error('Registration error:', error);
       toast({
