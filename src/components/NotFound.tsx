@@ -1,17 +1,12 @@
-import React from "react";
+import React from 'react';
+import { FileQuestion } from 'lucide-react';
 
 const NotFound = () => {
   return (
-    <div className="flex flex-col items-center justify-center p-4">
-      <img
-        src="https://images.unsplash.com/photo-1535268647677-300dbf3d78d1"
-        alt="404 Cat"
-        className="w-64 h-64 object-cover rounded-full mb-8"
-      />
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">页面正在开发中...</h1>
-      <p className="text-gray-600 text-center">
-        抱歉，您访问的页面正在建设中，请稍后再试。
-      </p>
+    <div className="flex flex-col items-center justify-center h-full p-8">
+      <FileQuestion className="w-16 h-16 text-gray-400 mb-4" />
+      <h1 className="text-2xl font-semibold text-gray-900 mb-2">页面未找到</h1>
+      <p className="text-gray-500">抱歉，您访问的页面不存在或正在开发中。</p>
     </div>
   );
 };
