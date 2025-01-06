@@ -58,7 +58,7 @@ const LoginForm = () => {
         .from("tenant_registrations")
         .select("tenant_id")
         .eq("tenant_id", formData.tenantId)
-        .single();
+        .maybeSingle();
 
       if (tenantError || !tenantData) {
         toast.error("租户编号不存在", {
@@ -73,9 +73,17 @@ const LoginForm = () => {
         .select("*")
         .eq("tenant_id", formData.tenantId)
         .eq("username", formData.username)
-        .single();
+        .maybeSingle();
 
-      if (userError || !userData) {
+      if (userError) {
+        console.error("User fetch error:", userError);
+        toast.error("获取用户信息失败", {
+          position: "top-center",
+        });
+        return;
+      }
+
+      if (!userData) {
         toast.error("用户名不存在", {
           position: "top-center",
         });
