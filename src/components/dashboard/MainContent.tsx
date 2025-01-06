@@ -75,6 +75,23 @@ export const MainContent = ({ username, currentPath }: MainContentProps) => {
     navigate(path);
   };
 
+  const renderContent = () => {
+    if (currentPath === '/dashboard') {
+      return (
+        <div className="flex items-center gap-2 mb-6">
+          <Home className="h-6 w-6 text-primary" />
+          <h1 className="text-2xl font-semibold text-gray-900">
+            欢迎回来, {username || '用户'}
+          </h1>
+        </div>
+      );
+    }
+
+    // 这里可以根据不同的路径返回不同的组件
+    // 暂时返回 NotFound，后续可以根据需求添加实际的页面组件
+    return <NotFound />;
+  };
+
   return (
     <main className="flex-1 flex flex-col bg-gray-50">
       <PageTabs
@@ -85,16 +102,7 @@ export const MainContent = ({ username, currentPath }: MainContentProps) => {
       />
       <div className="flex-1 p-6">
         <div className="max-w-7xl mx-auto">
-          {currentPath === '/dashboard' ? (
-            <div className="flex items-center gap-2 mb-6">
-              <Home className="h-6 w-6 text-primary" />
-              <h1 className="text-2xl font-semibold text-gray-900">
-                欢迎回来, {username || '用户'}
-              </h1>
-            </div>
-          ) : (
-            <NotFound />
-          )}
+          {renderContent()}
         </div>
       </div>
     </main>
