@@ -177,10 +177,10 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
       <SidebarHeader className="flex justify-center items-center p-4 border-b border-gray-200 bg-nav">
         <Logo />
       </SidebarHeader>
-      <SidebarContent className="py-4 bg-nav">
+      <SidebarContent className="py-6 bg-nav">
         <SidebarMenu>
           {menuItems.map((item) => (
-            <SidebarMenuItem key={item.label}>
+            <SidebarMenuItem key={item.label} className="mb-2">
               <SidebarMenuButton
                 asChild
                 isActive={currentPath === item.path}
@@ -192,7 +192,7 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
                 }}
               >
                 <div className={`
-                  flex items-center justify-between px-4 py-3 mx-2 rounded-lg 
+                  flex items-center justify-between px-4 py-3.5 mx-2 rounded-lg 
                   transition-colors cursor-pointer text-base
                   ${currentPath === item.path 
                     ? 'bg-nav-active text-primary' 
@@ -214,27 +214,29 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
               </SidebarMenuButton>
               {item.children && (
                 <SidebarMenuSub 
-                  className={`transition-all duration-200 mt-1 ${
+                  className={`transition-all duration-200 mt-2 ${
                     expandedMenus.includes(item.path) ? 'block' : 'hidden'
                   }`}
                 >
-                  {item.children.map((child) => (
-                    <SidebarMenuSubItem key={child.path}>
-                      <SidebarMenuSubButton
-                        isActive={currentPath === child.path}
-                        onClick={() => onMenuClick(child.path)}
-                        className={`
-                          pl-14 pr-4 py-2.5 mx-2 rounded-lg transition-colors text-sm
-                          ${currentPath === child.path
-                            ? 'text-primary bg-nav-active'
-                            : 'text-gray-300 hover:text-white hover:bg-nav-hover'
-                          }
-                        `}
-                      >
-                        {child.label}
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
+                  <div className="py-2 bg-nav-active/30 mx-2 rounded-lg">
+                    {item.children.map((child) => (
+                      <SidebarMenuSubItem key={child.path} className="mb-1 last:mb-0">
+                        <SidebarMenuSubButton
+                          isActive={currentPath === child.path}
+                          onClick={() => onMenuClick(child.path)}
+                          className={`
+                            pl-14 pr-4 py-3 transition-colors text-sm
+                            ${currentPath === child.path
+                              ? 'text-primary bg-nav-active'
+                              : 'text-gray-300 hover:text-white hover:bg-nav-hover'
+                            }
+                          `}
+                        >
+                          {child.label}
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </div>
                 </SidebarMenuSub>
               )}
             </SidebarMenuItem>
