@@ -9,6 +9,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import {
@@ -37,11 +38,20 @@ import {
   MessageSquare,
   Star,
   Briefcase,
+  ChevronRight,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const menuItems = [
-  { icon: Home, label: "首页", path: "/dashboard" },
+  { 
+    icon: Home, 
+    label: "首页", 
+    path: "/dashboard",
+    children: [
+      { label: "工作台", path: "/dashboard/workspace" },
+      { label: "分析页", path: "/dashboard/analysis" },
+    ]
+  },
   { icon: FileText, label: "案件管理", path: "/cases" },
   { icon: MessageSquare, label: "调解管理", path: "/mediation" },
   { icon: BarChart2, label: "仪表盘", path: "/stats" },
@@ -63,6 +73,8 @@ const Dashboard = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [username, setUsername] = useState<string | null>(null);
+  const [department, setDepartment] = useState("技术部"); // 临时部门数据
+  const [role, setRole] = useState("系统管理员"); // 临时角色数据
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -109,7 +121,7 @@ const Dashboard = () => {
         <Sidebar className="border-r border-gray-200">
           <SidebarHeader className="p-4 border-b border-gray-200 bg-nav">
             <img
-              src="/lovable-uploads/345b6c78-cf53-428b-8148-2d5243378f46.png"
+              src="/lovable-uploads/4b6c2cac-5597-4e26-bfde-a2902643b26a.png"
               alt="Logo"
               className="h-8"
             />
@@ -121,12 +133,30 @@ const Dashboard = () => {
                   <SidebarMenuButton asChild>
                     <a 
                       href={item.path} 
-                      className="flex items-center gap-3 px-3 py-2 text-gray-300 hover:bg-nav-hover hover:text-white rounded-lg mx-2 transition-colors"
+                      className="flex items-center justify-between px-3 py-2 text-gray-300 hover:bg-nav-hover hover:text-white rounded-lg mx-2 transition-colors group"
                     >
-                      <item.icon className="h-5 w-5" />
-                      <span className="text-sm">{item.label}</span>
+                      <div className="flex items-center gap-3">
+                        <item.icon className="h-5 w-5" />
+                        <span className="text-sm">{item.label}</span>
+                      </div>
+                      {item.children && (
+                        <ChevronRight className="h-4 w-4 transition-transform group-hover:rotate-90" />
+                      )}
                     </a>
                   </SidebarMenuButton>
+                  {item.children && (
+                    <div className="ml-11 mt-1 space-y-1">
+                      {item.children.map((child) => (
+                        <a
+                          key={child.label}
+                          href={child.path}
+                          className="block px-3 py-1 text-sm text-gray-400 hover:text-white hover:bg-nav-hover rounded-lg transition-colors"
+                        >
+                          {child.label}
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
@@ -137,6 +167,7 @@ const Dashboard = () => {
           {/* Top toolbar */}
           <header className="h-16 border-b border-gray-200 bg-white px-6 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-4 flex-1 max-w-xl">
+              <SidebarTrigger />
               <Search className="h-5 w-5 text-gray-400" />
               <Input
                 type="search"
@@ -158,7 +189,14 @@ const Dashboard = () => {
                   <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center text-white text-sm">
                     {username?.[0]?.toUpperCase() || 'U'}
                   </div>
-                  <span className="text-sm text-gray-700">{username || '用户'}</span>
+                  <div className="flex flex-col items-start">
+                    <span className="text-sm font-medium text-gray-700">{username || '用户'}</span>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <span>{department}</span>
+                      <span>·</span>
+                      <span>{role}</span>
+                    </div>
+                  </div>
                   <ChevronDown className="h-4 w-4 text-gray-500" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">

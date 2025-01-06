@@ -32,6 +32,7 @@ export default {
         nav: {
           DEFAULT: "#2C3E50",
           hover: "#34495E",
+          active: "#1E2A37",
         },
         text: {
           primary: "#303133",
