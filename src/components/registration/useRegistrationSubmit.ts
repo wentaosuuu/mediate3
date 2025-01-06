@@ -11,18 +11,23 @@ export const useRegistrationSubmit = () => {
   const { toast } = useToast();
 
   const checkUsernameExists = async (username: string) => {
-    const { data, error } = await supabase
-      .from('tenant_registrations')
-      .select('username')
-      .eq('username', username)
-      .maybeSingle();
+    try {
+      const { data, error } = await supabase
+        .from('tenant_registrations')
+        .select('username')
+        .eq('username', username)
+        .single();
 
-    if (error) {
+      if (error && error.code !== 'PGRST116') {
+        console.error('Username check error:', error);
+        return true;
+      }
+
+      return data !== null;
+    } catch (error) {
       console.error('Username check error:', error);
       return true;
     }
-
-    return data !== null;
   };
 
   const handleSubmit = async (
@@ -34,7 +39,7 @@ export const useRegistrationSubmit = () => {
       const validationError = validateForm(formData);
       if (validationError) {
         toast({
-          title: "错误",
+          title: "验证错误",
           description: validationError,
           variant: "destructive",
         });
@@ -45,14 +50,14 @@ export const useRegistrationSubmit = () => {
       const usernameExists = await checkUsernameExists(formData.username);
       if (usernameExists) {
         toast({
-          title: "错误",
+          title: "用户名已存在",
           description: "该用户名已被使用，请选择其他用户名",
           variant: "destructive",
         });
         return;
       }
 
-      // 生成租户ID和邮箱
+      // 生成租户ID
       const generatedTenantId = Math.floor(10000 + Math.random() * 90000).toString();
       const email = formData.businessEmail || `${formData.username}@${generatedTenantId}.com`;
 
@@ -60,16 +65,13 @@ export const useRegistrationSubmit = () => {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password: formData.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`
-        }
       });
 
       if (authError) {
         console.error('Auth error:', authError);
         toast({
           title: "注册失败",
-          description: "创建用户账户时发生错误",
+          description: authError.message,
           variant: "destructive",
         });
         return;
@@ -83,9 +85,6 @@ export const useRegistrationSubmit = () => {
         });
         return;
       }
-
-      // 等待一小段时间确保auth用户创建完成
-      await new Promise(resolve => setTimeout(resolve, 1000));
 
       // 2. 创建租户注册记录
       const { error: registrationError } = await createTenantRegistration(
