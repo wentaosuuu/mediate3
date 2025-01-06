@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Home } from 'lucide-react';
 import NotFound from '@/components/NotFound';
 import { PageTabs } from './PageTabs';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { menuItems } from '@/config/menuItems';
 
 interface Tab {
@@ -17,7 +17,6 @@ interface MainContentProps {
 }
 
 const getTabLabel = (path: string): string => {
-  // 递归查找菜单项
   const findMenuLabel = (items: any[]): string | null => {
     for (const item of items) {
       if (item.path === path) {
@@ -42,7 +41,6 @@ const getTabLabel = (path: string): string => {
 
 export const MainContent = ({ username, currentPath }: MainContentProps) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [tabs, setTabs] = useState<Tab[]>([
     { path: '/dashboard', label: '首页', closeable: false }
   ]);
