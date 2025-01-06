@@ -55,6 +55,12 @@ export const useLoginForm = () => {
         return;
       }
 
+      if (!registrationData.business_email) {
+        console.error("No business email found for user");
+        toast.error("账户邮箱未设置，请联系管理员");
+        return;
+      }
+
       console.log("Found registration data:", {
         email: registrationData.business_email,
         username: formData.username,
@@ -69,7 +75,18 @@ export const useLoginForm = () => {
 
       if (signInError) {
         console.error("Login error details:", signInError);
-        toast.error("密码错误");
+        
+        // More specific error messages based on the error type
+        if (signInError.message.includes("Invalid login credentials")) {
+          toast.error("密码错误，请重试");
+        } else {
+          toast.error("登录失败: " + signInError.message);
+        }
+        return;
+      }
+
+      if (!signInData.user) {
+        toast.error("登录失败，未能获取用户信息");
         return;
       }
 
