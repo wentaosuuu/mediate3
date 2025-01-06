@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { VerificationCode } from "./VerificationCode";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -26,6 +27,8 @@ export const LoginFields = ({
   onRefreshCode,
   onChange,
 }: LoginFieldsProps) => {
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
@@ -68,12 +71,25 @@ export const LoginFields = ({
         <label className="w-24 text-left text-sm font-medium text-text-primary">
           密码
         </label>
-        <Input
-          type="password"
-          className="flex-1 rounded-full border-gray-300 focus:border-primary focus:ring-primary"
-          value={formData.password}
-          onChange={(e) => onChange("password", e.target.value)}
-        />
+        <div className="flex-1 relative">
+          <Input
+            type={showPassword ? "text" : "password"}
+            className="w-full rounded-full border-gray-300 focus:border-primary focus:ring-primary pr-10"
+            value={formData.password}
+            onChange={(e) => onChange("password", e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+          >
+            {showPassword ? (
+              <EyeOff className="h-5 w-5" />
+            ) : (
+              <Eye className="h-5 w-5" />
+            )}
+          </button>
+        </div>
       </div>
 
       <div className="flex items-center gap-4">
