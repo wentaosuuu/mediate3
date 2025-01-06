@@ -62,8 +62,6 @@ export const useLoginForm = () => {
       const cleanTenantId = formData.tenantId.toLowerCase().trim();
       const email = `${cleanUsername}.${cleanTenantId}@tenant.com`;
 
-      console.log("Attempting login with email:", email);
-
       // First check if the tenant exists
       const { data: tenantData, error: tenantError } = await supabase
         .from('tenant_registrations')
@@ -71,12 +69,25 @@ export const useLoginForm = () => {
         .eq('tenant_id', cleanTenantId)
         .single();
 
-      if (!tenantData) {
+      if (tenantError || !tenantData) {
         toast.error("租户编号不存在，请检查后重试", { position: "top-center" });
         return;
       }
 
-      // Then attempt to sign in
+      // Check if user exists in the users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('username')
+        .eq('tenant_id', cleanTenantId)
+        .eq('username', cleanUsername)
+        .single();
+
+      if (userError || !userData) {
+        toast.error("用户名不存在，请检查后重试", { position: "top-center" });
+        return;
+      }
+
+      // Attempt to sign in
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password: formData.password,
@@ -84,25 +95,7 @@ export const useLoginForm = () => {
 
       if (signInError) {
         console.error("Sign in error:", signInError);
-        
-        // Check specific error cases
-        if (signInError.message.includes("Invalid login credentials")) {
-          // Check if user exists first
-          const { data: userData } = await supabase
-            .from('users')
-            .select('username')
-            .eq('tenant_id', cleanTenantId)
-            .eq('username', cleanUsername)
-            .single();
-
-          if (!userData) {
-            toast.error("用户名不存在，请检查后重试", { position: "top-center" });
-          } else {
-            toast.error("密码错误，请重新输入", { position: "top-center" });
-          }
-        } else {
-          toast.error("登录失败，请稍后重试", { position: "top-center" });
-        }
+        toast.error("密码错误，请重新输入", { position: "top-center" });
         return;
       }
 
