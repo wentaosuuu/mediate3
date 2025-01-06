@@ -62,10 +62,14 @@ export const useLoginForm = () => {
       const cleanTenantId = formData.tenantId.toLowerCase().trim();
       const email = `${cleanUsername}.${cleanTenantId}@tenant.com`;
 
-      console.log("尝试登录的邮箱:", email);
-      console.log("输入的密码:", formData.password);
+      console.log("登录信息：", {
+        租户编号: cleanTenantId,
+        用户名: cleanUsername,
+        生成的邮箱: email,
+        密码: formData.password
+      });
 
-      // 首先检查租户是否存在
+      // 检查租户是否存在
       const { data: tenantData, error: tenantError } = await supabase
         .from('tenant_registrations')
         .select('tenant_id')
@@ -73,9 +77,12 @@ export const useLoginForm = () => {
         .single();
 
       if (tenantError || !tenantData) {
+        console.error("租户查询错误:", tenantError);
         toast.error("租户编号不存在，请检查后重试", { position: "top-center" });
         return;
       }
+
+      console.log("租户验证通过:", tenantData);
 
       // 检查用户是否存在
       const { data: userData, error: userError } = await supabase
@@ -86,9 +93,12 @@ export const useLoginForm = () => {
         .single();
 
       if (userError || !userData) {
+        console.error("用户查询错误:", userError);
         toast.error("用户名不存在，请检查后重试", { position: "top-center" });
         return;
       }
+
+      console.log("用户验证通过:", userData);
 
       // 尝试登录
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -106,6 +116,8 @@ export const useLoginForm = () => {
         toast.error("登录失败，未能获取用户信息", { position: "top-center" });
         return;
       }
+
+      console.log("登录成功，用户信息:", signInData.user);
 
       toast.success("登录成功", { position: "top-center" });
       navigate("/dashboard");
