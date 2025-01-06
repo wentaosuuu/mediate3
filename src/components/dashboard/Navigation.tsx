@@ -177,7 +177,7 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
       <SidebarHeader className="flex justify-center items-center p-4 border-b border-gray-200 bg-nav">
         <Logo />
       </SidebarHeader>
-      <SidebarContent className="py-2 bg-nav">
+      <SidebarContent className="py-4 bg-nav">
         <SidebarMenu>
           {menuItems.map((item) => (
             <SidebarMenuItem key={item.label}>
@@ -191,10 +191,17 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
                   }
                 }}
               >
-                <div className="flex items-center justify-between px-3 py-2 text-gray-300 hover:bg-nav-hover hover:text-white rounded-lg mx-2 transition-colors group cursor-pointer">
+                <div className={`
+                  flex items-center justify-between px-4 py-3 mx-2 rounded-lg 
+                  transition-colors cursor-pointer text-base
+                  ${currentPath === item.path 
+                    ? 'bg-nav-active text-primary' 
+                    : 'text-gray-300 hover:bg-nav-hover hover:text-white'
+                  }
+                `}>
                   <div className="flex items-center gap-3">
                     <item.icon className="h-5 w-5" />
-                    <span className="text-sm">{item.label}</span>
+                    <span className="font-medium">{item.label}</span>
                   </div>
                   {item.children && (
                     <ChevronRight 
@@ -207,7 +214,7 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
               </SidebarMenuButton>
               {item.children && (
                 <SidebarMenuSub 
-                  className={`transition-all duration-200 ${
+                  className={`transition-all duration-200 mt-1 ${
                     expandedMenus.includes(item.path) ? 'block' : 'hidden'
                   }`}
                 >
@@ -216,7 +223,13 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
                       <SidebarMenuSubButton
                         isActive={currentPath === child.path}
                         onClick={() => onMenuClick(child.path)}
-                        className="pl-12 pr-3 py-2 text-gray-300 hover:text-white hover:bg-nav-hover rounded-lg mx-2 transition-colors"
+                        className={`
+                          pl-14 pr-4 py-2.5 mx-2 rounded-lg transition-colors text-sm
+                          ${currentPath === child.path
+                            ? 'text-primary bg-nav-active'
+                            : 'text-gray-300 hover:text-white hover:bg-nav-hover'
+                          }
+                        `}
                       >
                         {child.label}
                       </SidebarMenuSubButton>
