@@ -69,16 +69,6 @@ export const useLoginForm = () => {
 
       if (signInError) {
         console.error("Sign in error:", signInError);
-        
-        // Check if the user exists in Supabase Auth
-        const { data: userExists } = await supabase.auth.admin.getUserByEmail(registrationData.business_email);
-        
-        if (!userExists) {
-          console.error("User does not exist in Supabase Auth");
-          toast.error("账户未激活，请联系管理员");
-          return;
-        }
-
         toast.error("密码错误，请重试");
         return;
       }
