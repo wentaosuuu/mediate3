@@ -12,9 +12,16 @@ interface MenuItemProps {
   currentPath: string;
   isExpanded: boolean;
   onMenuClick: (item: MenuItemType) => void;
+  onSubMenuClick: (path: string) => void;
 }
 
-export const MenuItem = ({ item, currentPath, isExpanded, onMenuClick }: MenuItemProps) => {
+export const MenuItem = ({ 
+  item, 
+  currentPath, 
+  isExpanded, 
+  onMenuClick,
+  onSubMenuClick 
+}: MenuItemProps) => {
   return (
     <SidebarMenuItem className="mb-4">
       <SidebarMenuButton
@@ -48,7 +55,7 @@ export const MenuItem = ({ item, currentPath, isExpanded, onMenuClick }: MenuIte
           isExpanded={isExpanded}
           children={item.children}
           currentPath={currentPath}
-          onMenuClick={(path) => onMenuClick({ ...item, path })}
+          onMenuClick={onSubMenuClick}
         />
       )}
     </SidebarMenuItem>

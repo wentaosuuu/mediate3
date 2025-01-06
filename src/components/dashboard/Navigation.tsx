@@ -28,6 +28,11 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
     }
   };
 
+  const handleSubMenuClick = (path: string) => {
+    // 点击子菜单项只进行页面跳转，不折叠菜单
+    onMenuClick(path);
+  };
+
   return (
     <Sidebar className="border-r border-gray-200">
       <SidebarHeader className="flex justify-center items-center p-4 border-b border-gray-200 bg-nav">
@@ -42,6 +47,7 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
               currentPath={currentPath}
               isExpanded={expandedMenu === item.path}
               onMenuClick={handleMenuClick}
+              onSubMenuClick={handleSubMenuClick}
             />
           ))}
         </SidebarMenu>
