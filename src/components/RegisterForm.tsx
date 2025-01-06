@@ -30,7 +30,6 @@ const RegisterForm = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  // 检查用户名是否已存在
   const checkUsernameExists = async (username: string) => {
     const { data, error } = await supabase
       .from('tenant_registrations')
@@ -40,7 +39,7 @@ const RegisterForm = () => {
 
     if (error) {
       console.error('Username check error:', error);
-      return true; // 如果检查出错，为安全起见返回 true
+      return true;
     }
 
     return data !== null;
@@ -80,7 +79,6 @@ const RegisterForm = () => {
       return;
     }
 
-    // 检查用户名是否已存在
     const usernameExists = await checkUsernameExists(formData.username);
     if (usernameExists) {
       toast({
@@ -94,6 +92,22 @@ const RegisterForm = () => {
     try {
       const generatedTenantId = Math.floor(10000 + Math.random() * 90000).toString();
       
+      // 1. 创建 Supabase Auth 用户
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.businessEmail || `${formData.username}@${generatedTenantId}.com`,
+        password: formData.password,
+      });
+
+      if (authError) {
+        console.error('Auth error:', authError);
+        toast({
+          title: "注册失败",
+          description: "创建用户账户时发生错误",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const registrationData = {
         tenant_id: generatedTenantId,
         contact_person: formData.contactPerson,
@@ -107,13 +121,15 @@ const RegisterForm = () => {
         business_email: formData.businessEmail || null,
       };
 
-      // 1. 首先创建租户注册记录
+      // 2. 创建租户注册记录
       const { error: registrationError } = await supabase
         .from('tenant_registrations')
         .insert([registrationData]);
 
       if (registrationError) {
         console.error('Registration error:', registrationError);
+        // 如果租户注册失败，删除已创建的 auth 用户
+        await supabase.auth.admin.deleteUser(authData.user!.id);
         toast({
           title: "注册失败",
           description: registrationError.message,
@@ -122,19 +138,21 @@ const RegisterForm = () => {
         return;
       }
 
-      // 2. 然后在users表中创建用户记录
+      // 3. 创建用户记录
       const { error: userError } = await supabase
         .from('users')
         .insert([{
+          id: authData.user!.id,
           tenant_id: generatedTenantId,
           username: formData.username,
           phone: formData.phone,
-          email: formData.businessEmail || null
+          email: formData.businessEmail || `${formData.username}@${generatedTenantId}.com`
         }]);
 
       if (userError) {
         console.error('User creation error:', userError);
-        // 如果用户创建失败，回滚租户注册
+        // 如果用户创建失败，回滚所有更改
+        await supabase.auth.admin.deleteUser(authData.user!.id);
         await supabase
           .from('tenant_registrations')
           .delete()

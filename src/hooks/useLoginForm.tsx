@@ -43,6 +43,7 @@ export const useLoginForm = () => {
     }
 
     try {
+      // 1. 首先验证租户ID是否存在
       const { data: tenantData, error: tenantError } = await supabase
         .from("tenant_registrations")
         .select("tenant_id")
@@ -56,6 +57,7 @@ export const useLoginForm = () => {
         return;
       }
 
+      // 2. 然后验证用户名是否存在于该租户下
       const { data: userData, error: userError } = await supabase
         .from("users")
         .select("*")
@@ -78,15 +80,14 @@ export const useLoginForm = () => {
         return;
       }
 
-      const loginEmail = userData.email || `${formData.username}@${formData.tenantId}.com`;
-
-      const { error } = await supabase.auth.signInWithPassword({
-        email: loginEmail,
+      // 3. 最后尝试登录
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: userData.email,
         password: formData.password,
       });
 
-      if (error) {
-        console.error("Login error:", error);
+      if (signInError) {
+        console.error("Login error:", signInError);
         toast.error("用户名或密码错误", {
           position: "top-center",
         });
