@@ -29,20 +29,14 @@ export const LoginFields = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
-        <label className="w-24 text-left text-sm font-medium text-text-primary">
-          租户编号
-        </label>
-        <div className="flex-1 flex items-center">
-          <Input
-            type="text"
-            className="flex-1 rounded-full border-gray-300 focus:border-primary focus:ring-primary"
-            value={formData.tenantId}
-            onChange={(e) => onChange("tenantId", e.target.value)}
-          />
-          <TooltipProvider>
+        <div className="w-24 text-left flex items-center gap-1">
+          <label className="text-sm font-medium text-text-primary">
+            租户编号
+          </label>
+          <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <AlertCircle className="h-4 w-4 ml-2 text-gray-400" />
+                <AlertCircle className="h-4 w-4 text-gray-400 cursor-help" />
               </TooltipTrigger>
               <TooltipContent>
                 <p>如忘记租户编号，请联系业务经理找回</p>
@@ -50,6 +44,12 @@ export const LoginFields = ({
             </Tooltip>
           </TooltipProvider>
         </div>
+        <Input
+          type="text"
+          className="flex-1 rounded-full border-gray-300 focus:border-primary focus:ring-primary"
+          value={formData.tenantId}
+          onChange={(e) => onChange("tenantId", e.target.value)}
+        />
       </div>
 
       <div className="flex items-center gap-4">
