@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
-import { SidebarProvider } from '@/components/ui/sidebar';
 import { CaseSearchForm } from '@/components/case/CaseSearchForm';
 import { CaseTable } from '@/components/case/CaseTable';
 
@@ -63,11 +62,13 @@ const CaseDistribution = () => {
 
   return (
     <div className="flex min-h-screen">
-      <Navigation
-        currentPath="/case/distribution"
-        onMenuClick={handleMenuClick}
-      />
-      <div className="flex-1 flex flex-col">
+      <div className="fixed left-0 top-0 h-full">
+        <Navigation
+          currentPath="/case/distribution"
+          onMenuClick={handleMenuClick}
+        />
+      </div>
+      <div className="flex-1 flex flex-col ml-[--sidebar-width]">
         <TopBar
           username={mockUser.username}
           department={mockUser.department}
