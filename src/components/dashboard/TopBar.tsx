@@ -1,7 +1,7 @@
 import React from 'react';
 import { Bell, ChevronDown, Home, LayoutDashboard, LogOut, Search, UserRound } from 'lucide-react';
 import { Input } from "@/components/ui/input";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,8 +29,9 @@ export const TopBar = ({
   return (
     <header className="h-16 border-b border-gray-200 bg-white px-6 flex items-center justify-between shadow-sm">
       <div className="flex items-center gap-4 flex-1 max-w-xl">
-        <SidebarTrigger />
-        <Search className="h-5 w-5 text-gray-400" />
+        <Button variant="ghost" size="icon" className="lg:hidden">
+          <Search className="h-5 w-5 text-gray-400" />
+        </Button>
         <Input
           type="search"
           placeholder="搜索模块、功能..."

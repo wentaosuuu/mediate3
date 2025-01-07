@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-  SidebarMenuSub,
-  SidebarMenuSubItem,
-  SidebarMenuSubButton,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { MenuItem } from '@/types/navigation';
 
@@ -15,7 +15,7 @@ interface SubMenuProps {
 
 export const SubMenu = ({ isExpanded, children, currentPath, onMenuClick }: SubMenuProps) => {
   return (
-    <SidebarMenuSub 
+    <SidebarMenu 
       className={`
         overflow-hidden transition-all duration-300 linear
         ${isExpanded 
@@ -26,8 +26,8 @@ export const SubMenu = ({ isExpanded, children, currentPath, onMenuClick }: SubM
     >
       <div className="py-3 bg-nav-active/30 mx-4 rounded-lg">
         {children.map((child) => (
-          <SidebarMenuSubItem key={child.path} className="mb-2 last:mb-0">
-            <SidebarMenuSubButton
+          <SidebarMenuItem key={child.path}>
+            <SidebarMenuButton
               isActive={currentPath === child.path}
               onClick={() => onMenuClick(child.path)}
               className={`
@@ -39,10 +39,10 @@ export const SubMenu = ({ isExpanded, children, currentPath, onMenuClick }: SubM
               `}
             >
               {child.label}
-            </SidebarMenuSubButton>
-          </SidebarMenuSubItem>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         ))}
       </div>
-    </SidebarMenuSub>
+    </SidebarMenu>
   );
 };
