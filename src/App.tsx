@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import CaseDistribution from "./pages/case/CaseDistribution";
 import NotFound from "./components/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,8 +22,7 @@ const App = () => (
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           {/* 案件管理路由 */}
-          <Route path="/case/distribution" element={<NotFound />} />
-          {/* 调解管理路由 */}
+          <Route path="/case/distribution" element={<CaseDistribution />} />
           <Route path="/mediation/center" element={<NotFound />} />
           <Route path="/mediation/debtor" element={<NotFound />} />
           <Route path="/mediation/case-info" element={<NotFound />} />

@@ -9,6 +9,75 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      cases: {
+        Row: {
+          adjuster: string | null
+          batch_number: string
+          borrower_number: string
+          case_entry_time: string | null
+          case_number: string
+          created_at: string
+          customer_name: string
+          distribution_time: string | null
+          distributor: string | null
+          id: string
+          id_number: string
+          latest_edit_time: string | null
+          latest_progress_time: string | null
+          phone: string | null
+          product_line: string | null
+          progress_status: string | null
+          receiver: string | null
+          result_time: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          adjuster?: string | null
+          batch_number: string
+          borrower_number: string
+          case_entry_time?: string | null
+          case_number: string
+          created_at?: string
+          customer_name: string
+          distribution_time?: string | null
+          distributor?: string | null
+          id?: string
+          id_number: string
+          latest_edit_time?: string | null
+          latest_progress_time?: string | null
+          phone?: string | null
+          product_line?: string | null
+          progress_status?: string | null
+          receiver?: string | null
+          result_time?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          adjuster?: string | null
+          batch_number?: string
+          borrower_number?: string
+          case_entry_time?: string | null
+          case_number?: string
+          created_at?: string
+          customer_name?: string
+          distribution_time?: string | null
+          distributor?: string | null
+          id?: string
+          id_number?: string
+          latest_edit_time?: string | null
+          latest_progress_time?: string | null
+          phone?: string | null
+          product_line?: string | null
+          progress_status?: string | null
+          receiver?: string | null
+          result_time?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tenant_registrations: {
         Row: {
           address: string | null
