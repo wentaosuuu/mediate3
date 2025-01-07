@@ -89,12 +89,12 @@ const CaseDistribution = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex w-full h-screen bg-gray-100">
+      <div className="flex h-screen w-full">
         <Navigation
           currentPath="/case/distribution"
           onMenuClick={handleMenuClick}
         />
-        <div className="flex flex-col flex-1 min-w-0">
+        <div className="flex flex-col flex-1">
           <TopBar
             username={mockUser.username}
             department={mockUser.department}
@@ -103,10 +103,12 @@ const CaseDistribution = () => {
             onSearch={handleSearch}
             searchQuery={searchQuery}
           />
-          <div className="space-y-4 p-6">
-            <h1 className="text-2xl font-semibold text-gray-900">分案管理</h1>
-            <CaseSearchForm onSearch={handleSearchCases} onReset={handleReset} />
-            <CaseTable data={cases} isLoading={isLoading} />
+          <div className="flex-1 overflow-auto p-6 bg-gray-50">
+            <div className="space-y-4">
+              <h1 className="text-2xl font-semibold text-gray-900">分案管理</h1>
+              <CaseSearchForm onSearch={handleSearchCases} onReset={handleReset} />
+              <CaseTable data={cases} isLoading={isLoading} />
+            </div>
           </div>
         </div>
       </div>
