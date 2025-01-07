@@ -41,9 +41,7 @@ const getTabLabel = (path: string): string => {
 
 export const MainContent = ({ username, currentPath }: MainContentProps) => {
   const navigate = useNavigate();
-  const [tabs, setTabs] = useState<Tab[]>([
-    { path: '/dashboard', label: '首页', closeable: false }
-  ]);
+  const [tabs, setTabs] = useState<Tab[]>([]);
 
   useEffect(() => {
     if (currentPath === '/dashboard') return;
@@ -62,8 +60,7 @@ export const MainContent = ({ username, currentPath }: MainContentProps) => {
     setTabs(prev => {
       const newTabs = prev.filter(tab => tab.path !== path);
       if (path === currentPath) {
-        const lastTab = newTabs[newTabs.length - 1];
-        navigate(lastTab.path);
+        navigate(newTabs.length > 0 ? newTabs[newTabs.length - 1].path : '/dashboard');
       }
       return newTabs;
     });

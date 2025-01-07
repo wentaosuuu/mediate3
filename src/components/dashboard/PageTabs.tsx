@@ -1,5 +1,5 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import { X, Home } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface Tab {
@@ -18,7 +18,24 @@ interface PageTabsProps {
 export const PageTabs = ({ tabs, currentPath, onClose, onTabClick }: PageTabsProps) => {
   return (
     <div className="flex items-center gap-1 px-4 py-1.5 bg-white border-b">
-      {tabs.map((tab) => (
+      {/* Home tab is always first */}
+      <div
+        className={`
+          flex items-center gap-1.5 px-3 py-1.5 rounded cursor-pointer text-xs
+          transition-colors duration-200 ease-in-out
+          ${currentPath === '/dashboard' 
+            ? 'bg-primary text-white' 
+            : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+          }
+        `}
+        onClick={() => onTabClick('/dashboard')}
+      >
+        <Home className="h-3.5 w-3.5" />
+        <span>首页</span>
+      </div>
+      
+      {/* Other tabs */}
+      {tabs.filter(tab => tab.path !== '/dashboard').map((tab) => (
         <div
           key={tab.path}
           className={`
