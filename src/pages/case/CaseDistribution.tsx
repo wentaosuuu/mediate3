@@ -89,7 +89,7 @@ const CaseDistribution = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen w-full">
+      <div className="flex h-screen">
         <Navigation
           currentPath="/case/distribution"
           onMenuClick={handleMenuClick}
@@ -103,13 +103,13 @@ const CaseDistribution = () => {
             onSearch={handleSearch}
             searchQuery={searchQuery}
           />
-          <div className="flex-1 overflow-auto p-6 bg-gray-50">
+          <main className="flex-1 overflow-auto p-6 bg-gray-50">
             <div className="space-y-4">
               <h1 className="text-2xl font-semibold text-gray-900">分案管理</h1>
               <CaseSearchForm onSearch={handleSearchCases} onReset={handleReset} />
               <CaseTable data={cases} isLoading={isLoading} />
             </div>
-          </div>
+          </main>
         </div>
       </div>
     </SidebarProvider>
