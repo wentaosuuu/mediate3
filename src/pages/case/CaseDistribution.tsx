@@ -1,21 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Navigation } from '@/components/dashboard/Navigation';
+import { TopBar } from '@/components/dashboard/TopBar';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { CaseSearchForm } from '@/components/case/CaseSearchForm';
 import { CaseTable } from '@/components/case/CaseTable';
 import { toast } from 'sonner';
 
-interface SearchParams {
-  caseNumber?: string;
-  batchNumber?: string;
-  borrowerNumber?: string;
-  idNumber?: string;
-  customerName?: string;
-  phone?: string;
-}
-
 const CaseDistribution = () => {
-  const [searchParams, setSearchParams] = React.useState<SearchParams>({});
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Mock user data - replace with actual user data later
+  const mockUser = {
+    username: '张三',
+    department: '技术部',
+    role: '管理员'
+  };
+
+  const handleLogout = () => {
+    navigate('/');
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const handleMenuClick = (path: string) => {
+    navigate(path);
+  };
+
+  const [searchParams, setSearchParams] = React.useState({});
 
   const { data: cases = [], isLoading } = useQuery({
     queryKey: ['cases', searchParams],
@@ -54,7 +71,7 @@ const CaseDistribution = () => {
     },
   });
 
-  const handleSearch = (values: SearchParams) => {
+  const handleSearchCases = (values: any) => {
     setSearchParams(values);
   };
 
@@ -63,11 +80,29 @@ const CaseDistribution = () => {
   };
 
   return (
-    <div className="space-y-4 p-6">
-      <h1 className="text-2xl font-semibold text-gray-900">分案管理</h1>
-      <CaseSearchForm onSearch={handleSearch} onReset={handleReset} />
-      <CaseTable data={cases} isLoading={isLoading} />
-    </div>
+    <SidebarProvider>
+      <div className="flex w-full h-screen bg-gray-100">
+        <Navigation
+          currentPath="/case/distribution"
+          onMenuClick={handleMenuClick}
+        />
+        <div className="flex flex-col flex-1 min-w-0">
+          <TopBar
+            username={mockUser.username}
+            department={mockUser.department}
+            role={mockUser.role}
+            onLogout={handleLogout}
+            onSearch={handleSearch}
+            searchQuery={searchQuery}
+          />
+          <div className="space-y-4 p-6">
+            <h1 className="text-2xl font-semibold text-gray-900">分案管理</h1>
+            <CaseSearchForm onSearch={handleSearchCases} onReset={handleReset} />
+            <CaseTable data={cases} isLoading={isLoading} />
+          </div>
+        </div>
+      </div>
+    </SidebarProvider>
   );
 };
 
