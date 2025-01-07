@@ -16,25 +16,23 @@ export const CaseTableRow = ({ caseItem }: CaseTableRowProps) => {
 
   return (
     <TableRow>
-      <TableCell className="whitespace-nowrap bg-white sticky left-0 z-10">
-        {caseItem.case_number}
-      </TableCell>
-      <TableCell className="whitespace-nowrap">{caseItem.batch_number}</TableCell>
-      <TableCell className="whitespace-nowrap">{caseItem.borrower_number}</TableCell>
-      <TableCell className="whitespace-nowrap">{caseItem.id_number}</TableCell>
-      <TableCell className="whitespace-nowrap">{caseItem.customer_name}</TableCell>
-      <TableCell className="whitespace-nowrap">{caseItem.phone || '-'}</TableCell>
-      <TableCell className="whitespace-nowrap">{caseItem.product_line || '-'}</TableCell>
-      <TableCell className="whitespace-nowrap">{caseItem.receiver || '-'}</TableCell>
-      <TableCell className="whitespace-nowrap">{caseItem.adjuster || '-'}</TableCell>
-      <TableCell className="whitespace-nowrap">{caseItem.distributor || '-'}</TableCell>
-      <TableCell className="whitespace-nowrap">{caseItem.progress_status || '-'}</TableCell>
-      <TableCell className="whitespace-nowrap">{formatDate(caseItem.latest_progress_time)}</TableCell>
-      <TableCell className="whitespace-nowrap">{formatDate(caseItem.latest_edit_time)}</TableCell>
-      <TableCell className="whitespace-nowrap">{formatDate(caseItem.case_entry_time)}</TableCell>
-      <TableCell className="whitespace-nowrap">{formatDate(caseItem.distribution_time)}</TableCell>
-      <TableCell className="whitespace-nowrap">{formatDate(caseItem.result_time)}</TableCell>
-      <TableCell className="sticky right-0 bg-white shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)] z-10">
+      <TableCell className="w-[120px] truncate">{caseItem.case_number}</TableCell>
+      <TableCell className="w-[120px] truncate">{caseItem.batch_number}</TableCell>
+      <TableCell className="w-[120px] truncate">{caseItem.borrower_number}</TableCell>
+      <TableCell className="w-[120px] truncate">{caseItem.id_number}</TableCell>
+      <TableCell className="w-[100px] truncate">{caseItem.customer_name}</TableCell>
+      <TableCell className="w-[120px] truncate">{caseItem.phone || '-'}</TableCell>
+      <TableCell className="w-[100px] truncate">{caseItem.product_line || '-'}</TableCell>
+      <TableCell className="w-[100px] truncate">{caseItem.receiver || '-'}</TableCell>
+      <TableCell className="w-[100px] truncate">{caseItem.adjuster || '-'}</TableCell>
+      <TableCell className="w-[100px] truncate">{caseItem.distributor || '-'}</TableCell>
+      <TableCell className="w-[100px] truncate">{caseItem.progress_status || '-'}</TableCell>
+      <TableCell className="w-[150px] truncate">{formatDate(caseItem.latest_progress_time)}</TableCell>
+      <TableCell className="w-[150px] truncate">{formatDate(caseItem.latest_edit_time)}</TableCell>
+      <TableCell className="w-[150px] truncate">{formatDate(caseItem.case_entry_time)}</TableCell>
+      <TableCell className="w-[150px] truncate">{formatDate(caseItem.distribution_time)}</TableCell>
+      <TableCell className="w-[150px] truncate">{formatDate(caseItem.result_time)}</TableCell>
+      <TableCell className="w-[120px]">
         <div className="space-x-2">
           <Button size="sm" variant="outline">
             编辑
