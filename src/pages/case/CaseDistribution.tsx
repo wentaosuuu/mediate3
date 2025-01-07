@@ -4,6 +4,9 @@ import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { CaseSearchForm } from '@/components/case/CaseSearchForm';
 import { CaseTable } from '@/components/case/CaseTable';
+import { CaseStatusTabs } from '@/components/case/CaseStatusTabs';
+import { DepartmentSidebar } from '@/components/case/DepartmentSidebar';
+import { PageTabs } from '@/components/dashboard/PageTabs';
 
 interface SearchParams {
   caseNumber?: string;
@@ -27,6 +30,8 @@ const CaseDistribution = () => {
   const [searchParams, setSearchParams] = useState<SearchParams>({});
   const [cases, setCases] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedDepartment, setSelectedDepartment] = useState('1-1');
+  const [caseStatus, setCaseStatus] = useState('pending');
 
   const handleMenuClick = (path: string) => {
     navigate(path);
@@ -49,6 +54,18 @@ const CaseDistribution = () => {
     setSearchParams({});
   };
 
+  const handleAddCase = () => {
+    // Handle add case
+  };
+
+  const handleImportCases = () => {
+    // Handle import cases
+  };
+
+  const handleExportCases = () => {
+    // Handle export cases
+  };
+
   // Mock user data
   const mockUser = {
     username: '张三',
@@ -59,6 +76,11 @@ const CaseDistribution = () => {
   const handleLogout = () => {
     navigate('/');
   };
+
+  const mockTabs = [
+    { path: '/case/distribution', label: '分案管理', closeable: false },
+    { path: '/case/follow-up', label: '案件跟进', closeable: true },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -82,14 +104,34 @@ const CaseDistribution = () => {
             onSearch={handleSearch}
             searchQuery={searchQuery}
           />
+          <PageTabs
+            tabs={mockTabs}
+            currentPath="/case/distribution"
+            onClose={(path) => console.log('close tab:', path)}
+            onTabClick={(path) => navigate(path)}
+          />
         </div>
 
         {/* 主要内容区域 */}
-        <div className="pt-16 px-6">
-          <div className="space-y-4">
-            <h1 className="text-2xl font-semibold text-gray-900">分案管理</h1>
-            <CaseSearchForm onSearch={handleSearchCases} onReset={handleReset} />
-            <CaseTable data={cases} isLoading={isLoading} />
+        <div className="pt-28 px-6">
+          <div className="mb-4">
+            <CaseStatusTabs value={caseStatus} onValueChange={setCaseStatus} />
+          </div>
+          <div className="flex">
+            <DepartmentSidebar
+              selectedDepartment={selectedDepartment}
+              onDepartmentSelect={setSelectedDepartment}
+            />
+            <div className="flex-1 space-y-4">
+              <CaseSearchForm
+                onSearch={handleSearchCases}
+                onReset={handleReset}
+                onAddCase={handleAddCase}
+                onImportCases={handleImportCases}
+                onExportCases={handleExportCases}
+              />
+              <CaseTable data={cases} isLoading={isLoading} />
+            </div>
           </div>
         </div>
       </div>
