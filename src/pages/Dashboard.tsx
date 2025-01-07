@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { MainContent } from '@/components/dashboard/MainContent';
-import { SidebarProvider } from '@/components/ui/sidebar';
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -18,7 +17,6 @@ const Dashboard = () => {
   };
 
   const handleLogout = () => {
-    // Add logout logic here
     navigate('/');
   };
 
@@ -31,13 +29,15 @@ const Dashboard = () => {
   };
 
   return (
-    <SidebarProvider>
-      <div className="flex w-full h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100">
+      <div className="fixed left-0 top-0 h-full w-64 z-30">
         <Navigation
           currentPath={location.pathname}
           onMenuClick={handleMenuClick}
         />
-        <div className="flex flex-col flex-1 min-w-0">
+      </div>
+      <div className="flex-1 flex flex-col ml-64">
+        <div className="fixed top-0 right-0 left-64 z-20">
           <TopBar
             username={mockUser.username}
             department={mockUser.department}
@@ -46,13 +46,15 @@ const Dashboard = () => {
             onSearch={handleSearch}
             searchQuery={searchQuery}
           />
+        </div>
+        <div className="mt-16">
           <MainContent
             username={mockUser.username}
             currentPath={location.pathname}
           />
         </div>
       </div>
-    </SidebarProvider>
+    </div>
   );
 };
 

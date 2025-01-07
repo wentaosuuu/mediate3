@@ -61,29 +61,31 @@ const CaseDistribution = () => {
   };
 
   return (
-    <div className="flex min-h-screen">
-      <div className="fixed left-0 top-0 h-full">
+    <div className="flex min-h-screen bg-gray-100">
+      <div className="fixed left-0 top-0 h-full w-64 z-30">
         <Navigation
           currentPath="/case/distribution"
           onMenuClick={handleMenuClick}
         />
       </div>
-      <div className="flex-1 flex flex-col ml-[--sidebar-width]">
-        <TopBar
-          username={mockUser.username}
-          department={mockUser.department}
-          role={mockUser.role}
-          onLogout={handleLogout}
-          onSearch={handleSearch}
-          searchQuery={searchQuery}
-        />
-        <main className="flex-1 overflow-auto p-6 bg-gray-50">
+      <div className="flex-1 flex flex-col ml-64">
+        <div className="fixed top-0 right-0 left-64 z-20">
+          <TopBar
+            username={mockUser.username}
+            department={mockUser.department}
+            role={mockUser.role}
+            onLogout={handleLogout}
+            onSearch={handleSearch}
+            searchQuery={searchQuery}
+          />
+        </div>
+        <div className="mt-16 p-6">
           <div className="space-y-4">
             <h1 className="text-2xl font-semibold text-gray-900">分案管理</h1>
             <CaseSearchForm onSearch={handleSearchCases} onReset={handleReset} />
             <CaseTable data={cases} isLoading={isLoading} />
           </div>
-        </main>
+        </div>
       </div>
     </div>
   );
