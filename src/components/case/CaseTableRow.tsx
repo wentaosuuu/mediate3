@@ -15,7 +15,7 @@ export const CaseTableRow = ({ caseItem }: CaseTableRowProps) => {
   };
 
   return (
-    <TableRow className="relative">
+    <TableRow>
       <TableCell className="sticky left-0 z-20 bg-white w-[120px] truncate">
         {caseItem.case_number}
       </TableCell>

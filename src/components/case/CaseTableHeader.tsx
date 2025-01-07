@@ -4,7 +4,7 @@ import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
 export const CaseTableHeader = () => {
   return (
     <TableHeader>
-      <TableRow className="relative">
+      <TableRow>
         <TableHead className="sticky left-0 z-20 bg-white w-[120px]">案件编号</TableHead>
         <div className="flex">
           <TableHead className="w-[120px]">批次编号</TableHead>
