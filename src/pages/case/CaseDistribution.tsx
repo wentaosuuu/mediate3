@@ -9,9 +9,19 @@ import { CaseSearchForm } from '@/components/case/CaseSearchForm';
 import { CaseTable } from '@/components/case/CaseTable';
 import { toast } from 'sonner';
 
+interface SearchParams {
+  caseNumber?: string;
+  batchNumber?: string;
+  borrowerNumber?: string;
+  idNumber?: string;
+  customerName?: string;
+  phone?: string;
+}
+
 const CaseDistribution = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchParams, setSearchParams] = useState<SearchParams>({});
 
   // Mock user data - replace with actual user data later
   const mockUser = {
@@ -31,8 +41,6 @@ const CaseDistribution = () => {
   const handleMenuClick = (path: string) => {
     navigate(path);
   };
-
-  const [searchParams, setSearchParams] = React.useState({});
 
   const { data: cases = [], isLoading } = useQuery({
     queryKey: ['cases', searchParams],
@@ -71,7 +79,7 @@ const CaseDistribution = () => {
     },
   });
 
-  const handleSearchCases = (values: any) => {
+  const handleSearchCases = (values: SearchParams) => {
     setSearchParams(values);
   };
 
