@@ -11,69 +11,126 @@ export type Database = {
     Tables: {
       cases: {
         Row: {
+          actual_repayment: string | null
           adjuster: string | null
           batch_number: string
           borrower_number: string
           case_entry_time: string | null
           case_number: string
+          client: string | null
           created_at: string
           customer_name: string
+          delegation_expiry_time: string | null
+          delegation_period: string | null
           distribution_time: string | null
           distributor: string | null
+          first_delegation_time: string | null
           id: string
           id_number: string
+          installment_amount: string | null
+          installment_periods: string | null
+          is_delegation_expired: string | null
           latest_edit_time: string | null
           latest_progress_time: string | null
+          loan_amount: string | null
+          mediation_status: string | null
+          overdue_date: string | null
+          overdue_days: string | null
+          overdue_m_value: string | null
           phone: string | null
+          preferential_policy: string | null
           product_line: string | null
           progress_status: string | null
           receiver: string | null
+          reduction_amount: string | null
+          remaining_amount: string | null
+          remaining_periods: string | null
+          repaid_amount: string | null
           result_time: string | null
           tenant_id: string
+          total_periods: string | null
           updated_at: string
         }
         Insert: {
+          actual_repayment?: string | null
           adjuster?: string | null
           batch_number: string
           borrower_number: string
           case_entry_time?: string | null
           case_number: string
+          client?: string | null
           created_at?: string
           customer_name: string
+          delegation_expiry_time?: string | null
+          delegation_period?: string | null
           distribution_time?: string | null
           distributor?: string | null
+          first_delegation_time?: string | null
           id?: string
           id_number: string
+          installment_amount?: string | null
+          installment_periods?: string | null
+          is_delegation_expired?: string | null
           latest_edit_time?: string | null
           latest_progress_time?: string | null
+          loan_amount?: string | null
+          mediation_status?: string | null
+          overdue_date?: string | null
+          overdue_days?: string | null
+          overdue_m_value?: string | null
           phone?: string | null
+          preferential_policy?: string | null
           product_line?: string | null
           progress_status?: string | null
           receiver?: string | null
+          reduction_amount?: string | null
+          remaining_amount?: string | null
+          remaining_periods?: string | null
+          repaid_amount?: string | null
           result_time?: string | null
           tenant_id: string
+          total_periods?: string | null
           updated_at?: string
         }
         Update: {
+          actual_repayment?: string | null
           adjuster?: string | null
           batch_number?: string
           borrower_number?: string
           case_entry_time?: string | null
           case_number?: string
+          client?: string | null
           created_at?: string
           customer_name?: string
+          delegation_expiry_time?: string | null
+          delegation_period?: string | null
           distribution_time?: string | null
           distributor?: string | null
+          first_delegation_time?: string | null
           id?: string
           id_number?: string
+          installment_amount?: string | null
+          installment_periods?: string | null
+          is_delegation_expired?: string | null
           latest_edit_time?: string | null
           latest_progress_time?: string | null
+          loan_amount?: string | null
+          mediation_status?: string | null
+          overdue_date?: string | null
+          overdue_days?: string | null
+          overdue_m_value?: string | null
           phone?: string | null
+          preferential_policy?: string | null
           product_line?: string | null
           progress_status?: string | null
           receiver?: string | null
+          reduction_amount?: string | null
+          remaining_amount?: string | null
+          remaining_periods?: string | null
+          repaid_amount?: string | null
           result_time?: string | null
           tenant_id?: string
+          total_periods?: string | null
           updated_at?: string
         }
         Relationships: []
