@@ -1,19 +1,18 @@
 import React from 'react';
-import NotFound from '@/components/NotFound';
 import { TabManager } from './TabManager';
-import { WelcomeContent } from './WelcomeContent';
 
 interface MainContentProps {
   username: string | null;
   currentPath: string;
+  children?: React.ReactNode;
 }
 
-export const MainContent = ({ username, currentPath }: MainContentProps) => {
+export const MainContent = ({ username, currentPath, children }: MainContentProps) => {
   const renderContent = () => {
     if (currentPath === '/dashboard') {
-      return <WelcomeContent username={username} />;
+      return <div className="p-6">欢迎回来, {username}!</div>;
     }
-    return <NotFound />;
+    return children;
   };
 
   return (

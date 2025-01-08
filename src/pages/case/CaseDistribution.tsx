@@ -6,7 +6,7 @@ import { CaseSearchForm } from '@/components/case/CaseSearchForm';
 import { CaseTable } from '@/components/case/CaseTable';
 import { CaseStatusTabs } from '@/components/case/CaseStatusTabs';
 import { DepartmentSidebar } from '@/components/case/DepartmentSidebar';
-import { PageTabs } from '@/components/dashboard/PageTabs';
+import { MainContent } from '@/components/dashboard/MainContent';
 
 interface SearchParams {
   caseNumber?: string;
@@ -77,14 +77,8 @@ const CaseDistribution = () => {
     navigate('/');
   };
 
-  const mockTabs = [
-    { path: '/case/distribution', label: '分案管理', closeable: false },
-    { path: '/case/follow-up', label: '案件跟进', closeable: true },
-  ];
-
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* 左侧固定导航栏 */}
       <div className="fixed left-0 top-0 h-full w-64 z-30">
         <Navigation
           currentPath="/case/distribution"
@@ -92,28 +86,16 @@ const CaseDistribution = () => {
         />
       </div>
 
-      {/* 右侧内容区域 */}
       <div className="pl-64 min-h-screen">
-        {/* 顶部固定导航栏 */}
-        <div className="fixed top-0 right-0 left-64 z-20">
-          <TopBar
-            username={mockUser.username}
-            department={mockUser.department}
-            role={mockUser.role}
-            onLogout={handleLogout}
-            onSearch={handleSearch}
-            searchQuery={searchQuery}
-          />
-          <PageTabs
-            tabs={mockTabs}
-            currentPath="/case/distribution"
-            onClose={(path) => console.log('close tab:', path)}
-            onTabClick={(path) => navigate(path)}
-          />
-        </div>
-
-        {/* 主要内容区域 */}
-        <div className="pt-28 px-6">
+        <TopBar
+          username={mockUser.username}
+          department={mockUser.department}
+          role={mockUser.role}
+          onLogout={handleLogout}
+          onSearch={handleSearch}
+          searchQuery={searchQuery}
+        />
+        <MainContent username={mockUser.username} currentPath="/case/distribution">
           <div className="mb-4">
             <CaseStatusTabs value={caseStatus} onValueChange={setCaseStatus} />
           </div>
@@ -133,7 +115,7 @@ const CaseDistribution = () => {
               <CaseTable data={cases} isLoading={isLoading} />
             </div>
           </div>
-        </div>
+        </MainContent>
       </div>
     </div>
   );
