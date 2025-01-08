@@ -38,16 +38,13 @@ const getTabLabel = (path: string): string => {
 
 export const TabManager = ({ currentPath }: TabManagerProps) => {
   const navigate = useNavigate();
-  const [tabs, setTabs] = useState<Tab[]>([]);
-
-  // 初始化标签页，确保首页标签始终存在
-  useEffect(() => {
-    setTabs([{
+  const [tabs, setTabs] = useState<Tab[]>([
+    {
       path: '/dashboard',
       label: '首页',
       closeable: false
-    }]);
-  }, []);
+    }
+  ]);
 
   // 处理新标签页的添加
   useEffect(() => {
@@ -59,10 +56,10 @@ export const TabManager = ({ currentPath }: TabManagerProps) => {
       const otherTabs = prev.filter(tab => tab.path !== '/dashboard');
       
       // 检查当前路径的标签是否已存在
-      const currentTab = [...otherTabs, homeTab].find(tab => tab?.path === currentPath);
+      const existingTab = prev.find(tab => tab.path === currentPath);
       
-      if (!currentTab) {
-        // 如果标签不存在，添加新标签
+      if (!existingTab) {
+        // 如果标签不存在，添加新标签，确保首页标签在最前面
         return [
           homeTab || { path: '/dashboard', label: '首页', closeable: false },
           ...otherTabs,
