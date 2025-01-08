@@ -16,9 +16,16 @@ interface PageTabsProps {
 }
 
 export const PageTabs = ({ tabs, currentPath, onClose, onTabClick }: PageTabsProps) => {
+  const navigate = useNavigate();
+
+  // Ensure home tab is always first
+  const homeTab = tabs.find(tab => tab.path === '/dashboard');
+  const otherTabs = tabs.filter(tab => tab.path !== '/dashboard');
+  const sortedTabs = homeTab ? [homeTab, ...otherTabs] : otherTabs;
+
   return (
     <div className="flex items-center gap-1 px-4 py-1.5 bg-white border-b">
-      {tabs.map((tab) => (
+      {sortedTabs.map((tab) => (
         <div
           key={tab.path}
           className={`
