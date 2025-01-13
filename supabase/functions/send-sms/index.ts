@@ -9,7 +9,7 @@ const corsHeaders = {
 const SMS_CONFIG = {
   account: 'yb1206',
   password: 'nr4brb',
-  url: 'http://plate.hbsmservice.com:8080/sms/norsubmit'
+  url: 'http://www.dh3t.com/json/sms/BatchSubmit'  // 更新为新的URL
 }
 
 serve(async (req) => {
@@ -40,7 +40,7 @@ serve(async (req) => {
     params.append('mobile', phoneNumbers.replace(/\s+/g, '')) // 移除所有空格
     params.append('content', smsContent)
     params.append('reqid', transactionId)
-    params.append('resptype', '1')  // 改回使用 resptype=1
+    params.append('resptype', '1')  // 使用 resptype=1
 
     // 构建完整的请求URL
     const requestUrl = `${SMS_CONFIG.url}?${params.toString()}`
