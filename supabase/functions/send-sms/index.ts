@@ -37,13 +37,13 @@ serve(async (req) => {
     const params = new URLSearchParams()
     params.append('account', SMS_CONFIG.account)
     params.append('password', SMS_CONFIG.password)
-    params.append('mobile', phoneNumbers)
+    params.append('mobile', phoneNumbers.replace(/\s+/g, '')) // 移除所有空格
     params.append('content', smsContent)
     params.append('reqid', transactionId)
-    params.append('resptype', '1')  // 返回json格式
+    params.append('resptype', 'json')  // 使用json而不是1
 
-    console.log('发送短信请求参数:', params.toString())
-    console.log('发送短信URL:', SMS_CONFIG.url)
+    const requestUrl = `${SMS_CONFIG.url}?${params.toString()}`
+    console.log('完整请求URL:', requestUrl)
 
     // 调用短信接口
     const response = await fetch(SMS_CONFIG.url, {
@@ -59,23 +59,34 @@ serve(async (req) => {
     let result
     try {
       const text = await response.text()
-      console.log('短信API响应内容:', text)
-      result = JSON.parse(text)
+      console.log('短信API原始响应:', text)
+      
+      try {
+        result = JSON.parse(text)
+      } catch {
+        // 如果不是JSON格式，创建一个标准格式的结果对象
+        result = {
+          code: response.status === 200 ? '0' : '1',
+          msg: text
+        }
+      }
     } catch (e) {
       console.error('解析响应失败:', e)
       throw new Error('解析短信接口响应失败')
     }
     
-    console.log('解析后的响应:', result)
+    console.log('处理后的响应:', result)
 
     // 处理响应
-    const success = result.code === '0'
+    const success = result.code === '0' || result.code === 0
     return new Response(
       JSON.stringify({
         success,
         errorDesc: success ? null : `发送失败: ${result.msg || '未知错误'}`,
         result,
-        verificationCode // 返回验证码供前端使用
+        verificationCode,
+        requestUrl, // 返回请求URL以便调试
+        rawResponse: result // 返回原始响应以便调试
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -88,7 +99,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: false,
-        errorDesc: error.message
+        errorDesc: error.message,
+        error: error.toString()
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
