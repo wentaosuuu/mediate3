@@ -28,16 +28,14 @@ serve(async (req) => {
     }
 
     // 构建请求参数
-    const params = new URLSearchParams({
-      account: SMS_CONFIG.account,
-      password: SMS_CONFIG.password,
-      mobile: phoneNumbers,
-      content: content,
-      reqid: transactionId,
-      // 使用默认值
-      resptype: '1',  // 返回json格式
-      sign: '【云宝宝】'
-    })
+    const params = new URLSearchParams()
+    params.append('account', SMS_CONFIG.account)
+    params.append('password', SMS_CONFIG.password)
+    params.append('mobile', phoneNumbers)
+    params.append('content', content)
+    params.append('reqid', transactionId)
+    params.append('resptype', '1')  // 返回json格式
+    params.append('sign', '【云宝宝】')
 
     console.log('Sending SMS with params:', params.toString())
 
@@ -50,9 +48,19 @@ serve(async (req) => {
       body: params.toString()
     })
 
-    const result = await response.json()
+    console.log('SMS API raw response:', response)
     
-    console.log('SMS API response:', result)
+    let result
+    try {
+      const text = await response.text()
+      console.log('SMS API response text:', text)
+      result = JSON.parse(text)
+    } catch (e) {
+      console.error('Failed to parse response:', e)
+      throw new Error('解析短信接口响应失败')
+    }
+    
+    console.log('SMS API parsed response:', result)
 
     // 处理响应
     const success = result.code === '0'
