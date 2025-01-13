@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { X } from "lucide-react";
+import { X, Calendar } from "lucide-react";
 
 interface CreateSmsDialogProps {
   open: boolean;
@@ -124,10 +124,13 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
               <div className="flex items-start gap-4">
                 <span className="w-[116px]">推送时间：</span>
                 <div className="flex-1">
-                  <Input 
-                    type="datetime-local" 
-                    className="bg-white w-[260px] [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-2" 
-                  />
+                  <div className="relative w-[260px]">
+                    <Input 
+                      type="datetime-local" 
+                      className="bg-white pr-10" 
+                    />
+                    <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" />
+                  </div>
                   <div className="text-red-500 text-sm mt-1">*发送时间非必填项，设置发送时间则按照发送时间发送</div>
                 </div>
               </div>
