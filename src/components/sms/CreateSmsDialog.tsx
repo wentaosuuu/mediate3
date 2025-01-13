@@ -25,7 +25,6 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
   const [phoneNumbers, setPhoneNumbers] = useState<string>("");
   const [pushTime, setPushTime] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const templateContent = "【云宝宝】法调云V3.0短信触达服务测试";
   const { toast } = useToast();
 
   const handleSmsTypeChange = (type: string) => {
@@ -63,7 +62,7 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
       const { data, error } = await supabase.functions.invoke('send-sms', {
         body: {
           phoneNumbers,
-          content: templateContent,
+          content: "验证码",  // 实际内容将在Edge Function中生成
           transactionId
         }
       });
@@ -129,7 +128,7 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
                 <span className="w-24">短信内容：</span>
                 <div className="flex-1">
                   {selectedTemplate === "template1" ? (
-                    <div className="p-2 bg-gray-50 rounded border">{templateContent}</div>
+                    <div className="p-2 bg-gray-50 rounded border">【云宝宝】您的验证码是******（验证码将在发送时生成）</div>
                   ) : (
                     <div className="text-red-500">请先选择短信模板</div>
                   )}
@@ -177,7 +176,7 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
               <div className="h-full w-full bg-gray-100 rounded-[28px] p-4">
                 {selectedTemplate === "template1" ? (
                   <div className="bg-white rounded-lg p-4 shadow mt-8">
-                    <p className="text-sm">{templateContent}</p>
+                    <p className="text-sm">【云宝宝】您的验证码是******（验证码将在发送时生成）</p>
                   </div>
                 ) : (
                   <div className="text-center text-gray-400 mt-8">

@@ -27,15 +27,20 @@ serve(async (req) => {
       throw new Error('手机号码和短信内容不能为空')
     }
 
+    // 生成6位随机验证码
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // 构建短信内容
+    const smsContent = `【云宝宝】您的验证码是${verificationCode}`;
+
     // 构建请求参数
     const params = new URLSearchParams()
     params.append('account', SMS_CONFIG.account)
     params.append('password', SMS_CONFIG.password)
     params.append('mobile', phoneNumbers)
-    params.append('content', content)
+    params.append('content', smsContent)
     params.append('reqid', transactionId)
     params.append('resptype', '1')  // 返回json格式
-    params.append('sign', '【云宝宝】')
 
     console.log('发送短信请求参数:', params.toString())
     console.log('发送短信URL:', SMS_CONFIG.url)
@@ -69,7 +74,8 @@ serve(async (req) => {
       JSON.stringify({
         success,
         errorDesc: success ? null : `发送失败: ${result.msg || '未知错误'}`,
-        result
+        result,
+        verificationCode // 返回验证码供前端使用
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
