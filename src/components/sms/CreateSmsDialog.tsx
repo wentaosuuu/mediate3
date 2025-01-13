@@ -28,7 +28,7 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[1000px]">
+      <DialogContent className="max-w-[1200px]">
         <DialogHeader>
           <DialogTitle className="text-lg font-medium">新建短信</DialogTitle>
           <Button
@@ -87,7 +87,7 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 whitespace-nowrap">
+              <div className="flex items-start gap-4">
                 <span className="text-red-500 mr-1">*</span>
                 <span className="w-24">发送用户及发送数据：</span>
                 <div className="flex-1">
@@ -106,7 +106,7 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
                 <div className="flex-1">
                   <Input 
                     type="datetime-local" 
-                    className="bg-white w-[260px]" 
+                    className="bg-white w-[260px] [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-2" 
                   />
                   <div className="text-red-500 text-sm mt-1">*发送时间非必填项，设置发送时间则按照发送时间发送</div>
                 </div>
@@ -115,6 +115,13 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
               <div className="text-center text-gray-500">
                 共0个手机号码，0个号码一条短信
               </div>
+
+              <DialogFooter className="mt-6 justify-start">
+                <Button variant="outline" onClick={() => onOpenChange(false)}>
+                  取消
+                </Button>
+                <Button type="submit">提交</Button>
+              </DialogFooter>
             </div>
           </div>
 
@@ -138,13 +145,6 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
             </div>
           </div>
         </div>
-
-        <DialogFooter className="mt-6">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            取消
-          </Button>
-          <Button type="submit">提交</Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
