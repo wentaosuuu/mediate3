@@ -1,6 +1,5 @@
 // 导入必要的依赖
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { crypto } from "https://deno.land/std@0.177.0/crypto/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,10 +7,12 @@ const corsHeaders = {
 }
 
 // MD5加密函数
-function md5(message: string): string {
-  const hash = crypto.createHash('md5');
-  hash.update(message);
-  return hash.toString();
+async function md5(message: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(message);
+  const hashBuffer = await crypto.subtle.digest('MD5', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 serve(async (req) => {
@@ -43,7 +44,7 @@ serve(async (req) => {
     console.log('密码拼接字符串:', passwordString);
     
     // 获取MD5加密后的密码
-    const password = md5(passwordString);
+    const password = await md5(passwordString);
     console.log('MD5加密后的密码:', password);
 
     // 构建请求体
