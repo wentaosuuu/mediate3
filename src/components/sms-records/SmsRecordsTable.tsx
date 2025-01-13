@@ -1,13 +1,44 @@
 import React from 'react';
+import { format } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import type { SmsRecord } from '@/types/sms';
 
-export const SmsRecordsTable = () => {
+interface SmsRecordsTableProps {
+  data: SmsRecord[];
+  isLoading: boolean;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  onExport: () => void;
+}
+
+export const SmsRecordsTable = ({ 
+  data, 
+  isLoading, 
+  currentPage, 
+  totalPages,
+  onPageChange,
+  onExport 
+}: SmsRecordsTableProps) => {
+  const formatDate = (date: string | null) => {
+    if (!date) return '-';
+    return format(new Date(date), 'yyyy-MM-dd HH:mm:ss');
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm">
       <div className="p-4 border-b">
         <div className="flex gap-2">
-          <Button variant="outline">导出Excel</Button>
+          <Button variant="outline" onClick={onExport}>导出Excel</Button>
         </div>
       </div>
       <div className="w-full">
@@ -27,13 +58,68 @@ export const SmsRecordsTable = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell colSpan={10} className="text-center py-8 text-gray-500">
-                暂无数据
-              </TableCell>
-            </TableRow>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={10} className="text-center py-8">
+                  加载中...
+                </TableCell>
+              </TableRow>
+            ) : data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={10} className="text-center py-8 text-gray-500">
+                  暂无数据
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((record) => (
+                <TableRow key={record.id}>
+                  <TableCell>{record.id}</TableCell>
+                  <TableCell>{record.send_code}</TableCell>
+                  <TableCell>{record.recipients.join(', ')}</TableCell>
+                  <TableCell>{record.sms_type}</TableCell>
+                  <TableCell className="max-w-[300px] truncate">{record.content}</TableCell>
+                  <TableCell>
+                    成功：{record.success_count || 0}
+                    <br />
+                    失败：{record.fail_count || 0}
+                  </TableCell>
+                  <TableCell>{formatDate(record.send_time)}</TableCell>
+                  <TableCell>{record.status === 'success' ? formatDate(record.send_time) : '-'}</TableCell>
+                  <TableCell>{formatDate(record.created_at)}</TableCell>
+                  <TableCell>{record.created_by || '-'}</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
+      </div>
+      <div className="p-4 border-t">
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious 
+                onClick={() => onPageChange(currentPage - 1)}
+                className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+              />
+            </PaginationItem>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <PaginationItem key={page}>
+                <PaginationLink
+                  onClick={() => onPageChange(page)}
+                  isActive={currentPage === page}
+                >
+                  {page}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext 
+                onClick={() => onPageChange(currentPage + 1)}
+                className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   );

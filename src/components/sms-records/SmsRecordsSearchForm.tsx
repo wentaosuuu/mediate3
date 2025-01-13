@@ -8,57 +8,100 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { SmsSearchParams } from '@/types/sms';
 
-export const SmsRecordsSearchForm = () => {
+interface SmsRecordsSearchFormProps {
+  onSearch: (params: SmsSearchParams) => void;
+}
+
+export const SmsRecordsSearchForm = ({ onSearch }: SmsRecordsSearchFormProps) => {
+  const [content, setContent] = React.useState('');
+  const [customerInfo, setCustomerInfo] = React.useState('');
+  const [smsType, setSmsType] = React.useState('');
+  const [status, setStatus] = React.useState('');
+  const [startTime, setStartTime] = React.useState('');
+  const [endTime, setEndTime] = React.useState('');
+
+  const handleSearch = () => {
+    onSearch({
+      content,
+      customerInfo,
+      smsType,
+      status,
+      startTime,
+      endTime
+    });
+  };
+
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
-      <div className="flex gap-4 items-end">
-        <div className="flex-1 max-w-[200px]">
+      <div className="flex gap-4 items-end flex-wrap">
+        <div className="flex-1 min-w-[200px]">
           <label className="block text-sm text-gray-600 mb-1">短信内容：</label>
-          <Input placeholder="请输入" />
+          <Input 
+            placeholder="请输入" 
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          />
         </div>
-        <div className="flex-1 max-w-[200px]">
+        <div className="flex-1 min-w-[200px]">
           <label className="block text-sm text-gray-600 mb-1">客户姓名/手机号：</label>
-          <Input placeholder="请输入" />
+          <Input 
+            placeholder="请输入" 
+            value={customerInfo}
+            onChange={(e) => setCustomerInfo(e.target.value)}
+          />
         </div>
-        <div className="flex-1 max-w-[200px]">
+        <div className="flex-1 min-w-[200px]">
           <label className="block text-sm text-gray-600 mb-1">短信类型：</label>
-          <Select>
+          <Select value={smsType} onValueChange={setSmsType}>
             <SelectTrigger className="bg-white">
               <SelectValue placeholder="请选择" />
             </SelectTrigger>
-            <SelectContent className="bg-white">
-              <SelectItem value="type1">类型一</SelectItem>
-              <SelectItem value="type2">类型二</SelectItem>
+            <SelectContent>
+              <SelectItem value="notice">通知类</SelectItem>
+              <SelectItem value="marketing">营销类</SelectItem>
+              <SelectItem value="verification">验证码</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        <div className="flex-1 max-w-[200px]">
+        <div className="flex-1 min-w-[200px]">
           <label className="block text-sm text-gray-600 mb-1">发送状态：</label>
-          <Select>
+          <Select value={status} onValueChange={setStatus}>
             <SelectTrigger className="bg-white">
               <SelectValue placeholder="请选择" />
             </SelectTrigger>
-            <SelectContent className="bg-white">
+            <SelectContent>
               <SelectItem value="success">发送成功</SelectItem>
               <SelectItem value="failed">发送失败</SelectItem>
+              <SelectItem value="pending">待发送</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        <div className="flex-1 max-w-[200px]">
+        <div className="flex-1 min-w-[200px]">
           <label className="block text-sm text-gray-600 mb-1">发送时间：</label>
           <Input 
             type="datetime-local" 
-            className="bg-white [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+            className="bg-white"
           />
         </div>
-        <div className="flex-1 max-w-[200px]">
+        <div className="flex-1 min-w-[200px]">
           <Input 
             type="datetime-local"
-            className="bg-white [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+            className="bg-white"
           />
         </div>
-        <Button type="submit" className="bg-primary">搜索</Button>
+        <Button 
+          type="button" 
+          className="bg-primary"
+          onClick={handleSearch}
+        >
+          搜索
+        </Button>
       </div>
     </div>
   );
