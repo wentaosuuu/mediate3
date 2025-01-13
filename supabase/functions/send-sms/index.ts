@@ -1,10 +1,20 @@
 // 导入必要的依赖
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
 import { create } from "https://deno.land/x/djwt@v2.4/mod.ts"
+import { crypto } from "https://deno.land/std@0.177.0/crypto/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+// MD5加密函数
+async function md5(message: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(message);
+  const hashBuffer = await crypto.subtle.digest('MD5', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 serve(async (req) => {
@@ -28,32 +38,28 @@ serve(async (req) => {
     // 构建短信内容
     const smsContent = `【云宝宝】您的验证码是${verificationCode}`;
 
-    // API所需参数 - 更新为正确的账号密码
+    // API所需参数
     const account = 'yb1206';  // 账号
-    const password = 'nr4brb';  // 密码
+    const pwd = 'nr4brb';  // 密码
     const timestamp = new Date().getTime().toString();
 
-    // 构建签名字符串: MD5(account + password + timestamp)
-    const signStr = `${account}${password}${timestamp}`;
-    console.log('签名字符串:', signStr);
+    // 构建签名字符串: account+pwd+transactionId (按照顺序,不包含+号)
+    const signStr = `${account}${pwd}${transactionId}`;
+    console.log('MD5签名原始字符串:', signStr);
 
-    // 使用 TextEncoder 和 crypto.subtle.digest 计算 SHA-256
-    const encoder = new TextEncoder();
-    const data = encoder.encode(signStr);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const signature = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    
-    console.log('签名:', signature);
+    // 计算MD5签名
+    const signature = await md5(signStr);
+    console.log('MD5签名结果:', signature);
 
     // 构建请求体
     const requestBody = {
       account,
+      password: signature, // 这里使用MD5加密后的密码
       phones: phoneNumbers,
       content: smsContent,
       sign: signature,
-      timestamp,
-      extno: "01"
+      transactionId, // 使用传入的transactionId
+      extno: "01" // 扩展码
     };
 
     const apiUrl = 'http://www.dh3t.com/json/sms/BatchSubmit';
