@@ -7,12 +7,15 @@ const corsHeaders = {
 
 // MD5加密函数
 async function md5(message: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(message);
-  const hash = await crypto.subtle.digest('MD5', data);
-  return Array.from(new Uint8Array(hash))
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
+  // 使用 TextEncoder 将字符串转换为字节数组
+  const msgUint8 = new TextEncoder().encode(message);
+  // 使用 SubtleCrypto 的 digest 方法计算 MD5
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+  // 将 buffer 转换为字节数组
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  // 将字节数组转换为十六进制字符串
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex;
 }
 
 serve(async (req) => {
@@ -43,9 +46,9 @@ serve(async (req) => {
     const passwordString = `${account}${rawPassword}${transactionId}`;
     console.log('密码拼接字符串:', passwordString);
     
-    // 获取MD5加密后的密码
+    // 获取加密后的密码
     const password = await md5(passwordString);
-    console.log('MD5加密后的密码:', password);
+    console.log('加密后的密码:', password);
 
     // 构建请求体
     const requestBody = {
