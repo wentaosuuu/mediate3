@@ -1,23 +1,18 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { crypto } from "https://deno.land/std@0.168.0/crypto/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// 短信接口配置
-const SMS_CONFIG = {
-  account: 'yb1206',
-  password: await crypto.subtle.digest(
-    "MD5",
-    new TextEncoder().encode("nr4brb")
-  ).then(hash => {
-    return Array.from(new Uint8Array(hash))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
-  }), // MD5加密密码
-  url: 'http://www.dh3t.com/json/sms/BatchSubmit'
+// MD5加密函数
+async function md5(message: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(message);
+  const hash = await crypto.subtle.digest('MD5', data);
+  return Array.from(new Uint8Array(hash))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
 serve(async (req) => {
@@ -41,10 +36,14 @@ serve(async (req) => {
     // 构建短信内容
     const smsContent = `【云宝宝】您的验证码是${verificationCode}`;
 
+    // 获取MD5加密后的密码
+    const password = await md5('nr4brb');
+    console.log('MD5加密后的密码:', password);
+
     // 构建请求体
     const requestBody = {
-      account: SMS_CONFIG.account,
-      password: SMS_CONFIG.password,
+      account: 'yb1206',
+      password: password,
       transactionId: transactionId,
       list: [
         {
@@ -57,14 +56,14 @@ serve(async (req) => {
     };
 
     console.log('发送短信请求参数:', {
-      url: SMS_CONFIG.url,
+      url: 'http://www.dh3t.com/json/sms/BatchSubmit',
       method: 'POST',
       body: JSON.stringify(requestBody),
     });
 
     try {
       // 使用POST方法发送请求到短信API
-      const response = await fetch(SMS_CONFIG.url, {
+      const response = await fetch('http://www.dh3t.com/json/sms/BatchSubmit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -99,7 +98,7 @@ serve(async (req) => {
           errorDesc: success ? null : `发送失败: ${typeof result === 'string' ? result : JSON.stringify(result)}`,
           result,
           verificationCode,
-          requestUrl: SMS_CONFIG.url,
+          requestUrl: 'http://www.dh3t.com/json/sms/BatchSubmit',
           rawResponse: result
         }),
         { 
