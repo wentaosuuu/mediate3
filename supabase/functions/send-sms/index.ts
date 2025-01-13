@@ -33,23 +33,25 @@ serve(async (req) => {
     // 构建短信内容
     const smsContent = `【云宝宝】您的验证码是${verificationCode}`;
 
-    // 构建请求参数
-    const params = {
+    // 构建请求体
+    const requestBody = {
       account: SMS_CONFIG.account,
       password: SMS_CONFIG.password,
-      mobile: phoneNumbers.replace(/\s+/g, ''),
-      content: smsContent,
-      reqid: transactionId,
-      resptype: '1'
+      transactionId: transactionId,
+      list: [
+        {
+          mobile: phoneNumbers.replace(/\s+/g, ''),
+          content: smsContent,
+          uuid: transactionId,
+          ext: "01"
+        }
+      ]
     };
-
-    // 将参数转换为查询字符串
-    const queryString = new URLSearchParams(params).toString();
 
     console.log('发送短信请求参数:', {
       url: SMS_CONFIG.url,
       method: 'POST',
-      body: queryString,
+      body: JSON.stringify(requestBody),
     });
 
     try {
@@ -57,9 +59,9 @@ serve(async (req) => {
       const response = await fetch(SMS_CONFIG.url, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
-        body: queryString
+        body: JSON.stringify(requestBody)
       });
       
       console.log('短信API响应状态:', response.status, response.statusText);
