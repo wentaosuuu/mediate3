@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-import { CaseDistribution } from './pages/case/CaseDistribution';
-import { SmsService } from './pages/mediation/SmsService';
+import CaseDistribution from './pages/case/CaseDistribution';
+import SmsService from './pages/mediation/SmsService';
 
 function App() {
   return (
