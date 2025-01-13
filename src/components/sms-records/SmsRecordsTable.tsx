@@ -10,7 +10,9 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { exportSmsRecordsToExcel } from '@/utils/exportUtils';
 import type { SmsRecord } from '@/types/sms';
+import { useToast } from '@/hooks/use-toast';
 
 interface SmsRecordsTableProps {
   data: SmsRecord[];
@@ -18,7 +20,6 @@ interface SmsRecordsTableProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-  onExport: () => void;
 }
 
 export const SmsRecordsTable = ({ 
@@ -27,18 +28,36 @@ export const SmsRecordsTable = ({
   currentPage, 
   totalPages,
   onPageChange,
-  onExport 
 }: SmsRecordsTableProps) => {
+  const { toast } = useToast();
+  
   const formatDate = (date: string | null) => {
     if (!date) return '-';
     return format(new Date(date), 'yyyy-MM-dd HH:mm:ss');
+  };
+
+  const handleExport = () => {
+    try {
+      exportSmsRecordsToExcel(data);
+      toast({
+        title: "导出成功",
+        description: "Excel文件已开始下载",
+      });
+    } catch (error) {
+      console.error('Export error:', error);
+      toast({
+        title: "导出失败",
+        description: "请稍后重试",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
     <div className="bg-white rounded-lg shadow-sm">
       <div className="p-4 border-b">
         <div className="flex gap-2">
-          <Button variant="outline" onClick={onExport}>导出Excel</Button>
+          <Button variant="outline" onClick={handleExport}>导出Excel</Button>
         </div>
       </div>
       <div className="w-full">
