@@ -23,8 +23,16 @@ interface CreateSmsDialogProps {
 }
 
 export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) => {
+  const [smsType, setSmsType] = useState<string>("normal");
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+  const [phoneNumbers, setPhoneNumbers] = useState<string>("");
   const templateContent = "【云宝宝】法调云V3.0短信触达服务测试";
+
+  const handleSmsTypeChange = (type: string) => {
+    setSmsType(type);
+    setSelectedTemplate("");
+    setPhoneNumbers("");
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -48,11 +56,21 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
               <span>短信类型：</span>
               <div className="flex gap-4">
                 <label className="flex items-center gap-2">
-                  <input type="radio" name="smsType" defaultChecked />
+                  <input 
+                    type="radio" 
+                    name="smsType" 
+                    checked={smsType === "normal"}
+                    onChange={() => handleSmsTypeChange("normal")}
+                  />
                   <span>普通文本短信</span>
                 </label>
                 <label className="flex items-center gap-2">
-                  <input type="radio" name="smsType" />
+                  <input 
+                    type="radio" 
+                    name="smsType" 
+                    checked={smsType === "voice"}
+                    onChange={() => handleSmsTypeChange("voice")}
+                  />
                   <span>智能外呼通知</span>
                 </label>
               </div>
@@ -90,14 +108,16 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
               <div className="flex items-start gap-4">
                 <span className="text-red-500 mr-1">*</span>
                 <span className="w-24">发送用户及发送数据：</span>
-                <div className="flex-1">
-                  {selectedTemplate ? (
-                    <Button variant="outline" className="bg-white">
-                      导入发送用户
-                    </Button>
-                  ) : (
-                    <div className="text-red-500">请先选择短信模板</div>
-                  )}
+                <div className="flex-1 flex gap-2">
+                  <Input 
+                    placeholder="请输入手机号码，多个号码用逗号分隔" 
+                    value={phoneNumbers}
+                    onChange={(e) => setPhoneNumbers(e.target.value)}
+                    className="bg-white flex-1"
+                  />
+                  <Button variant="outline" className="bg-white whitespace-nowrap">
+                    导入发送用户
+                  </Button>
                 </div>
               </div>
 
@@ -113,15 +133,15 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
               </div>
 
               <div className="text-center text-gray-500">
-                共0个手机号码，0个号码一条短信
+                共{phoneNumbers.split(',').filter(n => n.trim()).length}个手机号码，{phoneNumbers.split(',').filter(n => n.trim()).length}个号码一条短信
               </div>
 
-              <DialogFooter className="mt-6 justify-start">
+              <div className="flex justify-center gap-4 mt-6">
                 <Button variant="outline" onClick={() => onOpenChange(false)}>
                   取消
                 </Button>
                 <Button type="submit">提交</Button>
-              </DialogFooter>
+              </div>
             </div>
           </div>
 
