@@ -33,32 +33,33 @@ serve(async (req) => {
     // 构建短信内容
     const smsContent = `【云宝宝】您的验证码是${verificationCode}`;
 
-    // 构建请求头
-    const headers = new Headers({
-      'Content-Type': 'application/x-www-form-urlencoded',
-    });
+    // 构建请求参数
+    const params = {
+      account: SMS_CONFIG.account,
+      password: SMS_CONFIG.password,
+      mobile: phoneNumbers.replace(/\s+/g, ''),
+      content: smsContent,
+      reqid: transactionId,
+      resptype: '1'
+    };
 
-    // 构建请求体
-    const formBody = new URLSearchParams();
-    formBody.append('account', SMS_CONFIG.account);
-    formBody.append('password', SMS_CONFIG.password);
-    formBody.append('mobile', phoneNumbers.replace(/\s+/g, '')); // 移除所有空格
-    formBody.append('content', smsContent);
-    formBody.append('reqid', transactionId);
-    formBody.append('resptype', '1');
+    // 将参数转换为查询字符串
+    const queryString = new URLSearchParams(params).toString();
 
     console.log('发送短信请求参数:', {
       url: SMS_CONFIG.url,
       method: 'POST',
-      body: formBody.toString()
+      body: queryString,
     });
 
     try {
       // 使用POST方法发送请求到短信API
       const response = await fetch(SMS_CONFIG.url, {
         method: 'POST',
-        headers,
-        body: formBody
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: queryString
       });
       
       console.log('短信API响应状态:', response.status, response.statusText);
@@ -71,7 +72,6 @@ serve(async (req) => {
       try {
         result = JSON.parse(text);
       } catch {
-        // 如果不是JSON格式，按照文本处理
         result = text;
       }
       
@@ -80,7 +80,7 @@ serve(async (req) => {
       // 根据响应确定是否发送成功
       const success = response.status === 200 && (
         (typeof result === 'string' && result.includes('0')) || 
-        (typeof result === 'object' && (result.code === '0' || result.code === 0))
+        (typeof result === 'object' && (result.result === '0' || result.result === 0))
       );
 
       return new Response(
