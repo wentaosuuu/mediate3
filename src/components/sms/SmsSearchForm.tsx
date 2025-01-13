@@ -37,8 +37,10 @@ export const SmsSearchForm = () => {
               <SelectValue placeholder="请选择" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="success">发送成功</SelectItem>
-              <SelectItem value="failed">发送失败</SelectItem>
+              <SelectItem value="sent">已发送</SelectItem>
+              <SelectItem value="pending">待发送</SelectItem>
+              <SelectItem value="sending">发送中</SelectItem>
+              <SelectItem value="cancelled">已取消</SelectItem>
             </SelectContent>
           </Select>
         </div>
