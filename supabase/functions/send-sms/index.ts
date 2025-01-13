@@ -6,15 +6,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// MD5加密函数
-async function md5(message: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(message);
-  const hashBuffer = await crypto.subtle.digest('MD5', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
 serve(async (req) => {
   // 处理 CORS 预检请求
   if (req.method === 'OPTIONS') {
@@ -36,41 +27,43 @@ serve(async (req) => {
     // 构建短信内容
     const smsContent = `【云宝宝】您的验证码是${verificationCode}`;
 
-    // 按照文档要求构建密码
+    // API所需参数
     const account = 'yb1206';
     const rawPassword = 'nr4brb';
-    // 拼接字符串: account + pwd + transactionId
-    const passwordString = `${account}${rawPassword}${transactionId}`;
-    console.log('密码拼接字符串:', passwordString);
+    const timestamp = new Date().getTime().toString();
+
+    // 构建签名字符串: account + password + timestamp
+    const signStr = `${account}${rawPassword}${timestamp}`;
+    console.log('签名字符串:', signStr);
+
+    // 计算MD5签名
+    const encoder = new TextEncoder();
+    const data = encoder.encode(signStr);
+    const hashBuffer = await crypto.subtle.digest('MD5', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const signature = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     
-    // 获取MD5加密后的密码
-    const password = await md5(passwordString);
-    console.log('MD5加密后的密码:', password);
+    console.log('MD5签名:', signature);
 
     // 构建请求体
     const requestBody = {
-      account: account,
-      password: password,
-      transactionId: transactionId,
-      list: [
-        {
-          mobile: phoneNumbers.replace(/\s+/g, ''),
-          content: smsContent,
-          uuid: transactionId,
-          ext: "01"
-        }
-      ]
+      account,
+      phones: phoneNumbers,
+      content: smsContent,
+      sign: signature,
+      timestamp,
+      extno: "01"
     };
 
     console.log('发送短信请求参数:', {
-      url: 'http://www.dh3t.com/json/sms/BatchSubmit',
+      url: 'http://112.74.139.4:8002/sms/batch/v1',
       method: 'POST',
       body: JSON.stringify(requestBody),
     });
 
     try {
-      // 使用POST方法发送请求到短信API
-      const response = await fetch('http://www.dh3t.com/json/sms/BatchSubmit', {
+      // 发送POST请求到短信API
+      const response = await fetch('http://112.74.139.4:8002/sms/batch/v1', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,24 +73,21 @@ serve(async (req) => {
       
       console.log('短信API响应状态:', response.status, response.statusText);
       
-      const text = await response.text();
-      console.log('短信API原始响应:', text);
+      const responseText = await response.text();
+      console.log('短信API原始响应:', responseText);
 
       // 尝试解析响应
       let result;
       try {
-        result = JSON.parse(text);
+        result = JSON.parse(responseText);
       } catch {
-        result = text;
+        result = responseText;
       }
       
       console.log('处理后的响应:', result);
 
-      // 根据响应确定是否发送成功
-      const success = response.status === 200 && (
-        (typeof result === 'string' && result.includes('0')) || 
-        (typeof result === 'object' && (result.result === '0' || result.result === 0))
-      );
+      // 根据API文档判断是否发送成功
+      const success = response.status === 200 && result?.code === '0';
 
       return new Response(
         JSON.stringify({
@@ -105,7 +95,7 @@ serve(async (req) => {
           errorDesc: success ? null : `发送失败: ${typeof result === 'string' ? result : JSON.stringify(result)}`,
           result,
           verificationCode,
-          requestUrl: 'http://www.dh3t.com/json/sms/BatchSubmit',
+          requestUrl: 'http://112.74.139.4:8002/sms/batch/v1',
           rawResponse: result
         }),
         { 
