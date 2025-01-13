@@ -25,7 +25,7 @@ interface CreateSmsDialogProps {
 export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[800px]">
+      <DialogContent className="max-w-[1000px]">
         <DialogHeader>
           <DialogTitle className="text-lg font-medium">新建短信</DialogTitle>
           <Button
@@ -38,62 +38,78 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
           </Button>
         </DialogHeader>
         
-        <div className="space-y-6">
-          <div className="flex items-center gap-4">
-            <span>短信类型：</span>
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2">
-                <input type="radio" name="smsType" defaultChecked />
-                <span>普通文本短信</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input type="radio" name="smsType" />
-                <span>智能外呼通知</span>
-              </label>
+        <div className="flex gap-8">
+          {/* Left side - Form content */}
+          <div className="flex-1 space-y-6">
+            <div className="flex items-center gap-4">
+              <span>短信类型：</span>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2">
+                  <input type="radio" name="smsType" defaultChecked />
+                  <span>普通文本短信</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input type="radio" name="smsType" />
+                  <span>智能外呼通知</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-start gap-4">
+                <span className="text-red-500 mr-1">*</span>
+                <span className="w-24">短信模板：</span>
+                <div className="flex-1">
+                  <Select>
+                    <SelectTrigger className="bg-white">
+                      <SelectValue placeholder="请选择" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="template1">模板一</SelectItem>
+                      <SelectItem value="template2">模板二</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <span className="text-red-500 mr-1">*</span>
+                <span className="w-24">短信内容：</span>
+                <div className="flex-1">
+                  <div className="text-red-500">请先选择短信模板</div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <span className="text-red-500 mr-1">*</span>
+                <span className="w-24">发送用户及发送数据：</span>
+                <div className="flex-1">
+                  <div className="text-red-500">请先选择短信模板</div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <span className="w-[116px]">推送时间：</span>
+                <div className="flex-1">
+                  <Input type="datetime-local" className="bg-white" />
+                  <div className="text-red-500 text-sm mt-1">*发送时间非必填项，设置发送时间则按照发送时间发送</div>
+                </div>
+              </div>
+
+              <div className="text-center text-gray-500">
+                共0个手机号码，0个号码一条短信
+              </div>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-start gap-4">
-              <span className="text-red-500 mr-1">*</span>
-              <span className="w-24">短信模板：</span>
-              <Select className="flex-1">
-                <SelectTrigger className="bg-white">
-                  <SelectValue placeholder="请选择" />
-                </SelectTrigger>
-                <SelectContent className="bg-white">
-                  <SelectItem value="template1">模板一</SelectItem>
-                  <SelectItem value="template2">模板二</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <span className="text-red-500 mr-1">*</span>
-              <span className="w-24">短信内容：</span>
-              <div className="flex-1">
-                <div className="text-red-500">请先选择短信模板</div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <span className="text-red-500 mr-1">*</span>
-              <span className="w-24">发送用户及发送数据：</span>
-              <div className="flex-1">
-                <div className="text-red-500">请先选择短信模板</div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <span className="w-[116px]">推送时间：</span>
-              <div className="flex-1">
-                <Input type="datetime-local" className="bg-white" />
-                <div className="text-red-500 text-sm mt-1">*发送时间非必填项，设置发送时间则按照发送时间发送</div>
-              </div>
-            </div>
-
-            <div className="text-center text-gray-500">
-              共0个手机号码，0个号码一条短信
+          {/* Right side - Phone preview */}
+          <div className="w-[300px] flex-shrink-0">
+            <div className="w-full">
+              <img 
+                src="/lovable-uploads/5023865e-b307-468f-a42b-f4cbb5112bd8.png" 
+                alt="Phone Preview" 
+                className="w-full h-auto"
+              />
             </div>
           </div>
         </div>
