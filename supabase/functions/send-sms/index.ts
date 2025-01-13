@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createHash } from "https://deno.land/std@0.168.0/hash/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,8 +9,7 @@ const corsHeaders = {
 // 短信接口配置
 const SMS_CONFIG = {
   account: 'yb1206',
-  // 注意：密码需要进行MD5加密
-  password: 'nr4brb',
+  password: createHash("md5").update("nr4brb").toString(), // MD5加密密码
   url: 'http://www.dh3t.com/json/sms/BatchSubmit'
 }
 
