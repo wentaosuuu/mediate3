@@ -11,6 +11,8 @@ import { SmsTypeSelector } from './SmsTypeSelector';
 import { SmsTemplateSelector } from './SmsTemplateSelector';
 import { PhoneNumberInput } from './PhoneNumberInput';
 import { PushTimeSelector } from './PushTimeSelector';
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CreateSmsDialogProps {
   open: boolean;
@@ -22,13 +24,75 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   const [phoneNumbers, setPhoneNumbers] = useState<string>("");
   const [pushTime, setPushTime] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const templateContent = "【云宝宝】法调云V3.0短信触达服务测试";
+  const { toast } = useToast();
 
   const handleSmsTypeChange = (type: string) => {
     setSmsType(type);
     setSelectedTemplate("");
     setPhoneNumbers("");
     setPushTime("");
+  };
+
+  const handleSubmit = async () => {
+    if (!selectedTemplate) {
+      toast({
+        title: "错误",
+        description: "请选择短信模板",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!phoneNumbers) {
+      toast({
+        title: "错误",
+        description: "请输入手机号码",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const transactionId = crypto.randomUUID();
+      
+      // 调用 Edge Function 发送短信
+      const { data, error } = await supabase.functions.invoke('send-sms', {
+        body: {
+          phoneNumbers,
+          content: templateContent,
+          transactionId
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        toast({
+          title: "发送成功",
+          description: "短信已成功发送",
+        });
+        onOpenChange(false);
+      } else {
+        toast({
+          title: "发送失败",
+          description: data.errorDesc || "短信发送失败",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('发送短信失败:', error);
+      toast({
+        title: "发送失败",
+        description: "发送短信时发生错误",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -83,14 +147,25 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
               />
 
               <div className="text-center text-gray-500">
-                共{phoneNumbers.split(',').filter(n => n.trim()).length}个手机号码，{phoneNumbers.split(',').filter(n => n.trim()).length}个号码一条短信
+                共{phoneNumbers.split(',').filter(n => n.trim()).length}个手机号码，
+                {phoneNumbers.split(',').filter(n => n.trim()).length}个号码一条短信
               </div>
 
               <div className="flex justify-center gap-4 mt-6">
-                <Button variant="outline" onClick={() => onOpenChange(false)}>
+                <Button 
+                  variant="outline" 
+                  onClick={() => onOpenChange(false)}
+                  disabled={isSubmitting}
+                >
                   取消
                 </Button>
-                <Button type="submit">提交</Button>
+                <Button 
+                  type="submit" 
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "发送中..." : "提交"}
+                </Button>
               </div>
             </div>
           </div>
