@@ -36,13 +36,20 @@ serve(async (req) => {
     // 构建短信内容
     const smsContent = `【云宝宝】您的验证码是${verificationCode}`;
 
+    // 按照文档要求构建密码
+    const account = 'yb1206';
+    const rawPassword = 'nr4brb';
+    // 拼接字符串: account + pwd + transactionId
+    const passwordString = `${account}${rawPassword}${transactionId}`;
+    console.log('密码拼接字符串:', passwordString);
+    
     // 获取MD5加密后的密码
-    const password = await md5('nr4brb');
+    const password = await md5(passwordString);
     console.log('MD5加密后的密码:', password);
 
     // 构建请求体
     const requestBody = {
-      account: 'yb1206',
+      account: account,
       password: password,
       transactionId: transactionId,
       list: [
