@@ -37,7 +37,7 @@ serve(async (req) => {
     const signStr = `${account}${rawPassword}${timestamp}`;
     console.log('签名字符串:', signStr);
 
-    // 使用 TextEncoder 和 crypto.subtle.digest 计算 MD5
+    // 使用 TextEncoder 和 crypto.subtle.digest 计算 SHA-256
     const encoder = new TextEncoder();
     const data = encoder.encode(signStr);
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
@@ -57,14 +57,14 @@ serve(async (req) => {
     };
 
     console.log('发送短信请求参数:', {
-      url: 'http://112.74.139.4:8002/sms/batch/v1',
+      url: 'http://112.74.139.4:8002/api/sms/batch/v1', // 更新了 API 路径
       method: 'POST',
       body: JSON.stringify(requestBody),
     });
 
     try {
       // 发送POST请求到短信API
-      const response = await fetch('http://112.74.139.4:8002/sms/batch/v1', {
+      const response = await fetch('http://112.74.139.4:8002/api/sms/batch/v1', { // 更新了 API 路径
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +96,7 @@ serve(async (req) => {
           errorDesc: success ? null : `发送失败: ${typeof result === 'string' ? result : JSON.stringify(result)}`,
           result,
           verificationCode,
-          requestUrl: 'http://112.74.139.4:8002/sms/batch/v1',
+          requestUrl: 'http://112.74.139.4:8002/api/sms/batch/v1', // 更新了 API 路径
           rawResponse: result
         }),
         { 
