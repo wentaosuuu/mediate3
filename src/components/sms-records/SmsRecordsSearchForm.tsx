@@ -79,20 +79,20 @@ export const SmsRecordsSearchForm = ({ onSearch }: SmsRecordsSearchFormProps) =>
           </Select>
         </div>
         {/* 将发送时间相关的输入框放在同一个容器中，作为一个整体进行换行 */}
-        <div className="flex-1 min-w-[420px]">
+        <div className="flex-1 min-w-[200px]">
           <label className="block text-sm text-gray-600 mb-1">发送时间：</label>
           <div className="flex gap-2">
             <Input 
               type="datetime-local" 
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="bg-white flex-1"
+              className="bg-white w-[200px]"
             />
             <Input 
               type="datetime-local"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="bg-white flex-1"
+              className="bg-white w-[200px]"
             />
           </div>
         </div>
