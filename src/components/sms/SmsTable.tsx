@@ -1,13 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { CreateSmsDialog } from './CreateSmsDialog';
 
 export const SmsTable = () => {
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+
   return (
     <div className="bg-white rounded-lg shadow-sm">
       <div className="p-4 border-b">
         <div className="flex gap-2">
-          <Button variant="outline">+ 新增</Button>
+          <Button variant="outline" onClick={() => setShowCreateDialog(true)}>
+            + 新增
+          </Button>
           <Button variant="outline">导出Excel</Button>
         </div>
       </div>
@@ -38,6 +43,11 @@ export const SmsTable = () => {
           </TableBody>
         </Table>
       </div>
+
+      <CreateSmsDialog 
+        open={showCreateDialog} 
+        onOpenChange={setShowCreateDialog}
+      />
     </div>
   );
 };
