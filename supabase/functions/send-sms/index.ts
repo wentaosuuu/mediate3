@@ -34,42 +34,48 @@ serve(async (req) => {
     const smsContent = `【云宝宝】您的验证码是${verificationCode}`;
 
     // 构建请求参数
-    const params = new URLSearchParams()
-    params.append('account', SMS_CONFIG.account)
-    params.append('password', SMS_CONFIG.password)
-    params.append('mobile', phoneNumbers.replace(/\s+/g, '')) // 移除所有空格
-    params.append('content', smsContent)
-    params.append('reqid', transactionId)
-    params.append('resptype', '1')
+    const formData = new FormData();
+    formData.append('account', SMS_CONFIG.account);
+    formData.append('password', SMS_CONFIG.password);
+    formData.append('mobile', phoneNumbers.replace(/\s+/g, '')); // 移除所有空格
+    formData.append('content', smsContent);
+    formData.append('reqid', transactionId);
+    formData.append('resptype', '1');
 
-    // 构建完整的请求URL
-    const requestUrl = `${SMS_CONFIG.url}?${params.toString()}`
-    console.log('发送短信请求URL:', requestUrl)
+    console.log('发送短信请求参数:', {
+      url: SMS_CONFIG.url,
+      method: 'POST',
+      formData: Object.fromEntries(formData)
+    });
 
     try {
-      // 发送GET请求到短信API
-      const response = await fetch(requestUrl)
-      console.log('短信API响应状态:', response.status, response.statusText)
+      // 使用POST方法发送请求到短信API
+      const response = await fetch(SMS_CONFIG.url, {
+        method: 'POST',
+        body: formData
+      });
       
-      const text = await response.text()
-      console.log('短信API原始响应:', text)
+      console.log('短信API响应状态:', response.status, response.statusText);
+      
+      const text = await response.text();
+      console.log('短信API原始响应:', text);
 
       // 尝试解析响应
-      let result
+      let result;
       try {
-        result = JSON.parse(text)
+        result = JSON.parse(text);
       } catch {
         // 如果不是JSON格式，按照文本处理
-        result = text
+        result = text;
       }
       
-      console.log('处理后的响应:', result)
+      console.log('处理后的响应:', result);
 
       // 根据响应确定是否发送成功
       const success = response.status === 200 && (
         (typeof result === 'string' && result.includes('0')) || 
         (typeof result === 'object' && (result.code === '0' || result.code === 0))
-      )
+      );
 
       return new Response(
         JSON.stringify({
@@ -77,21 +83,21 @@ serve(async (req) => {
           errorDesc: success ? null : `发送失败: ${typeof result === 'string' ? result : JSON.stringify(result)}`,
           result,
           verificationCode,
-          requestUrl,
+          requestUrl: SMS_CONFIG.url,
           rawResponse: result
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: success ? 200 : 400
         }
-      )
+      );
     } catch (fetchError) {
-      console.error('调用短信API时发生错误:', fetchError)
-      throw new Error(`调用短信API失败: ${fetchError.message}`)
+      console.error('调用短信API时发生错误:', fetchError);
+      throw new Error(`调用短信API失败: ${fetchError.message}`);
     }
 
   } catch (error) {
-    console.error('发送短信时发生错误:', error)
+    console.error('发送短信时发生错误:', error);
     return new Response(
       JSON.stringify({
         success: false,
@@ -102,6 +108,6 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400
       }
-    )
+    );
   }
-})
+});
