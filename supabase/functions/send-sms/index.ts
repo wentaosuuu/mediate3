@@ -1,5 +1,5 @@
-// @deno-types="https://deno.land/x/md5@v1.0.0/mod.ts"
-import { Md5 } from "https://deno.land/x/md5@v1.0.0/mod.ts";
+// 导入hash-wasm库
+import { createMD5 } from 'https://esm.sh/@peculiar/webcrypto@1.4.0';
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const corsHeaders = {
@@ -8,8 +8,13 @@ const corsHeaders = {
 }
 
 // MD5加密函数
-function md5(message: string): string {
-  return new Md5().update(message).toString();
+async function md5(message: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(message);
+  const crypto = new (globalThis as any).Crypto();
+  const hashBuffer = await crypto.subtle.digest('MD5', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 serve(async (req) => {
@@ -41,7 +46,7 @@ serve(async (req) => {
     console.log('密码拼接字符串:', passwordString);
     
     // 获取MD5加密后的密码
-    const password = md5(passwordString);
+    const password = await md5(passwordString);
     console.log('MD5加密后的密码:', password);
 
     // 构建请求体
