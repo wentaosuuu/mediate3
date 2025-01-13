@@ -56,15 +56,16 @@ serve(async (req) => {
       extno: "01"
     };
 
+    const apiUrl = 'http://www.dh3t.com/json/sms/BatchSubmit';
     console.log('发送短信请求参数:', {
-      url: 'http://112.74.139.4:8002/api/sms/batch/v1', // 更新了 API 路径
+      url: apiUrl,
       method: 'POST',
       body: JSON.stringify(requestBody),
     });
 
     try {
       // 发送POST请求到短信API
-      const response = await fetch('http://112.74.139.4:8002/api/sms/batch/v1', { // 更新了 API 路径
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +97,7 @@ serve(async (req) => {
           errorDesc: success ? null : `发送失败: ${typeof result === 'string' ? result : JSON.stringify(result)}`,
           result,
           verificationCode,
-          requestUrl: 'http://112.74.139.4:8002/api/sms/batch/v1', // 更新了 API 路径
+          requestUrl: apiUrl,
           rawResponse: result
         }),
         { 
