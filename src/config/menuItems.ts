@@ -36,7 +36,8 @@ export const menuItems: MenuItem[] = [
       { label: "调解中心", path: "/mediation/center" },
       { label: "债务人管理", path: "/mediation/debtor" },
       { label: "案件公示信息", path: "/mediation/case-info" },
-      { label: "案件公示信息管理", path: "/mediation/case-info-manage" }
+      { label: "案件公示信息管理", path: "/mediation/case-info-manage" },
+      { label: "短信触达服务", path: "/mediation/sms-service" }
     ]
   },
   { 
