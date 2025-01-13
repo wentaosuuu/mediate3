@@ -1,3 +1,5 @@
+// @deno-types="https://deno.land/x/md5@v1.0.0/mod.ts"
+import { Md5 } from "https://deno.land/x/md5@v1.0.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const corsHeaders = {
@@ -6,16 +8,8 @@ const corsHeaders = {
 }
 
 // MD5加密函数
-async function md5(message: string): Promise<string> {
-  // 使用 TextEncoder 将字符串转换为字节数组
-  const msgUint8 = new TextEncoder().encode(message);
-  // 使用 SubtleCrypto 的 digest 方法计算 MD5
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-  // 将 buffer 转换为字节数组
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  // 将字节数组转换为十六进制字符串
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return hashHex;
+function md5(message: string): string {
+  return new Md5().update(message).toString();
 }
 
 serve(async (req) => {
@@ -46,9 +40,9 @@ serve(async (req) => {
     const passwordString = `${account}${rawPassword}${transactionId}`;
     console.log('密码拼接字符串:', passwordString);
     
-    // 获取加密后的密码
-    const password = await md5(passwordString);
-    console.log('加密后的密码:', password);
+    // 获取MD5加密后的密码
+    const password = md5(passwordString);
+    console.log('MD5加密后的密码:', password);
 
     // 构建请求体
     const requestBody = {
