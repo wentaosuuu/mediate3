@@ -21,10 +21,10 @@ export const SmsSearchForm = () => {
         <div className="flex-1 max-w-[200px]">
           <label className="block text-sm text-gray-600 mb-1">短信类型：</label>
           <Select>
-            <SelectTrigger>
+            <SelectTrigger className="bg-white">
               <SelectValue placeholder="请选择" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               <SelectItem value="type1">类型一</SelectItem>
               <SelectItem value="type2">类型二</SelectItem>
             </SelectContent>
@@ -33,10 +33,10 @@ export const SmsSearchForm = () => {
         <div className="flex-1 max-w-[200px]">
           <label className="block text-sm text-gray-600 mb-1">发送状态：</label>
           <Select>
-            <SelectTrigger>
+            <SelectTrigger className="bg-white">
               <SelectValue placeholder="请选择" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               <SelectItem value="sent">已发送</SelectItem>
               <SelectItem value="pending">待发送</SelectItem>
               <SelectItem value="sending">发送中</SelectItem>
