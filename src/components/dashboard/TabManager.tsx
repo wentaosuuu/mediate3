@@ -38,31 +38,45 @@ const getTabLabel = (path: string): string => {
 
 export const TabManager = ({ currentPath }: TabManagerProps) => {
   const navigate = useNavigate();
-  const [tabs, setTabs] = useState<Tab[]>([
-    {
+  const [tabs, setTabs] = useState<Tab[]>(() => {
+    // 从 localStorage 恢复标签页状态
+    const savedTabs = localStorage.getItem('openTabs');
+    if (savedTabs) {
+      const parsedTabs = JSON.parse(savedTabs);
+      // 确保首页标签始终存在
+      if (!parsedTabs.find((tab: Tab) => tab.path === '/dashboard')) {
+        parsedTabs.unshift({
+          path: '/dashboard',
+          label: '首页',
+          closeable: false
+        });
+      }
+      return parsedTabs;
+    }
+    return [{
       path: '/dashboard',
       label: '首页',
       closeable: false
-    }
-  ]);
+    }];
+  });
+
+  // 保存标签页状态到 localStorage
+  useEffect(() => {
+    localStorage.setItem('openTabs', JSON.stringify(tabs));
+  }, [tabs]);
 
   // 处理新标签页的添加
   useEffect(() => {
     if (currentPath === '/dashboard') return;
 
     setTabs(prev => {
-      // 确保首页标签存在
-      const homeTab = prev.find(tab => tab.path === '/dashboard');
-      const otherTabs = prev.filter(tab => tab.path !== '/dashboard');
-      
       // 检查当前路径的标签是否已存在
       const existingTab = prev.find(tab => tab.path === currentPath);
       
       if (!existingTab) {
-        // 如果标签不存在，添加新标签，确保首页标签在最前面
+        // 如果标签不存在，添加新标签
         return [
-          homeTab || { path: '/dashboard', label: '首页', closeable: false },
-          ...otherTabs,
+          ...prev,
           {
             path: currentPath,
             label: getTabLabel(currentPath),

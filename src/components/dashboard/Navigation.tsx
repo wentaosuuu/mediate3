@@ -16,12 +16,30 @@ interface NavigationProps {
 }
 
 export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
-  const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
+  // 获取当前路径对应的一级菜单路径
+  const getCurrentParentPath = (path: string) => {
+    for (const item of menuItems) {
+      if (item.children) {
+        if (item.children.some(child => child.path === path)) {
+          return item.path;
+        }
+      } else if (item.path === path) {
+        return item.path;
+      }
+    }
+    return null;
+  };
+
+  const [expandedMenu, setExpandedMenu] = useState<string | null>(getCurrentParentPath(currentPath));
 
   const handleMenuClick = (item: MenuItemType) => {
     if (item.children) {
-      // 如果有子菜单，只切换展开状态
-      setExpandedMenu(prev => prev === item.path ? null : item.path);
+      // 如果点击的是当前展开的菜单，则折叠
+      // 如果点击的是其他菜单，则展开新菜单
+      const currentParentPath = getCurrentParentPath(currentPath);
+      if (currentParentPath !== item.path) {
+        setExpandedMenu(item.path);
+      }
     } else {
       // 如果是叶子节点，才进行页面跳转
       onMenuClick(item.path);

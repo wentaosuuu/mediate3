@@ -60,7 +60,7 @@ export const SmsRecordsTable = ({
           <Button variant="outline" onClick={handleExport}>导出Excel</Button>
         </div>
       </div>
-      <div className="w-full">
+      <div className="w-full overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -70,8 +70,11 @@ export const SmsRecordsTable = ({
               <TableHead>短信类型</TableHead>
               <TableHead>短信内容</TableHead>
               <TableHead>发送数量</TableHead>
-              <TableHead>发送时间</TableHead>
-              <TableHead>接收时间</TableHead>
+              <TableHead className="whitespace-normal">
+                发送时间
+                <br />
+                接收时间
+              </TableHead>
               <TableHead>创建时间</TableHead>
               <TableHead>发送人</TableHead>
             </TableRow>
@@ -79,13 +82,13 @@ export const SmsRecordsTable = ({
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={10} className="text-center py-8">
+                <TableCell colSpan={9} className="text-center py-8">
                   加载中...
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={10} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={9} className="text-center py-8 text-gray-500">
                   暂无数据
                 </TableCell>
               </TableRow>
@@ -102,8 +105,11 @@ export const SmsRecordsTable = ({
                     <br />
                     失败：{record.fail_count || 0}
                   </TableCell>
-                  <TableCell>{formatDate(record.send_time)}</TableCell>
-                  <TableCell>{record.status === 'success' ? formatDate(record.send_time) : '-'}</TableCell>
+                  <TableCell className="whitespace-normal">
+                    {formatDate(record.send_time)}
+                    <br />
+                    {record.status === 'success' ? formatDate(record.send_time) : '-'}
+                  </TableCell>
                   <TableCell>{formatDate(record.created_at)}</TableCell>
                   <TableCell>{record.created_by || '-'}</TableCell>
                 </TableRow>
