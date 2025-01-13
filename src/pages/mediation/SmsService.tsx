@@ -40,7 +40,7 @@ const SmsService = () => {
         />
         <MainContent username={mockUser.username} currentPath="/mediation/sms-service">
           <div className="space-y-4">
-            <h1 className="text-2xl font-semibold">短信触达服务</h1>
+            <h1 className="text-xl font-medium text-text-primary">短信触达服务</h1>
             <SmsSearchForm />
             <SmsTable />
           </div>
