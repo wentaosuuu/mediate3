@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -23,6 +23,9 @@ interface CreateSmsDialogProps {
 }
 
 export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) => {
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+  const templateContent = "【云宝宝】法调云V3.0短信触达服务测试";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[1000px]">
@@ -60,8 +63,8 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
                 <span className="text-red-500 mr-1">*</span>
                 <span className="w-24">短信模板：</span>
                 <div className="flex-1">
-                  <Select>
-                    <SelectTrigger className="bg-white">
+                  <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                    <SelectTrigger className="bg-white w-[260px]">
                       <SelectValue placeholder="请选择" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
@@ -76,22 +79,35 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
                 <span className="text-red-500 mr-1">*</span>
                 <span className="w-24">短信内容：</span>
                 <div className="flex-1">
-                  <div className="text-red-500">请先选择短信模板</div>
+                  {selectedTemplate === "template1" ? (
+                    <div className="p-2 bg-gray-50 rounded border">{templateContent}</div>
+                  ) : (
+                    <div className="text-red-500">请先选择短信模板</div>
+                  )}
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-4 whitespace-nowrap">
                 <span className="text-red-500 mr-1">*</span>
                 <span className="w-24">发送用户及发送数据：</span>
                 <div className="flex-1">
-                  <div className="text-red-500">请先选择短信模板</div>
+                  {selectedTemplate ? (
+                    <Button variant="outline" className="bg-white">
+                      导入发送用户
+                    </Button>
+                  ) : (
+                    <div className="text-red-500">请先选择短信模板</div>
+                  )}
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
                 <span className="w-[116px]">推送时间：</span>
                 <div className="flex-1">
-                  <Input type="datetime-local" className="bg-white" />
+                  <Input 
+                    type="datetime-local" 
+                    className="bg-white w-[260px]" 
+                  />
                   <div className="text-red-500 text-sm mt-1">*发送时间非必填项，设置发送时间则按照发送时间发送</div>
                 </div>
               </div>
@@ -109,10 +125,15 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[120px] h-[25px] bg-gray-800 rounded-b-2xl"></div>
               {/* Phone screen */}
               <div className="h-full w-full bg-gray-100 rounded-[28px] p-4">
-                {/* Preview content will go here */}
-                <div className="text-center text-gray-400 mt-8">
-                  短信预览内容将显示在这里
-                </div>
+                {selectedTemplate === "template1" ? (
+                  <div className="bg-white rounded-lg p-4 shadow mt-8">
+                    <p className="text-sm">{templateContent}</p>
+                  </div>
+                ) : (
+                  <div className="text-center text-gray-400 mt-8">
+                    短信预览内容将显示在这里
+                  </div>
+                )}
               </div>
             </div>
           </div>
