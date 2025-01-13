@@ -9,7 +9,7 @@ const corsHeaders = {
 const SMS_CONFIG = {
   account: 'yb1206',
   password: 'nr4brb',
-  url: 'http://www.dh3t.com/json/sms/BatchSubmit'  // 更新为新的URL
+  url: 'http://www.dh3t.com/json/sms/BatchSubmit'
 }
 
 serve(async (req) => {
@@ -40,14 +40,14 @@ serve(async (req) => {
     params.append('mobile', phoneNumbers.replace(/\s+/g, '')) // 移除所有空格
     params.append('content', smsContent)
     params.append('reqid', transactionId)
-    params.append('resptype', '1')  // 使用 resptype=1
+    params.append('resptype', '1')
 
     // 构建完整的请求URL
     const requestUrl = `${SMS_CONFIG.url}?${params.toString()}`
-    console.log('完整请求URL:', requestUrl)
+    console.log('发送短信请求URL:', requestUrl)
 
     try {
-      // 使用 GET 请求调用短信接口
+      // 发送GET请求到短信API
       const response = await fetch(requestUrl)
       console.log('短信API响应状态:', response.status, response.statusText)
       
@@ -57,7 +57,6 @@ serve(async (req) => {
       // 尝试解析响应
       let result
       try {
-        // 如果是JSON格式
         result = JSON.parse(text)
       } catch {
         // 如果不是JSON格式，按照文本处理
