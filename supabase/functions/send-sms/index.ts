@@ -1,5 +1,7 @@
 // 导入必要的依赖
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { crypto } from "https://deno.land/std@0.168.0/crypto/mod.ts";
+import { Md5 } from "https://deno.land/std@0.168.0/hash/md5.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -36,13 +38,8 @@ serve(async (req) => {
     const signStr = `${account}${rawPassword}${timestamp}`;
     console.log('签名字符串:', signStr);
 
-    // 计算MD5签名
-    const encoder = new TextEncoder();
-    const data = encoder.encode(signStr);
-    const hashBuffer = await crypto.subtle.digest('MD5', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const signature = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    
+    // 使用 Deno 的 Md5 类计算签名
+    const signature = new Md5().update(signStr).toString();
     console.log('MD5签名:', signature);
 
     // 构建请求体
