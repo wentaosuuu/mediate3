@@ -135,6 +135,65 @@ export type Database = {
         }
         Relationships: []
       }
+      sms_records: {
+        Row: {
+          content: string
+          created_at: string | null
+          created_by: string | null
+          fail_count: number | null
+          frequency_fail_count: number | null
+          id: string
+          recipients: string[]
+          send_code: string
+          send_time: string | null
+          sms_type: string
+          status: string | null
+          success_count: number | null
+          template_name: string
+          tenant_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          created_by?: string | null
+          fail_count?: number | null
+          frequency_fail_count?: number | null
+          id?: string
+          recipients: string[]
+          send_code: string
+          send_time?: string | null
+          sms_type: string
+          status?: string | null
+          success_count?: number | null
+          template_name: string
+          tenant_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          created_by?: string | null
+          fail_count?: number | null
+          frequency_fail_count?: number | null
+          id?: string
+          recipients?: string[]
+          send_code?: string
+          send_time?: string | null
+          sms_type?: string
+          status?: string | null
+          success_count?: number | null
+          template_name?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_records_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenant_registrations: {
         Row: {
           address: string | null
