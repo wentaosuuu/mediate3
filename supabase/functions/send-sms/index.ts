@@ -8,6 +8,7 @@ const corsHeaders = {
 // 短信接口配置
 const SMS_CONFIG = {
   account: 'yb1206',
+  // 注意：密码需要进行MD5加密
   password: 'nr4brb',
   url: 'http://www.dh3t.com/json/sms/BatchSubmit'
 }
