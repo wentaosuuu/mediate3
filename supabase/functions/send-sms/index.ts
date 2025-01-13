@@ -40,18 +40,15 @@ serve(async (req) => {
     params.append('mobile', phoneNumbers.replace(/\s+/g, '')) // 移除所有空格
     params.append('content', smsContent)
     params.append('reqid', transactionId)
-    params.append('resptype', 'json')  // 使用json而不是1
+    params.append('resptype', 'json')
 
+    // 构建完整的请求URL
     const requestUrl = `${SMS_CONFIG.url}?${params.toString()}`
     console.log('完整请求URL:', requestUrl)
 
-    // 调用短信接口
-    const response = await fetch(SMS_CONFIG.url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: params.toString()
+    // 使用 GET 请求调用短信接口
+    const response = await fetch(requestUrl, {
+      method: 'GET',  // 改为 GET 请求
     })
 
     console.log('短信API响应状态:', response.status, response.statusText)
