@@ -1,13 +1,7 @@
 import React from 'react';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { FormField } from './FormField';
+import { TimeRangeField } from './TimeRangeField';
 import type { SmsSearchParams } from '@/types/sms';
 
 interface SmsRecordsSearchFormProps {
@@ -22,6 +16,20 @@ export const SmsRecordsSearchForm = ({ onSearch }: SmsRecordsSearchFormProps) =>
   const [startTime, setStartTime] = React.useState('');
   const [endTime, setEndTime] = React.useState('');
 
+  // 短信类型选项
+  const smsTypeOptions = [
+    { value: 'notice', label: '通知类' },
+    { value: 'marketing', label: '营销类' },
+    { value: 'verification', label: '验证码' },
+  ];
+
+  // 发送状态选项
+  const statusOptions = [
+    { value: 'success', label: '发送成功' },
+    { value: 'failed', label: '发送失败' },
+    { value: 'pending', label: '待发送' },
+  ];
+
   const handleSearch = () => {
     onSearch({
       content,
@@ -35,67 +43,39 @@ export const SmsRecordsSearchForm = ({ onSearch }: SmsRecordsSearchFormProps) =>
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
-      {/* 修改为 flex-wrap，让内容可以自动换行 */}
       <div className="flex flex-wrap gap-4">
-        <div className="w-[200px]">
-          <label className="block text-sm text-gray-600 mb-1">短信内容：</label>
-          <Input 
-            placeholder="请输入" 
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-          />
-        </div>
-        <div className="w-[200px]">
-          <label className="block text-sm text-gray-600 mb-1">客户姓名/手机号：</label>
-          <Input 
-            placeholder="请输入" 
-            value={customerInfo}
-            onChange={(e) => setCustomerInfo(e.target.value)}
-          />
-        </div>
-        <div className="w-[200px]">
-          <label className="block text-sm text-gray-600 mb-1">短信类型：</label>
-          <Select value={smsType} onValueChange={setSmsType}>
-            <SelectTrigger className="bg-white">
-              <SelectValue placeholder="请选择" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="notice">通知类</SelectItem>
-              <SelectItem value="marketing">营销类</SelectItem>
-              <SelectItem value="verification">验证码</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="w-[200px]">
-          <label className="block text-sm text-gray-600 mb-1">发送状态：</label>
-          <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="bg-white">
-              <SelectValue placeholder="请选择" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="success">发送成功</SelectItem>
-              <SelectItem value="failed">发送失败</SelectItem>
-              <SelectItem value="pending">待发送</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="w-[420px]">
-          <label className="block text-sm text-gray-600 mb-1">发送时间：</label>
-          <div className="flex gap-2">
-            <Input 
-              type="datetime-local" 
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              className="bg-white w-[200px]"
-            />
-            <Input 
-              type="datetime-local"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              className="bg-white w-[200px]"
-            />
-          </div>
-        </div>
+        <FormField
+          label="短信内容"
+          type="input"
+          value={content}
+          onChange={setContent}
+        />
+        <FormField
+          label="客户姓名/手机号"
+          type="input"
+          value={customerInfo}
+          onChange={setCustomerInfo}
+        />
+        <FormField
+          label="短信类型"
+          type="select"
+          value={smsType}
+          onChange={setSmsType}
+          options={smsTypeOptions}
+        />
+        <FormField
+          label="发送状态"
+          type="select"
+          value={status}
+          onChange={setStatus}
+          options={statusOptions}
+        />
+        <TimeRangeField
+          startTime={startTime}
+          endTime={endTime}
+          onStartTimeChange={setStartTime}
+          onEndTimeChange={setEndTime}
+        />
         <div className="flex items-end">
           <Button 
             type="button" 
