@@ -17,7 +17,7 @@ export const PushTimeSelector = ({ value, onChange }: PushTimeSelectorProps) => 
             type="datetime-local" 
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="bg-white" 
+            className="bg-white [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer" 
           />
           <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" />
         </div>
