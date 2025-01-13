@@ -35,8 +35,9 @@ export const SmsRecordsSearchForm = ({ onSearch }: SmsRecordsSearchFormProps) =>
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
-      <div className="flex gap-4 items-end flex-wrap">
-        <div className="flex-1 min-w-[200px]">
+      {/* 修改为 flex-wrap，让内容可以自动换行 */}
+      <div className="flex flex-wrap gap-4">
+        <div className="w-[200px]">
           <label className="block text-sm text-gray-600 mb-1">短信内容：</label>
           <Input 
             placeholder="请输入" 
@@ -44,7 +45,7 @@ export const SmsRecordsSearchForm = ({ onSearch }: SmsRecordsSearchFormProps) =>
             onChange={(e) => setContent(e.target.value)}
           />
         </div>
-        <div className="flex-1 min-w-[200px]">
+        <div className="w-[200px]">
           <label className="block text-sm text-gray-600 mb-1">客户姓名/手机号：</label>
           <Input 
             placeholder="请输入" 
@@ -52,7 +53,7 @@ export const SmsRecordsSearchForm = ({ onSearch }: SmsRecordsSearchFormProps) =>
             onChange={(e) => setCustomerInfo(e.target.value)}
           />
         </div>
-        <div className="flex-1 min-w-[200px]">
+        <div className="w-[200px]">
           <label className="block text-sm text-gray-600 mb-1">短信类型：</label>
           <Select value={smsType} onValueChange={setSmsType}>
             <SelectTrigger className="bg-white">
@@ -65,7 +66,7 @@ export const SmsRecordsSearchForm = ({ onSearch }: SmsRecordsSearchFormProps) =>
             </SelectContent>
           </Select>
         </div>
-        <div className="flex-1 min-w-[200px]">
+        <div className="w-[200px]">
           <label className="block text-sm text-gray-600 mb-1">发送状态：</label>
           <Select value={status} onValueChange={setStatus}>
             <SelectTrigger className="bg-white">
@@ -78,8 +79,7 @@ export const SmsRecordsSearchForm = ({ onSearch }: SmsRecordsSearchFormProps) =>
             </SelectContent>
           </Select>
         </div>
-        {/* 将发送时间相关的输入框放在同一个容器中，作为一个整体进行换行 */}
-        <div className="flex-1 min-w-[200px]">
+        <div className="w-[420px]">
           <label className="block text-sm text-gray-600 mb-1">发送时间：</label>
           <div className="flex gap-2">
             <Input 
@@ -96,13 +96,15 @@ export const SmsRecordsSearchForm = ({ onSearch }: SmsRecordsSearchFormProps) =>
             />
           </div>
         </div>
-        <Button 
-          type="button" 
-          className="bg-primary"
-          onClick={handleSearch}
-        >
-          搜索
-        </Button>
+        <div className="flex items-end">
+          <Button 
+            type="button" 
+            className="bg-primary"
+            onClick={handleSearch}
+          >
+            搜索
+          </Button>
+        </div>
       </div>
     </div>
   );
