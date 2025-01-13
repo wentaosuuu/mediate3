@@ -83,22 +83,6 @@ const SmsRecords = () => {
     setCurrentPage(page);
   };
 
-  const handleExport = async () => {
-    try {
-      // 这里实现导出逻辑
-      toast({
-        title: "导出成功",
-        description: "Excel文件已开始下载",
-      });
-    } catch (error) {
-      toast({
-        title: "导出失败",
-        description: "请稍后重试",
-        variant: "destructive",
-      });
-    }
-  };
-
   const handleLogout = () => {
     navigate('/');
   };
@@ -131,7 +115,6 @@ const SmsRecords = () => {
               currentPage={currentPage}
               totalPages={data?.totalPages || 1}
               onPageChange={handlePageChange}
-              onExport={handleExport}
             />
           </div>
         </MainContent>
