@@ -28,13 +28,13 @@ serve(async (req) => {
     // 构建短信内容
     const smsContent = `【云宝宝】您的验证码是${verificationCode}`;
 
-    // API所需参数
-    const account = 'yb1206';
-    const rawPassword = 'nr4brb';
+    // API所需参数 - 更新为正确的账号密码
+    const account = 'yb1206';  // 账号
+    const password = 'nr4brb';  // 密码
     const timestamp = new Date().getTime().toString();
 
-    // 构建签名字符串: account + password + timestamp
-    const signStr = `${account}${rawPassword}${timestamp}`;
+    // 构建签名字符串: MD5(account + password + timestamp)
+    const signStr = `${account}${password}${timestamp}`;
     console.log('签名字符串:', signStr);
 
     // 使用 TextEncoder 和 crypto.subtle.digest 计算 SHA-256
