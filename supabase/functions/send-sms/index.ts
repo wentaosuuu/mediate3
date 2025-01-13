@@ -41,7 +41,6 @@ serve(async (req) => {
     // API所需参数
     const account = 'yb1206';  // 账号
     const pwd = 'nr4brb';  // 密码
-    const timestamp = new Date().getTime().toString();
 
     // 构建签名字符串: account+pwd+transactionId (按照顺序,不包含+号)
     const signStr = `${account}${pwd}${transactionId}`;
@@ -51,15 +50,23 @@ serve(async (req) => {
     const signature = await md5(signStr);
     console.log('MD5签名结果:', signature);
 
-    // 构建请求体
+    // 将手机号码字符串转换为数组
+    const phoneNumberList = phoneNumbers.split(',').map(phone => phone.trim());
+
+    // 构建短信列表
+    const smsList = phoneNumberList.map((mobile, index) => ({
+      mobile,
+      content: smsContent,
+      uuid: `${Date.now()}${index + 1}`,  // 生成唯一的uuid
+      ext: "01"  // 扩展码
+    }));
+
+    // 构建请求体 - 按照接口文档格式
     const requestBody = {
       account,
-      password: signature, // 这里使用MD5加密后的密码
-      phones: phoneNumbers,
-      content: smsContent,
-      sign: signature,
-      transactionId, // 使用传入的transactionId
-      extno: "01" // 扩展码
+      password: signature, // MD5加密后的密码
+      transactionId,
+      list: smsList
     };
 
     const apiUrl = 'http://www.dh3t.com/json/sms/BatchSubmit';
