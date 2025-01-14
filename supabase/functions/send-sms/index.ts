@@ -31,10 +31,15 @@ serve(async (req) => {
       throw new Error('手机号码和短信内容不能为空')
     }
 
-    // API所需参数
-    const account = 'yb1206';  // 账号
-    const pwd = 'nr4brb';  // 密码
+    // 从环境变量获取 API 配置
+    const account = Deno.env.get('SMS_ACCOUNT');
+    const pwd = Deno.env.get('SMS_PASSWORD');
+    const apiUrl = Deno.env.get('SMS_API_URL');
     
+    if (!account || !pwd || !apiUrl) {
+      throw new Error('短信服务配置不完整');
+    }
+
     // 对密码进行MD5加密
     const password = await md5(pwd);
     console.log('密码MD5加密结果:', password);
@@ -53,7 +58,6 @@ serve(async (req) => {
       sendtime: ''  // 为空表示立即发送
     };
 
-    const apiUrl = 'http://www.dh3t.com/json/sms/Submit';
     console.log('发送短信请求参数:', {
       url: apiUrl,
       method: 'POST',
