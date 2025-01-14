@@ -7,13 +7,14 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// MD5加密函数
+// MD5加密函数 - 确保生成32位小写字符串
 async function md5(message: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(message);
   const hashBuffer = await crypto.subtle.digest('MD5', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex.toLowerCase(); // 确保返回小写字符串
 }
 
 serve(async (req) => {
@@ -49,9 +50,9 @@ serve(async (req) => {
       throw new Error('短信服务配置不完整');
     }
 
-    // 对密码进行MD5加密
+    // 对密码进行32位小写MD5加密
     const password = await md5(pwd);
-    console.log('密码MD5加密完成');
+    console.log('密码MD5加密完成，长度:', password.length);
 
     // 将手机号码字符串转换为数组并去除空格
     const phoneNumberList = phoneNumbers.split(',').map(phone => phone.trim());
@@ -64,8 +65,8 @@ serve(async (req) => {
       msg: content,
       phones: phoneNumberList.join(','),
       sign: '【云宝宝】',
-      subcode: '01',  // 扩展码
-      sendtime: ''    // 为空表示立即发送
+      subcode: '',  // 不使用扩展码
+      sendtime: ''  // 为空表示立即发送
     };
 
     console.log('准备发送短信请求:', {
