@@ -11,6 +11,10 @@ import { SmsTypeSelector } from './SmsTypeSelector';
 import { SmsTemplateSelector } from './SmsTemplateSelector';
 import { PhoneNumberInput } from './PhoneNumberInput';
 import { PushTimeSelector } from './PushTimeSelector';
+import { SmsContentPreview } from './SmsContentPreview';
+import { PhonePreview } from './PhonePreview';
+import { SmsStats } from './SmsStats';
+import { ActionButtons } from './ActionButtons';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -26,6 +30,8 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
   const [pushTime, setPushTime] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+
+  const smsContent = "【云宝宝】V3.0测试：您的验证码是123456，请在5分钟内完成验证。";
 
   const handleSmsTypeChange = (type: string) => {
     setSmsType(type);
@@ -56,15 +62,14 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
     try {
       setIsSubmitting(true);
       
-      // 调用 Edge Function 发送短信
       const { data, error } = await supabase.functions.invoke('send-sms', {
         body: {
           phoneNumbers,
-          content: "【云宝宝】V3.0测试：您的验证码是123456，请在5分钟内完成验证。"  // 使用实际的短信模板内容
+          content: smsContent
         }
       });
 
-      console.log('短信发送响应:', data); // 添加日志
+      console.log('短信发送响应:', data);
 
       if (error) {
         console.error('发送短信错误:', error);
@@ -72,17 +77,16 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
       }
 
       if (data.success) {
-        // 保存短信记录到数据库
         const { error: dbError } = await supabase
           .from('sms_records')
           .insert([
             {
-              tenant_id: '12345', // 需要替换为实际的租户ID
+              tenant_id: '12345',
               send_code: Math.random().toString(36).substring(7),
               template_name: selectedTemplate,
               sms_type: smsType,
               recipients: phoneNumbers.split(',').map(n => n.trim()),
-              content: "【云宝宝】V3.0测试：您的验证码是123456，请在5分钟内完成验证。",
+              content: smsContent,
               success_count: data.summary.success,
               fail_count: data.summary.failed,
               status: 'sent'
@@ -152,17 +156,10 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
                 onTemplateChange={setSelectedTemplate}
               />
 
-              <div className="flex items-start gap-4">
-                <span className="text-red-500 mr-1">*</span>
-                <span className="w-24">短信内容：</span>
-                <div className="flex-1">
-                  {selectedTemplate === "template1" ? (
-                    <div className="p-2 bg-gray-50 rounded border">【云宝宝】V3.0测试：您的验证码是123456，请在5分钟内完成验证。</div>
-                  ) : (
-                    <div className="text-red-500">请先选择短信模板</div>
-                  )}
-                </div>
-              </div>
+              <SmsContentPreview 
+                selectedTemplate={selectedTemplate}
+                content={smsContent}
+              />
 
               <PhoneNumberInput
                 phoneNumbers={phoneNumbers}
@@ -174,47 +171,21 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
                 onChange={setPushTime}
               />
 
-              <div className="text-center text-gray-500">
-                共{phoneNumbers.split(',').filter(n => n.trim()).length}个手机号码，
-                {phoneNumbers.split(',').filter(n => n.trim()).length}个号码一条短信
-              </div>
+              <SmsStats phoneNumbers={phoneNumbers} />
 
-              <div className="flex justify-center gap-4 mt-6">
-                <Button 
-                  variant="outline" 
-                  onClick={() => onOpenChange(false)}
-                  disabled={isSubmitting}
-                >
-                  取消
-                </Button>
-                <Button 
-                  type="submit" 
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "发送中..." : "提交"}
-                </Button>
-              </div>
+              <ActionButtons 
+                onCancel={() => onOpenChange(false)}
+                onSubmit={handleSubmit}
+                isSubmitting={isSubmitting}
+              />
             </div>
           </div>
 
           {/* Right side - Phone preview */}
-          <div className="w-[300px] flex-shrink-0">
-            <div className="relative w-[300px] h-[600px] bg-white rounded-[36px] shadow-xl border-8 border-gray-800">
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[120px] h-[25px] bg-gray-800 rounded-b-2xl"></div>
-              <div className="h-full w-full bg-gray-100 rounded-[28px] p-4">
-                {selectedTemplate === "template1" ? (
-                  <div className="bg-white rounded-lg p-4 shadow mt-8">
-                    <p className="text-sm">【云宝宝】V3.0测试：您的验证码是123456，请在5分钟内完成验证。</p>
-                  </div>
-                ) : (
-                  <div className="text-center text-gray-400 mt-8">
-                    短信预览内容将显示在这里
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          <PhonePreview 
+            selectedTemplate={selectedTemplate}
+            content={smsContent}
+          />
         </div>
       </DialogContent>
     </Dialog>
