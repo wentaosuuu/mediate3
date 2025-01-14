@@ -43,7 +43,7 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
   const handleSubmit = async () => {
     if (!selectedTemplate) {
       toast({
-        title: "错误",
+        title: "提示",
         description: "请选择短信模板",
         variant: "destructive",
       });
@@ -52,7 +52,7 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
 
     if (!phoneNumbers) {
       toast({
-        title: "错误",
+        title: "提示",
         description: "请输入手机号码",
         variant: "destructive",
       });
@@ -96,9 +96,9 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
         if (dbError) {
           console.error('保存短信记录错误:', dbError);
           toast({
-            title: "记录保存失败",
+            title: "发送成功但记录保存失败",
             description: "短信已发送但保存记录时发生错误",
-            variant: "destructive",
+            className: "bg-yellow-500",
           });
           return;
         }
@@ -106,6 +106,7 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
         toast({
           title: "发送成功",
           description: `成功发送 ${data.summary.success} 条短信`,
+          className: "bg-green-500 text-white border-green-600",
         });
         onOpenChange(false);
       } else {
