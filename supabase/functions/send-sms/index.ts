@@ -34,15 +34,16 @@ serve(async (req) => {
     }
 
     // 从环境变量获取 API 配置
-    const account = Deno.env.get('SMS_ACCOUNT');
-    const pwd = Deno.env.get('SMS_PASSWORD');
-    const apiUrl = Deno.env.get('SMS_API_URL');
+    const account = Deno.env.get('SMS_ACCOUNT')?.trim();
+    const pwd = Deno.env.get('SMS_PASSWORD')?.trim();
+    const apiUrl = Deno.env.get('SMS_API_URL')?.trim();
     
     console.log('环境变量检查:', {
       hasAccount: !!account,
       hasPassword: !!pwd,
       hasApiUrl: !!apiUrl,
-      apiUrl
+      apiUrl,
+      account // 输出账号以验证格式
     });
 
     if (!account || !pwd || !apiUrl) {
@@ -52,7 +53,7 @@ serve(async (req) => {
 
     // 对密码进行32位小写MD5加密
     const password = await md5(pwd);
-    console.log('密码MD5加密完成，长度:', password.length);
+    console.log('密码MD5加密完成，长度:', password.length, '密码前6位:', password.substring(0, 6));
 
     // 将手机号码字符串转换为数组并去除空格
     const phoneNumberList = phoneNumbers.split(',').map(phone => phone.trim());
