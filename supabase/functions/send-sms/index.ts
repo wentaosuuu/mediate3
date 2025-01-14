@@ -36,27 +36,24 @@ serve(async (req) => {
     const pwd = 'nr4brb';  // 密码
     
     // 对密码进行MD5加密
-    const encryptedPassword = await md5(pwd);
-    console.log('密码MD5加密结果:', encryptedPassword);
+    const password = await md5(pwd);
+    console.log('密码MD5加密结果:', password);
 
     // 将手机号码字符串转换为数组并去除空格
     const phoneNumberList = phoneNumbers.split(',').map(phone => phone.trim());
 
-    // 构建短信列表
-    const smsList = phoneNumberList.map(mobile => ({
-      mobile,
-      content,
-      ext: "01"  // 扩展码
-    }));
-
     // 构建请求体
     const requestBody = {
       account,
-      password: encryptedPassword,
-      list: smsList
+      password,
+      msg: content,
+      phones: phoneNumberList.join(','),
+      sign: '【云宝宝】',
+      subcode: '01',  // 扩展码
+      sendtime: ''  // 为空表示立即发送
     };
 
-    const apiUrl = 'http://www.dh3t.com/json/sms/BatchSubmit';
+    const apiUrl = 'http://www.dh3t.com/json/sms/Submit';
     console.log('发送短信请求参数:', {
       url: apiUrl,
       method: 'POST',
