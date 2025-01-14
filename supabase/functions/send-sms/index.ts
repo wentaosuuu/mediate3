@@ -1,20 +1,9 @@
 // 导入必要的依赖
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
-import { crypto } from "https://deno.land/std@0.177.0/crypto/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
-// MD5加密函数 - 确保生成32位小写字符串
-async function md5(message: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(message);
-  const hashBuffer = await crypto.subtle.digest('MD5', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return hashHex.toLowerCase();
 }
 
 serve(async (req) => {
@@ -24,131 +13,74 @@ serve(async (req) => {
   }
 
   try {
-    const { phoneNumbers, content, transactionId } = await req.json()
+    const { phoneNumbers, content } = await req.json()
     
-    console.log('接收到短信请求:', { phoneNumbers, content, transactionId })
+    console.log('接收到短信请求:', { phoneNumbers, content })
 
     // 验证必要参数
-    if (!phoneNumbers || !content || !transactionId) {
-      throw new Error('手机号码、短信内容和事务ID不能为空')
+    if (!phoneNumbers || !content) {
+      throw new Error('手机号码和短信内容不能为空')
     }
 
-    // 从环境变量获取 API 配置
-    const account = Deno.env.get('SMS_ACCOUNT')?.trim();
-    const pwd = Deno.env.get('SMS_PASSWORD')?.trim();
-    const apiUrl = Deno.env.get('SMS_API_URL')?.trim();
-    
-    console.log('环境变量检查:', {
-      hasAccount: !!account,
-      hasPassword: !!pwd,
-      hasApiUrl: !!apiUrl,
-      apiUrl,
-      accountLength: account?.length
-    });
-
-    if (!account || !pwd || !apiUrl) {
-      console.error('配置缺失:', { account, apiUrl });
-      throw new Error('短信服务配置不完整');
-    }
-
-    // 按照文档要求生成密码:
-    // 1. account + pwd + transactionId 按顺序拼接(不包含+号)
-    // 2. 对拼接字符串进行MD5小写加密
-    const rawPassword = `${account}${pwd}${transactionId}`;
-    console.log('密码拼接信息:', {
-      accountLength: account.length,
-      pwdLength: pwd.length,
-      transactionIdLength: transactionId.length,
-      rawPasswordLength: rawPassword.length
-    });
-    
-    const password = await md5(rawPassword);
-    console.log('密码MD5加密信息:', {
-      rawLength: rawPassword.length,
-      hashedLength: password.length,
-      isLowerCase: password === password.toLowerCase(),
-      firstSixChars: password.substring(0, 6)
-    });
+    // API参数配置
+    const account = "109652";
+    const password = "waRwR3";
+    const extno = "10690545612";
 
     // 将手机号码字符串转换为数组并去除空格
     const phoneNumberList = phoneNumbers.split(',').map(phone => phone.trim());
     console.log('处理后的手机号列表:', phoneNumberList);
 
-    // 构建请求体
-    const requestBody = {
-      account,
-      password,
-      msg: content,
-      phones: phoneNumberList.join(','),
-      sign: '【云宝宝】',
-      subcode: '',  // 不使用扩展码
-      sendtime: ''  // 为空表示立即发送
-    };
+    // 为每个手机号发送短信
+    const results = await Promise.all(phoneNumberList.map(async (phone) => {
+      const apiUrl = new URL('http://39.107.242.113:7862/sms');
+      apiUrl.searchParams.append('action', 'send');
+      apiUrl.searchParams.append('account', account);
+      apiUrl.searchParams.append('password', password);
+      apiUrl.searchParams.append('mobile', phone);
+      apiUrl.searchParams.append('content', content);
+      apiUrl.searchParams.append('extno', extno);
+      apiUrl.searchParams.append('rt', 'json');
 
-    console.log('准备发送短信请求:', {
-      url: apiUrl,
-      requestBody: { ...requestBody, password: '***' }
-    });
+      console.log('发送短信请求URL:', apiUrl.toString());
 
-    try {
-      // 发送POST请求到短信API
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody)
-      });
-      
-      console.log('短信API响应状态:', response.status, response.statusText);
-      
-      const responseText = await response.text();
-      console.log('短信API原始响应:', responseText);
-
-      // 尝试解析响应
-      let result;
       try {
-        result = JSON.parse(responseText);
-      } catch {
-        result = responseText;
+        const response = await fetch(apiUrl.toString());
+        const result = await response.json();
+        console.log('短信API响应:', result);
+        return { phone, success: result.status === '0', result };
+      } catch (error) {
+        console.error('发送短信失败:', error);
+        return { phone, success: false, error: error.message };
       }
-      
-      console.log('处理后的响应:', result);
+    }));
 
-      // 根据API文档判断是否发送成功
-      const success = response.status === 200 && result?.result === "0";
+    // 统计发送结果
+    const successCount = results.filter(r => r.success).length;
+    const failCount = results.length - successCount;
 
-      // 如果发送成功，将记录保存到数据库
-      if (success && transactionId) {
-        // TODO: 保存发送记录到数据库
-        console.log('短信发送成功，事务ID:', transactionId);
-      }
-
-      return new Response(
-        JSON.stringify({
-          success,
-          errorDesc: success ? null : `发送失败: ${typeof result === 'string' ? result : JSON.stringify(result)}`,
-          result,
-          requestUrl: apiUrl,
-          rawResponse: result
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: success ? 200 : 400
+    return new Response(
+      JSON.stringify({
+        success: failCount === 0,
+        results,
+        summary: {
+          total: results.length,
+          success: successCount,
+          failed: failCount
         }
-      );
-    } catch (fetchError) {
-      console.error('调用短信API时发生错误:', fetchError);
-      throw new Error(`调用短信API失败: ${fetchError.message}`);
-    }
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: failCount === 0 ? 200 : 400
+      }
+    );
 
   } catch (error) {
-    console.error('发送短信时发生错误:', error);
+    console.error('处理短信请求时发生错误:', error);
     return new Response(
       JSON.stringify({
         success: false,
-        errorDesc: error.message,
-        error: error.toString()
+        error: error.message
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

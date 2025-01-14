@@ -55,15 +55,12 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
 
     try {
       setIsSubmitting(true);
-
-      const transactionId = crypto.randomUUID();
       
       // 调用 Edge Function 发送短信
       const { data, error } = await supabase.functions.invoke('send-sms', {
         body: {
           phoneNumbers,
-          content: "【云宝宝】您的验证码是123456，请在5分钟内完成验证。",  // 使用实际的短信模板内容
-          transactionId
+          content: "【云宝宝】您的验证码是123456，请在5分钟内完成验证。"  // 使用实际的短信模板内容
         }
       });
 
@@ -72,13 +69,13 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
       if (data.success) {
         toast({
           title: "发送成功",
-          description: "短信已成功发送",
+          description: `成功发送 ${data.summary.success} 条短信`,
         });
         onOpenChange(false);
       } else {
         toast({
           title: "发送失败",
-          description: data.errorDesc || "短信发送失败",
+          description: data.error || "短信发送失败",
           variant: "destructive",
         });
       }
