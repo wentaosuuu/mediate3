@@ -33,6 +33,7 @@ serve(async (req) => {
 
     // 为每个手机号发送短信
     const results = await Promise.all(phoneNumberList.map(async (phone) => {
+      // 构建完整的 URL，包含所有参数
       const apiUrl = new URL('http://39.107.242.113:7862/sms');
       apiUrl.searchParams.append('action', 'send');
       apiUrl.searchParams.append('account', account);
@@ -48,10 +49,23 @@ serve(async (req) => {
         const response = await fetch(apiUrl.toString());
         const result = await response.json();
         console.log('短信API响应:', result);
-        return { phone, success: result.status === '0', result };
+        
+        // 根据 API 响应判断是否发送成功
+        const success = result.status === '0';
+        return { 
+          phone, 
+          success, 
+          result,
+          message: success ? '发送成功' : `发送失败: ${result.message || '未知错误'}`
+        };
       } catch (error) {
         console.error('发送短信失败:', error);
-        return { phone, success: false, error: error.message };
+        return { 
+          phone, 
+          success: false, 
+          error: error.message,
+          message: `发送失败: ${error.message}`
+        };
       }
     }));
 
@@ -59,19 +73,29 @@ serve(async (req) => {
     const successCount = results.filter(r => r.success).length;
     const failCount = results.length - successCount;
 
+    // 详细的响应信息
+    const response = {
+      success: failCount === 0,
+      results,
+      summary: {
+        total: results.length,
+        success: successCount,
+        failed: failCount
+      },
+      details: results.map(r => ({
+        phone: r.phone,
+        status: r.success ? '成功' : '失败',
+        message: r.message
+      }))
+    };
+
+    console.log('最终响应:', response);
+
     return new Response(
-      JSON.stringify({
-        success: failCount === 0,
-        results,
-        summary: {
-          total: results.length,
-          success: successCount,
-          failed: failCount
-        }
-      }),
+      JSON.stringify(response),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: failCount === 0 ? 200 : 400
+        status: 200 // 即使有失败的情况也返回 200，让前端根据 success 字段判断
       }
     );
 
@@ -80,7 +104,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message
+        error: error.message,
+        message: '发送短信时发生错误'
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

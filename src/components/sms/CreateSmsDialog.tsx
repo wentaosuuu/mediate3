@@ -64,9 +64,41 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
         }
       });
 
-      if (error) throw error;
+      console.log('短信发送响应:', data); // 添加日志
+
+      if (error) {
+        console.error('发送短信错误:', error);
+        throw error;
+      }
 
       if (data.success) {
+        // 保存短信记录到数据库
+        const { error: dbError } = await supabase
+          .from('sms_records')
+          .insert([
+            {
+              tenant_id: '12345', // 需要替换为实际的租户ID
+              send_code: Math.random().toString(36).substring(7),
+              template_name: selectedTemplate,
+              sms_type: smsType,
+              recipients: phoneNumbers.split(',').map(n => n.trim()),
+              content: "【云宝宝】您的验证码是123456，请在5分钟内完成验证。",
+              success_count: data.summary.success,
+              fail_count: data.summary.failed,
+              status: 'sent'
+            }
+          ]);
+
+        if (dbError) {
+          console.error('保存短信记录错误:', dbError);
+          toast({
+            title: "记录保存失败",
+            description: "短信已发送但保存记录时发生错误",
+            variant: "destructive",
+          });
+          return;
+        }
+
         toast({
           title: "发送成功",
           description: `成功发送 ${data.summary.success} 条短信`,
@@ -75,7 +107,7 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
       } else {
         toast({
           title: "发送失败",
-          description: data.error || "短信发送失败",
+          description: data.error || "短信发送失败，请检查手机号码是否正确",
           variant: "destructive",
         });
       }
@@ -83,7 +115,7 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
       console.error('发送短信失败:', error);
       toast({
         title: "发送失败",
-        description: "发送短信时发生错误",
+        description: "发送短信时发生错误，请稍后重试",
         variant: "destructive",
       });
     } finally {
