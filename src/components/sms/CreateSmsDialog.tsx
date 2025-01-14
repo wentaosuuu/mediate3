@@ -60,7 +60,7 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
       const { data, error } = await supabase.functions.invoke('send-sms', {
         body: {
           phoneNumbers,
-          content: "【云宝宝】您的验证码是123456，请在5分钟内完成验证。"  // 使用实际的短信模板内容
+          content: "【云宝宝】V3.0测试：您的验证码是123456，请在5分钟内完成验证。"  // 使用实际的短信模板内容
         }
       });
 
@@ -82,7 +82,7 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
               template_name: selectedTemplate,
               sms_type: smsType,
               recipients: phoneNumbers.split(',').map(n => n.trim()),
-              content: "【云宝宝】您的验证码是123456，请在5分钟内完成验证。",
+              content: "【云宝宝】V3.0测试：您的验证码是123456，请在5分钟内完成验证。",
               success_count: data.summary.success,
               fail_count: data.summary.failed,
               status: 'sent'
@@ -157,7 +157,7 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
                 <span className="w-24">短信内容：</span>
                 <div className="flex-1">
                   {selectedTemplate === "template1" ? (
-                    <div className="p-2 bg-gray-50 rounded border">【云宝宝】您的验证码是123456，请在5分钟内完成验证。</div>
+                    <div className="p-2 bg-gray-50 rounded border">【云宝宝】V3.0测试：您的验证码是123456，请在5分钟内完成验证。</div>
                   ) : (
                     <div className="text-red-500">请先选择短信模板</div>
                   )}
