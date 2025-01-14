@@ -23,9 +23,9 @@ serve(async (req) => {
   }
 
   try {
-    const { phoneNumbers, content, transactionId } = await req.json()
+    const { phoneNumbers, content } = await req.json()
 
-    console.log('接收到短信请求:', { phoneNumbers, content, transactionId })
+    console.log('接收到短信请求:', { phoneNumbers, content })
 
     if (!phoneNumbers || !content) {
       throw new Error('手机号码和短信内容不能为空')
@@ -39,14 +39,13 @@ serve(async (req) => {
     const encryptedPassword = await md5(pwd);
     console.log('密码MD5加密结果:', encryptedPassword);
 
-    // 将手机号码字符串转换为数组
+    // 将手机号码字符串转换为数组并去除空格
     const phoneNumberList = phoneNumbers.split(',').map(phone => phone.trim());
 
     // 构建短信列表
     const smsList = phoneNumberList.map(mobile => ({
       mobile,
       content,
-      uuid: crypto.randomUUID(),  // 生成唯一的uuid
       ext: "01"  // 扩展码
     }));
 
