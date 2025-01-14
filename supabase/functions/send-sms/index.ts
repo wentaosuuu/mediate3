@@ -9,20 +9,11 @@ const corsHeaders = {
 
 // MD5加密函数 - 确保生成32位小写字符串
 async function md5(message: string): Promise<string> {
-  // 将密码转换为UTF-8编码的字节数组
   const encoder = new TextEncoder();
   const data = encoder.encode(message);
-  
-  // 使用MD5算法计算哈希值
   const hashBuffer = await crypto.subtle.digest('MD5', data);
-  
-  // 将缓冲区转换为字节数组
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  
-  // 将字节数组转换为十六进制字符串，确保每个字节都是两位数
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  
-  // 确保返回的是32位小写字符串
   return hashHex.toLowerCase();
 }
 
@@ -38,8 +29,8 @@ serve(async (req) => {
     console.log('接收到短信请求:', { phoneNumbers, content, transactionId })
 
     // 验证必要参数
-    if (!phoneNumbers || !content) {
-      throw new Error('手机号码和短信内容不能为空')
+    if (!phoneNumbers || !content || !transactionId) {
+      throw new Error('手机号码、短信内容和事务ID不能为空')
     }
 
     // 从环境变量获取 API 配置
@@ -52,7 +43,7 @@ serve(async (req) => {
       hasPassword: !!pwd,
       hasApiUrl: !!apiUrl,
       apiUrl,
-      accountLength: account?.length // 输出账号长度以验证格式
+      accountLength: account?.length
     });
 
     if (!account || !pwd || !apiUrl) {
@@ -60,10 +51,20 @@ serve(async (req) => {
       throw new Error('短信服务配置不完整');
     }
 
-    // 对密码进行32位小写MD5加密
-    const password = await md5(pwd);
+    // 按照文档要求生成密码:
+    // 1. account + pwd + transactionId 按顺序拼接(不包含+号)
+    // 2. 对拼接字符串进行MD5小写加密
+    const rawPassword = `${account}${pwd}${transactionId}`;
+    console.log('密码拼接信息:', {
+      accountLength: account.length,
+      pwdLength: pwd.length,
+      transactionIdLength: transactionId.length,
+      rawPasswordLength: rawPassword.length
+    });
+    
+    const password = await md5(rawPassword);
     console.log('密码MD5加密信息:', {
-      originalLength: pwd.length,
+      rawLength: rawPassword.length,
       hashedLength: password.length,
       isLowerCase: password === password.toLowerCase(),
       firstSixChars: password.substring(0, 6)
