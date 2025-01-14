@@ -23,10 +23,11 @@ serve(async (req) => {
   }
 
   try {
-    const { phoneNumbers, content } = await req.json()
+    const { phoneNumbers, content, transactionId } = await req.json()
+    
+    console.log('接收到短信请求:', { phoneNumbers, content, transactionId })
 
-    console.log('接收到短信请求:', { phoneNumbers, content })
-
+    // 验证必要参数
     if (!phoneNumbers || !content) {
       throw new Error('手机号码和短信内容不能为空')
     }
@@ -36,16 +37,25 @@ serve(async (req) => {
     const pwd = Deno.env.get('SMS_PASSWORD');
     const apiUrl = Deno.env.get('SMS_API_URL');
     
+    console.log('环境变量检查:', {
+      hasAccount: !!account,
+      hasPassword: !!pwd,
+      hasApiUrl: !!apiUrl,
+      apiUrl
+    });
+
     if (!account || !pwd || !apiUrl) {
+      console.error('配置缺失:', { account, apiUrl });
       throw new Error('短信服务配置不完整');
     }
 
     // 对密码进行MD5加密
     const password = await md5(pwd);
-    console.log('密码MD5加密结果:', password);
+    console.log('密码MD5加密完成');
 
     // 将手机号码字符串转换为数组并去除空格
     const phoneNumberList = phoneNumbers.split(',').map(phone => phone.trim());
+    console.log('处理后的手机号列表:', phoneNumberList);
 
     // 构建请求体
     const requestBody = {
@@ -55,13 +65,12 @@ serve(async (req) => {
       phones: phoneNumberList.join(','),
       sign: '【云宝宝】',
       subcode: '01',  // 扩展码
-      sendtime: ''  // 为空表示立即发送
+      sendtime: ''    // 为空表示立即发送
     };
 
-    console.log('发送短信请求参数:', {
+    console.log('准备发送短信请求:', {
       url: apiUrl,
-      method: 'POST',
-      body: JSON.stringify(requestBody),
+      requestBody: { ...requestBody, password: '***' }
     });
 
     try {
@@ -91,6 +100,12 @@ serve(async (req) => {
 
       // 根据API文档判断是否发送成功
       const success = response.status === 200 && result?.result === "0";
+
+      // 如果发送成功，将记录保存到数据库
+      if (success && transactionId) {
+        // TODO: 保存发送记录到数据库
+        console.log('短信发送成功，事务ID:', transactionId);
+      }
 
       return new Response(
         JSON.stringify({
