@@ -9,12 +9,21 @@ const corsHeaders = {
 
 // MD5加密函数 - 确保生成32位小写字符串
 async function md5(message: string): Promise<string> {
+  // 将密码转换为UTF-8编码的字节数组
   const encoder = new TextEncoder();
   const data = encoder.encode(message);
+  
+  // 使用MD5算法计算哈希值
   const hashBuffer = await crypto.subtle.digest('MD5', data);
+  
+  // 将缓冲区转换为字节数组
   const hashArray = Array.from(new Uint8Array(hashBuffer));
+  
+  // 将字节数组转换为十六进制字符串，确保每个字节都是两位数
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return hashHex.toLowerCase(); // 确保返回小写字符串
+  
+  // 确保返回的是32位小写字符串
+  return hashHex.toLowerCase();
 }
 
 serve(async (req) => {
@@ -43,7 +52,7 @@ serve(async (req) => {
       hasPassword: !!pwd,
       hasApiUrl: !!apiUrl,
       apiUrl,
-      account // 输出账号以验证格式
+      accountLength: account?.length // 输出账号长度以验证格式
     });
 
     if (!account || !pwd || !apiUrl) {
@@ -53,7 +62,12 @@ serve(async (req) => {
 
     // 对密码进行32位小写MD5加密
     const password = await md5(pwd);
-    console.log('密码MD5加密完成，长度:', password.length, '密码前6位:', password.substring(0, 6));
+    console.log('密码MD5加密信息:', {
+      originalLength: pwd.length,
+      hashedLength: password.length,
+      isLowerCase: password === password.toLowerCase(),
+      firstSixChars: password.substring(0, 6)
+    });
 
     // 将手机号码字符串转换为数组并去除空格
     const phoneNumberList = phoneNumbers.split(',').map(phone => phone.trim());
