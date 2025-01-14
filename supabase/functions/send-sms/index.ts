@@ -35,13 +35,9 @@ serve(async (req) => {
     const account = 'yb1206';  // 账号
     const pwd = 'nr4brb';  // 密码
 
-    // 构建签名字符串: account+pwd+transactionId (按照顺序,不包含+号)
-    const signStr = `${account}${pwd}${transactionId}`;
-    console.log('MD5签名原始字符串:', signStr);
-
-    // 计算MD5签名
-    const signature = await md5(signStr);
-    console.log('MD5签名结果:', signature);
+    // 只对密码进行MD5加密
+    const encryptedPassword = await md5(pwd);
+    console.log('密码MD5加密结果:', encryptedPassword);
 
     // 将手机号码字符串转换为数组
     const phoneNumberList = phoneNumbers.split(',').map(phone => phone.trim());
@@ -57,7 +53,7 @@ serve(async (req) => {
     // 构建请求体 - 按照接口文档格式
     const requestBody = {
       account,
-      password: signature, // MD5加密后的密码
+      password: encryptedPassword, // MD5加密后的密码
       transactionId,
       list: smsList
     };
@@ -95,7 +91,7 @@ serve(async (req) => {
       console.log('处理后的响应:', result);
 
       // 根据API文档判断是否发送成功
-      const success = response.status === 200 && result?.success === true;
+      const success = response.status === 200 && result?.result === "0";
 
       return new Response(
         JSON.stringify({
