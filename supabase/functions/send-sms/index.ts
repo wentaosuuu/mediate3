@@ -34,7 +34,7 @@ serve(async (req) => {
     // API所需参数
     const account = 'yb1206';  // 账号
     const pwd = 'nr4brb';  // 密码
-
+    
     // 对密码进行MD5加密
     const encryptedPassword = await md5(pwd);
     console.log('密码MD5加密结果:', encryptedPassword);
@@ -43,10 +43,10 @@ serve(async (req) => {
     const phoneNumberList = phoneNumbers.split(',').map(phone => phone.trim());
 
     // 构建短信列表
-    const smsList = phoneNumberList.map((mobile, index) => ({
+    const smsList = phoneNumberList.map(mobile => ({
       mobile,
-      content: content,
-      uuid: `${transactionId}_${index + 1}`,  // 使用transactionId作为uuid的一部分
+      content,
+      uuid: crypto.randomUUID(),  // 生成唯一的uuid
       ext: "01"  // 扩展码
     }));
 
@@ -54,7 +54,6 @@ serve(async (req) => {
     const requestBody = {
       account,
       password: encryptedPassword,
-      transactionId,
       list: smsList
     };
 
