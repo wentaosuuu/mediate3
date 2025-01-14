@@ -205,7 +205,7 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
               <div className="h-full w-full bg-gray-100 rounded-[28px] p-4">
                 {selectedTemplate === "template1" ? (
                   <div className="bg-white rounded-lg p-4 shadow mt-8">
-                    <p className="text-sm">【云宝宝】您的验证码是123456，请在5分钟内完成验证。</p>
+                    <p className="text-sm">【云宝宝】V3.0测试：您的验证码是123456，请在5分钟内完成验证。</p>
                   </div>
                 ) : (
                   <div className="text-center text-gray-400 mt-8">
