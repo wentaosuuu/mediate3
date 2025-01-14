@@ -1,6 +1,5 @@
 // 导入必要的依赖
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
-import { create } from "https://deno.land/x/djwt@v2.4/mod.ts"
 import { crypto } from "https://deno.land/std@0.177.0/crypto/mod.ts";
 
 const corsHeaders = {
@@ -32,12 +31,6 @@ serve(async (req) => {
       throw new Error('手机号码和短信内容不能为空')
     }
 
-    // 生成6位随机验证码
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-    
-    // 构建短信内容
-    const smsContent = `【云宝宝】您的验证码是${verificationCode}`;
-
     // API所需参数
     const account = 'yb1206';  // 账号
     const pwd = 'nr4brb';  // 密码
@@ -56,7 +49,7 @@ serve(async (req) => {
     // 构建短信列表
     const smsList = phoneNumberList.map((mobile, index) => ({
       mobile,
-      content: smsContent,
+      content: content,
       uuid: `${Date.now()}${index + 1}`,  // 生成唯一的uuid
       ext: "01"  // 扩展码
     }));
@@ -102,14 +95,13 @@ serve(async (req) => {
       console.log('处理后的响应:', result);
 
       // 根据API文档判断是否发送成功
-      const success = response.status === 200 && result?.code === '0';
+      const success = response.status === 200 && result?.success === true;
 
       return new Response(
         JSON.stringify({
           success,
           errorDesc: success ? null : `发送失败: ${typeof result === 'string' ? result : JSON.stringify(result)}`,
           result,
-          verificationCode,
           requestUrl: apiUrl,
           rawResponse: result
         }),
