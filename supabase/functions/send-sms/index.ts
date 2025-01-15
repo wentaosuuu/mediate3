@@ -13,9 +13,9 @@ serve(async (req) => {
   }
 
   try {
-    const { phoneNumbers, content } = await req.json()
+    const { phoneNumbers, content, smsType, templateName } = await req.json()
     
-    console.log('接收到短信请求:', { phoneNumbers, content })
+    console.log('接收到短信请求:', { phoneNumbers, content, smsType, templateName })
 
     // 验证必要参数
     if (!phoneNumbers || !content) {
@@ -56,12 +56,10 @@ serve(async (req) => {
 
         let result
         try {
-          // 尝试解析响应文本为 JSON
           result = JSON.parse(text)
           console.log('解析后的 JSON:', result)
         } catch (e) {
           console.error('解析响应JSON失败:', e)
-          // 如果解析失败，返回一个标准化的错误响应
           return { 
             phone, 
             success: false,
@@ -71,13 +69,15 @@ serve(async (req) => {
         }
 
         // 根据 API 响应判断是否发送成功
-        const success = result.status === '0'
+        const success = result.result === '0' // 修正：使用 result.result 而不是 status
+        const message = success ? '发送成功' : `发送失败: ${result.desc || '未知错误'}`
+        
         return { 
           phone, 
           success,
           result,
-          mid: result.list?.[0]?.mid, // 保存消息ID用于后续状态更新
-          message: success ? '发送成功' : `发送失败: ${result.message || '未知错误'}`
+          mid: result.msgid, // 保存消息ID用于后续状态更新
+          message
         }
       } catch (error) {
         console.error('发送短信失败:', error)
@@ -103,18 +103,19 @@ serve(async (req) => {
     // 保存发送记录
     const { error: dbError } = await supabaseClient
       .from('sms_records')
-      .insert(results.map(result => ({
-        tenant_id: '12345',
+      .insert({
+        tenant_id: '12345', // 这里应该从认证信息中获取
         send_code: Math.random().toString(36).substring(7),
-        template_name: 'default',
-        sms_type: 'text',
-        recipients: [result.phone],
+        template_name: templateName || 'default',
+        sms_type: smsType || 'text',
+        recipients: phoneNumberList,
         content: content,
-        success_count: result.success ? 1 : 0,
-        fail_count: result.success ? 0 : 1,
-        status: 'pending',
-        mid: result.mid // 保存消息ID用于后续状态更新
-      })))
+        success_count: successCount,
+        fail_count: failCount,
+        status: successCount === results.length ? 'success' : 
+                failCount === results.length ? 'failed' : 'partial',
+        mid: results[0]?.mid // 保存消息ID用于后续状态更新
+      })
 
     if (dbError) {
       console.error('保存短信记录错误:', dbError)
