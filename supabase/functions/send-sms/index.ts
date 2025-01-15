@@ -1,5 +1,5 @@
-// 导入必要的依赖
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -23,8 +23,8 @@ serve(async (req) => {
     }
 
     // API参数配置
-    const account = "109652";
-    const password = "waRwR3";
+    const account = Deno.env.get('SMS_ACCOUNT')!;
+    const password = Deno.env.get('SMS_PASSWORD')!;
     const extno = "10690545612";
 
     // 将手机号码字符串转换为数组并去除空格
@@ -34,7 +34,7 @@ serve(async (req) => {
     // 为每个手机号发送短信
     const results = await Promise.all(phoneNumberList.map(async (phone) => {
       // 构建完整的 URL，包含所有参数
-      const apiUrl = new URL('http://39.107.242.113:7862/sms');
+      const apiUrl = new URL(Deno.env.get('SMS_API_URL')!);
       apiUrl.searchParams.append('action', 'send');
       apiUrl.searchParams.append('account', account);
       apiUrl.searchParams.append('password', password);
@@ -54,7 +54,8 @@ serve(async (req) => {
         const success = result.status === '0';
         return { 
           phone, 
-          success, 
+          success,
+          mid: result.mid, // 保存消息ID
           result,
           message: success ? '发送成功' : `发送失败: ${result.message || '未知错误'}`
         };
@@ -73,6 +74,34 @@ serve(async (req) => {
     const successCount = results.filter(r => r.success).length;
     const failCount = results.length - successCount;
 
+    // 创建 Supabase 客户端
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // 保存发送记录
+    const { error: dbError } = await supabase
+      .from('sms_records')
+      .insert([
+        {
+          tenant_id: '12345',
+          send_code: Math.random().toString(36).substring(7),
+          template_name: "自定义内容",
+          sms_type: "营销短信",
+          recipients: phoneNumberList,
+          content: content,
+          success_count: successCount,
+          fail_count: failCount,
+          status: 'pending',
+          mid: results[0]?.mid // 保存消息ID用于后续状态更新
+        }
+      ]);
+
+    if (dbError) {
+      console.error('保存短信记录错误:', dbError);
+      throw dbError;
+    }
+
     // 详细的响应信息
     const response = {
       success: failCount === 0,
@@ -81,21 +110,14 @@ serve(async (req) => {
         total: results.length,
         success: successCount,
         failed: failCount
-      },
-      details: results.map(r => ({
-        phone: r.phone,
-        status: r.success ? '成功' : '失败',
-        message: r.message
-      }))
+      }
     };
-
-    console.log('最终响应:', response);
 
     return new Response(
       JSON.stringify(response),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 // 即使有失败的情况也返回 200，让前端根据 success 字段判断
+        status: 200
       }
     );
 
@@ -104,8 +126,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message,
-        message: '发送短信时发生错误'
+        error: error.message
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
