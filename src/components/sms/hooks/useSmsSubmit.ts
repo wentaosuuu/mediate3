@@ -38,6 +38,12 @@ export const useSmsSubmit = ({ onClose }: UseSmsSubmitProps) => {
     try {
       setIsSubmitting(true);
       
+      // 显示发送中的提示
+      toast({
+        title: "发送中",
+        description: "正在发送短信，请稍候...",
+      });
+      
       // 调用短信发送API
       const { data, error } = await supabase.functions.invoke('send-sms', {
         body: {
@@ -75,19 +81,21 @@ export const useSmsSubmit = ({ onClose }: UseSmsSubmitProps) => {
           console.error('保存短信记录错误:', dbError);
           toast({
             title: "发送成功但记录保存失败",
-            description: "短信已发送但保存记录时发生错误",
-            className: "bg-yellow-500",
+            description: "短信已发送但保存记录时发生错误，请联系管理员",
+            variant: "destructive",
           });
           return;
         }
 
+        // 发送成功提示
         toast({
           title: "发送成功",
-          description: `成功发送 ${data.summary.success} 条短信`,
+          description: `成功发送 ${data.summary.success} 条短信，失败 ${data.summary.failed} 条`,
           className: "bg-green-500 text-white border-green-600",
         });
         onClose();
       } else {
+        // 发送失败提示
         toast({
           title: "发送失败",
           description: data.error || "短信发送失败，请检查手机号码是否正确",
@@ -96,6 +104,7 @@ export const useSmsSubmit = ({ onClose }: UseSmsSubmitProps) => {
       }
     } catch (error) {
       console.error('发送短信失败:', error);
+      // 发送异常提示
       toast({
         title: "发送失败",
         description: "发送短信时发生错误，请稍后重试",
