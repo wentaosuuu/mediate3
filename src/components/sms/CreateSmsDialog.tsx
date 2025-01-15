@@ -32,15 +32,23 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
 
   // 处理提交
   const handleSubmit = async () => {
+    if (!phoneNumbers || !smsContent) {
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await submit({
+      const result = await submit({
         phoneNumbers: phoneNumbers.split(','),
         content: smsContent,
         smsType,
         templateName: selectedTemplate
       });
-      onOpenChange(false);
+      
+      // 只有在发送成功时才关闭弹窗
+      if (result && result.success) {
+        onOpenChange(false);
+      }
     } finally {
       setIsSubmitting(false);
     }

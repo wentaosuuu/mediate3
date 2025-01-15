@@ -9,25 +9,24 @@ interface SmsSubmitParams {
   templateName: string;
 }
 
+interface SmsSubmitResult {
+  success: boolean;
+  message?: string;
+}
+
 export const useSmsSubmit = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const submit = async ({ phoneNumbers, content, smsType, templateName }: SmsSubmitParams) => {
+  const submit = async ({ phoneNumbers, content, smsType, templateName }: SmsSubmitParams): Promise<SmsSubmitResult> => {
     if (!phoneNumbers.length || !content) {
       toast({
         title: "发送失败",
         description: "手机号码和短信内容不能为空",
         variant: "destructive",
       });
-      return;
+      return { success: false, message: "手机号码和短信内容不能为空" };
     }
-
-    // 显示发送中的提示
-    toast({
-      title: "发送中",
-      description: "正在发送短信，请稍候...",
-    });
 
     try {
       // 调用发送短信的 Edge Function
@@ -47,7 +46,7 @@ export const useSmsSubmit = () => {
           description: error.message || "请稍后重试",
           variant: "destructive",
         });
-        return;
+        return { success: false, message: error.message };
       }
 
       console.log('短信发送响应:', data);
@@ -61,6 +60,7 @@ export const useSmsSubmit = () => {
         });
         // 刷新短信记录列表
         queryClient.invalidateQueries({ queryKey: ['smsRecords'] });
+        return { success: true };
       } else {
         // 构建失败信息
         const failureDetails = data.details
@@ -69,10 +69,11 @@ export const useSmsSubmit = () => {
           .join('\n');
 
         const failureMessage = failureDetails ? `\n失败详情:\n${failureDetails}` : '';
+        const message = `成功：${data.summary.success}条\n失败：${data.summary.failed}条\n${failureMessage}`;
 
         toast({
           title: data.summary.success > 0 ? "部分发送成功" : "发送失败",
-          description: `成功：${data.summary.success}条\n失败：${data.summary.failed}条\n${failureMessage}`,
+          description: message,
           variant: "destructive",
         });
 
@@ -80,14 +81,24 @@ export const useSmsSubmit = () => {
           // 如果有部分成功，也刷新列表
           queryClient.invalidateQueries({ queryKey: ['smsRecords'] });
         }
+        
+        return { 
+          success: false, 
+          message: message 
+        };
       }
     } catch (error) {
       console.error('发送短信时发生错误:', error);
+      const message = "发送短信时发生错误，请稍后重试";
       toast({
         title: "发送失败",
-        description: "发送短信时发生错误，请稍后重试",
+        description: message,
         variant: "destructive",
       });
+      return { 
+        success: false, 
+        message: message 
+      };
     }
   };
 
