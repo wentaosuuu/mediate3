@@ -71,7 +71,7 @@ export const useSmsSubmit = ({ onClose }: UseSmsSubmitProps) => {
         toast({
           title: "发送成功",
           description: `成功发送 ${data.summary.success} 条短信`,
-          variant: "success",
+          variant: "default",  // 修改这里，使用 default 替代 success
         });
         // 刷新短信记录列表
         queryClient.invalidateQueries({ queryKey: ['smsRecords'] });
@@ -86,7 +86,7 @@ export const useSmsSubmit = ({ onClose }: UseSmsSubmitProps) => {
         toast({
           title: data.summary.success > 0 ? "部分发送成功" : "发送失败",
           description: `成功：${data.summary.success}条\n失败：${data.summary.failed}条\n${failureMessage}`,
-          variant: data.summary.success > 0 ? "secondary" : "destructive",
+          variant: data.summary.success > 0 ? "default" : "destructive", // 修改这里，使用 default 替代 secondary
         });
 
         if (data.summary.success > 0) {
