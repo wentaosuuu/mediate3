@@ -41,7 +41,7 @@ export const useSmsSubmit = ({ onClose }: UseSmsSubmitProps) => {
       setIsSubmitting(true);
       
       // 显示发送中的提示
-      const loadingToast = toast({
+      toast({
         title: "发送中",
         description: "正在发送短信，请稍候...",
         duration: 999999, // 持续显示直到完成
@@ -56,12 +56,6 @@ export const useSmsSubmit = ({ onClose }: UseSmsSubmitProps) => {
       });
 
       console.log('短信发送响应:', data);
-
-      // 关闭加载提示
-      toast({
-        id: loadingToast,
-        duration: 0,
-      });
 
       if (error) {
         console.error('发送短信错误:', error);
