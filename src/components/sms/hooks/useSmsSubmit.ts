@@ -1,114 +1,95 @@
-import { useState } from 'react';
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
-interface UseSmsSubmitProps {
-  onClose: () => void;
+interface SmsSubmitParams {
+  phoneNumbers: string[];
+  content: string;
+  smsType: string;
+  templateName: string;
 }
 
-export const useSmsSubmit = ({ onClose }: UseSmsSubmitProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export const useSmsSubmit = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const handleSubmit = async (
-    selectedTemplate: string,
-    phoneNumbers: string,
-    smsType: string,
-    smsContent: string
-  ) => {
-    // 验证表单
-    if (!selectedTemplate) {
+  const submit = async ({ phoneNumbers, content, smsType, templateName }: SmsSubmitParams) => {
+    if (!phoneNumbers.length || !content) {
       toast({
-        title: "提示",
-        description: "请选择短信模板",
+        title: "发送失败",
+        description: "手机号码和短信内容不能为空",
         variant: "destructive",
       });
       return;
     }
 
-    if (!phoneNumbers) {
-      toast({
-        title: "提示",
-        description: "请输入手机号码",
-        variant: "destructive",
-      });
-      return;
-    }
+    // 显示发送中的提示
+    toast({
+      title: "发送中",
+      description: "正在发送短信，请稍候...",
+    });
 
     try {
-      setIsSubmitting(true);
-      
-      // 显示发送中的提示
-      toast({
-        title: "发送中",
-        description: "正在发送短信，请稍候...",
-      });
-      
-      // 调用短信发送API
+      // 调用发送短信的 Edge Function
       const { data, error } = await supabase.functions.invoke('send-sms', {
         body: {
-          phoneNumbers,
-          content: smsContent,
+          phoneNumbers: phoneNumbers.join(','),
+          content,
           smsType,
-          templateName: selectedTemplate
+          templateName
         }
       });
 
       if (error) {
-        console.error('发送短信错误:', error);
+        console.error('发送短信失败:', error);
         toast({
           title: "发送失败",
-          description: error.message || "发送短信时发生错误",
+          description: error.message || "请稍后重试",
           variant: "destructive",
         });
         return;
       }
 
-      // 根据发送结果显示不同的提示
+      console.log('短信发送响应:', data);
+
+      // 处理发送结果
       if (data.success) {
+        // 全部发送成功
         toast({
           title: "发送成功",
           description: `成功发送 ${data.summary.success} 条短信`,
-          variant: "default",  // 修改这里，使用 default 替代 success
         });
         // 刷新短信记录列表
         queryClient.invalidateQueries({ queryKey: ['smsRecords'] });
-        onClose();
       } else {
-        // 部分成功或全部失败的情况
-        const failureMessage = data.details
-          .filter(d => d.status === '失败')
-          .map(d => `${d.phone}: ${d.message}`)
+        // 构建失败信息
+        const failureDetails = data.details
+          .filter(detail => detail.status === '失败')
+          .map(detail => `${detail.phone}: ${detail.message}`)
           .join('\n');
+
+        const failureMessage = failureDetails ? `\n失败详情:\n${failureDetails}` : '';
 
         toast({
           title: data.summary.success > 0 ? "部分发送成功" : "发送失败",
           description: `成功：${data.summary.success}条\n失败：${data.summary.failed}条\n${failureMessage}`,
-          variant: data.summary.success > 0 ? "default" : "destructive", // 修改这里，使用 default 替代 secondary
+          variant: "destructive",
         });
 
         if (data.summary.success > 0) {
-          // 如果有部分成功，也关闭对话框
+          // 如果有部分成功，也刷新列表
           queryClient.invalidateQueries({ queryKey: ['smsRecords'] });
-          onClose();
         }
       }
     } catch (error) {
-      console.error('发送短信失败:', error);
+      console.error('发送短信时发生错误:', error);
       toast({
         title: "发送失败",
         description: "发送短信时发生错误，请稍后重试",
         variant: "destructive",
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
-  return {
-    isSubmitting,
-    handleSubmit
-  };
+  return { submit };
 };
