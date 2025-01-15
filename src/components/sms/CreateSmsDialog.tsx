@@ -39,7 +39,7 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
     setIsSubmitting(true);
     try {
       const result = await submit({
-        phoneNumbers: phoneNumbers.split(','),
+        phoneNumbers: phoneNumbers.split(',').map(p => p.trim()),
         content: smsContent,
         smsType,
         templateName: selectedTemplate

@@ -13,113 +13,111 @@ serve(async (req) => {
   }
 
   try {
-    const { phoneNumbers, content, smsType, templateName } = await req.json()
-    
-    console.log('接收到短信请求:', { phoneNumbers, content, smsType, templateName })
-
-    // 验证必要参数
-    if (!phoneNumbers || !content) {
-      throw new Error('手机号码和短信内容不能为空')
-    }
-
-    // API参数配置
-    const account = Deno.env.get('SMS_ACCOUNT')
-    const password = Deno.env.get('SMS_PASSWORD')
-    const extno = "10690545612"
-
-    // 将手机号码字符串转换为数组并去除空格
-    const phoneNumberList = Array.isArray(phoneNumbers) ? phoneNumbers : [phoneNumbers]
-    console.log('处理后的手机号列表:', phoneNumberList)
-
-    // 为每个手机号发送短信
-    const results = await Promise.all(phoneNumberList.map(async (phone) => {
-      const formData = new URLSearchParams()
-      formData.append('action', 'send')
-      formData.append('account', account)
-      formData.append('password', password)
-      formData.append('mobile', phone)
-      formData.append('content', content)
-      formData.append('extno', extno)
-      formData.append('rt', 'json')
-
-      try {
-        const response = await fetch(Deno.env.get('SMS_API_URL'), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: formData.toString()
-        })
-
-        const text = await response.text()
-        console.log('API响应文本:', text)
-
-        let result
-        try {
-          result = JSON.parse(text)
-          console.log('解析后的 JSON:', result)
-        } catch (e) {
-          console.error('解析响应JSON失败:', e)
-          return { 
-            phone, 
-            success: false,
-            message: `发送失败: API 响应格式错误 (${text.substring(0, 100)}...)`
-          }
-        }
-
-        // 根据 API 响应判断是否发送成功
-        const success = result.result === '0'
-        const message = success ? '发送成功' : `发送失败: ${result.desc || '未知错误'}`
-        
-        return { 
-          phone, 
-          success,
-          message
-        }
-      } catch (error) {
-        console.error('发送短信失败:', error)
-        return { 
-          phone, 
-          success: false, 
-          message: `发送失败: ${error.message}`
-        }
-      }
-    }))
-
-    // 统计发送结果
-    const successCount = results.filter(r => r.success).length
-    const failCount = results.length - successCount
-
-    // 创建 Supabase 客户端
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
+    // 获取请求参数
+    const { phoneNumbers, content, smsType, templateName } = await req.json()
+    console.log('收到发送短信请求:', { phoneNumbers, content, smsType, templateName })
+
+    // API 参数
+    const account = Deno.env.get('SMS_ACCOUNT')
+    const password = Deno.env.get('SMS_PASSWORD')
+    const apiUrl = Deno.env.get('SMS_API_URL')
+    const extno = "10690545612"
+
+    // 将手机号码字符串转换为数组并去除空格
+    const phoneNumberList = phoneNumbers.split(',').map(phone => phone.trim())
+    console.log('处理后的手机号列表:', phoneNumberList)
+
+    // 为每个手机号发送短信
+    const results = await Promise.all(phoneNumberList.map(async (phone) => {
+      try {
+        // 构建请求参数
+        const params = new URLSearchParams({
+          account,
+          password,
+          mobile: phone,
+          msg: content,
+          extno,
+          rt: 'json'
+        })
+
+        // 发送请求
+        const response = await fetch(`${apiUrl}?${params.toString()}`)
+        const text = await response.text()
+        console.log(`手机号 ${phone} 的API响应:`, text)
+
+        // 尝试解析响应
+        let result
+        try {
+          result = JSON.parse(text)
+        } catch (parseError) {
+          console.error('解析API响应失败:', parseError)
+          return { 
+            phone, 
+            success: false,
+            error: '解析响应失败',
+            message: `发送失败: API 响应格式错误 (${text.substring(0, 100)}...)`
+          }
+        }
+
+        // 根据 API 响应判断是否发送成功
+        const success = result.result === '0' // 修正：使用 result.result 而不是 status
+        const message = success ? '发送成功' : `发送失败: ${result.desc || '未知错误'}`
+        
+        return { 
+          phone, 
+          success,
+          result,
+          mid: result.msgid, // 保存消息ID用于后续状态更新
+          message
+        }
+      } catch (error) {
+        console.error(`发送短信到 ${phone} 时发生错误:`, error)
+        return { 
+          phone, 
+          success: false, 
+          error: error.message,
+          message: `发送失败: ${error.message}`
+        }
+      }
+    }))
+
+    // 统计成功和失败数量
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.length - successCount
+
+    // 生成发送编码
+    const sendCode = `SMS_${Date.now()}`
+
     // 保存发送记录
     const { error: dbError } = await supabaseClient
       .from('sms_records')
       .insert({
-        tenant_id: '12345', // 这里应该从认证信息中获取
-        send_code: Math.random().toString(36).substring(7),
-        template_name: templateName || 'default',
-        sms_type: smsType || 'text',
+        send_code: sendCode,
+        template_name: templateName,
+        sms_type: smsType,
         recipients: phoneNumberList,
-        content: content,
+        content,
         success_count: successCount,
         fail_count: failCount,
         status: successCount === results.length ? 'success' : 
-                failCount === results.length ? 'failed' : 'partial'
+                failCount === results.length ? 'failed' : 'partial',
+        mid: results[0]?.mid // 保存消息ID用于后续状态更新
       })
 
     if (dbError) {
-      console.error('保存短信记录错误:', dbError)
+      console.error('保存发送记录失败:', dbError)
       throw dbError
     }
 
-    // 返回结果
+    // 详细的响应信息
     const response = {
       success: failCount === 0,
+      results,
       summary: {
         total: results.length,
         success: successCount,
@@ -132,23 +130,24 @@ serve(async (req) => {
       }))
     }
 
-    console.log('最终响应:', response)
-
     return new Response(
       JSON.stringify(response),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200
+        status: 200 
       }
     )
 
   } catch (error) {
-    console.error('处理短信请求时发生错误:', error)
+    console.error('处理发送短信请求失败:', error)
     return new Response(
-      JSON.stringify({
-        success: false,
+      JSON.stringify({ 
+        success: false, 
         error: error.message,
-        message: '发送短信时发生错误'
+        details: [{
+          status: '失败',
+          message: error.message
+        }]
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

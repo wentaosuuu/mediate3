@@ -32,7 +32,7 @@ export const useSmsSubmit = () => {
       // 调用发送短信的 Edge Function
       const { data, error } = await supabase.functions.invoke('send-sms', {
         body: {
-          phoneNumbers,
+          phoneNumbers: phoneNumbers.join(','),
           content,
           smsType,
           templateName
