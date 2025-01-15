@@ -33,20 +33,30 @@ serve(async (req) => {
 
     // 为每个手机号发送短信
     const results = await Promise.all(phoneNumberList.map(async (phone) => {
-      // 构建完整的 URL，包含所有参数
-      const apiUrl = new URL(Deno.env.get('SMS_API_URL')!);
-      apiUrl.searchParams.append('action', 'send');
-      apiUrl.searchParams.append('account', account);
-      apiUrl.searchParams.append('password', password);
-      apiUrl.searchParams.append('mobile', phone);
-      apiUrl.searchParams.append('content', content);
-      apiUrl.searchParams.append('extno', extno);
-      apiUrl.searchParams.append('rt', 'json');
+      // 构建请求参数
+      const params = new URLSearchParams({
+        action: 'send',
+        account,
+        password,
+        mobile: phone,
+        content,
+        extno,
+        rt: 'json'
+      });
 
-      console.log('发送短信请求URL:', apiUrl.toString());
+      const apiUrl = Deno.env.get('SMS_API_URL')!;
+      console.log('发送短信请求URL:', apiUrl);
+      console.log('发送短信请求参数:', params.toString());
 
       try {
-        const response = await fetch(apiUrl.toString());
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: params.toString()
+        });
+
         const responseText = await response.text();
         console.log('短信API原始响应:', responseText);
 
@@ -55,15 +65,6 @@ serve(async (req) => {
           result = JSON.parse(responseText);
         } catch (parseError) {
           console.error('解析响应JSON失败:', parseError);
-          // 如果不是JSON格式，检查是否包含特定的错误信息
-          if (responseText.includes('Please use POST method')) {
-            return {
-              phone,
-              success: false,
-              error: 'API需要使用POST方法',
-              message: '发送失败: API配置错误，请联系管理员'
-            };
-          }
           return {
             phone,
             success: false,
