@@ -13,6 +13,7 @@ import {
 import { exportSmsRecordsToExcel } from '@/utils/exportUtils';
 import type { SmsRecord } from '@/types/sms';
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
 
 interface SmsRecordsTableProps {
   data: SmsRecord[];
@@ -34,6 +35,20 @@ export const SmsRecordsTable = ({
   const formatDate = (date: string | null) => {
     if (!date) return '-';
     return format(new Date(date), 'yyyy-MM-dd HH:mm:ss');
+  };
+
+  // 获取短信状态的显示样式
+  const getSmsStatusDisplay = (status: string | null) => {
+    switch (status) {
+      case 'success':
+        return <Badge variant="success">发送成功</Badge>;
+      case 'failed':
+        return <Badge variant="destructive">发送失败</Badge>;
+      case 'pending':
+        return <Badge variant="secondary">发送中</Badge>;
+      default:
+        return <Badge variant="outline">未知状态</Badge>;
+    }
   };
 
   const handleExport = () => {
@@ -70,6 +85,7 @@ export const SmsRecordsTable = ({
               <TableHead>短信类型</TableHead>
               <TableHead>短信内容</TableHead>
               <TableHead>发送数量</TableHead>
+              <TableHead>发送状态</TableHead>
               <TableHead className="whitespace-normal">
                 发送时间
                 <br />
@@ -82,13 +98,13 @@ export const SmsRecordsTable = ({
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8">
+                <TableCell colSpan={10} className="text-center py-8">
                   加载中...
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={10} className="text-center py-8 text-gray-500">
                   暂无数据
                 </TableCell>
               </TableRow>
@@ -105,6 +121,7 @@ export const SmsRecordsTable = ({
                     <br />
                     失败：{record.fail_count || 0}
                   </TableCell>
+                  <TableCell>{getSmsStatusDisplay(record.status)}</TableCell>
                   <TableCell className="whitespace-normal">
                     {formatDate(record.send_time)}
                     <br />
