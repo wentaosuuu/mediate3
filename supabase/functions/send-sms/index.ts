@@ -56,21 +56,27 @@ serve(async (req) => {
 
         let result
         try {
+          // 尝试解析响应文本为 JSON
           result = JSON.parse(text)
+          console.log('解析后的 JSON:', result)
         } catch (e) {
           console.error('解析响应JSON失败:', e)
-          throw new Error('解析响应失败')
+          // 如果解析失败，返回一个标准化的错误响应
+          return { 
+            phone, 
+            success: false,
+            error: '解析响应失败',
+            message: `发送失败: API 响应格式错误 (${text.substring(0, 100)}...)`
+          }
         }
 
-        console.log('短信API响应:', result)
-        
         // 根据 API 响应判断是否发送成功
         const success = result.status === '0'
         return { 
           phone, 
           success,
           result,
-          mid: result.list?.[0]?.mid, // 保存消息ID
+          mid: result.list?.[0]?.mid, // 保存消息ID用于后续状态更新
           message: success ? '发送成功' : `发送失败: ${result.message || '未知错误'}`
         }
       } catch (error) {
