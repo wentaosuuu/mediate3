@@ -69,40 +69,23 @@ export const useSmsSubmit = () => {
 
       console.log('短信发送响应:', data);
 
-      // 处理发送结果
       if (data.success) {
-        // 全部发送成功
         toast({
           title: "发送成功",
-          description: `成功发送 ${data.summary.success} 条短信`,
+          description: data.message || "短信发送成功",
         });
         // 刷新短信记录列表
         queryClient.invalidateQueries({ queryKey: ['smsRecords'] });
         return { success: true };
       } else {
-        // 构建失败信息
-        const failureDetails = data.details
-          .filter(detail => detail.status === '失败')
-          .map(detail => `${detail.phone}: ${detail.message}`)
-          .join('\n');
-
-        const failureMessage = failureDetails ? `\n失败详情:\n${failureDetails}` : '';
-        const message = `成功：${data.summary.success}条\n失败：${data.summary.failed}条\n${failureMessage}`;
-
         toast({
-          title: data.summary.success > 0 ? "部分发送成功" : "发送失败",
-          description: message,
+          title: "发送失败",
+          description: data.message || "发送失败，请稍后重试",
           variant: "destructive",
         });
-
-        if (data.summary.success > 0) {
-          // 如果有部分成功，也刷新列表
-          queryClient.invalidateQueries({ queryKey: ['smsRecords'] });
-        }
-        
         return { 
           success: false, 
-          message: message 
+          message: data.message 
         };
       }
     } catch (error) {
