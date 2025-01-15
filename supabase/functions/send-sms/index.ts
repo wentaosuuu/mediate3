@@ -47,8 +47,32 @@ serve(async (req) => {
 
       try {
         const response = await fetch(apiUrl.toString());
-        const result = await response.json();
-        console.log('短信API响应:', result);
+        const responseText = await response.text();
+        console.log('短信API原始响应:', responseText);
+
+        let result;
+        try {
+          result = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error('解析响应JSON失败:', parseError);
+          // 如果不是JSON格式，检查是否包含特定的错误信息
+          if (responseText.includes('Please use POST method')) {
+            return {
+              phone,
+              success: false,
+              error: 'API需要使用POST方法',
+              message: '发送失败: API配置错误，请联系管理员'
+            };
+          }
+          return {
+            phone,
+            success: false,
+            error: `无法解析API响应: ${responseText}`,
+            message: '发送失败: API响应格式错误'
+          };
+        }
+
+        console.log('解析后的API响应:', result);
         
         // 根据 API 响应判断是否发送成功
         const success = result.status === '0';
