@@ -28,7 +28,7 @@ serve(async (req) => {
     const extno = "10690545612"
 
     // 将手机号码字符串转换为数组并去除空格
-    const phoneNumberList = phoneNumbers.split(',').map(phone => phone.trim())
+    const phoneNumberList = Array.isArray(phoneNumbers) ? phoneNumbers : [phoneNumbers]
     console.log('处理后的手机号列表:', phoneNumberList)
 
     // 为每个手机号发送短信
@@ -63,20 +63,17 @@ serve(async (req) => {
           return { 
             phone, 
             success: false,
-            error: '解析响应失败',
             message: `发送失败: API 响应格式错误 (${text.substring(0, 100)}...)`
           }
         }
 
         // 根据 API 响应判断是否发送成功
-        const success = result.result === '0' // 修正：使用 result.result 而不是 status
+        const success = result.result === '0'
         const message = success ? '发送成功' : `发送失败: ${result.desc || '未知错误'}`
         
         return { 
           phone, 
           success,
-          result,
-          mid: result.msgid, // 保存消息ID用于后续状态更新
           message
         }
       } catch (error) {
@@ -84,7 +81,6 @@ serve(async (req) => {
         return { 
           phone, 
           success: false, 
-          error: error.message,
           message: `发送失败: ${error.message}`
         }
       }
@@ -113,8 +109,7 @@ serve(async (req) => {
         success_count: successCount,
         fail_count: failCount,
         status: successCount === results.length ? 'success' : 
-                failCount === results.length ? 'failed' : 'partial',
-        mid: results[0]?.mid // 保存消息ID用于后续状态更新
+                failCount === results.length ? 'failed' : 'partial'
       })
 
     if (dbError) {
@@ -122,10 +117,9 @@ serve(async (req) => {
       throw dbError
     }
 
-    // 详细的响应信息
+    // 返回结果
     const response = {
       success: failCount === 0,
-      results,
       summary: {
         total: results.length,
         success: successCount,
