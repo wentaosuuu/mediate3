@@ -143,7 +143,6 @@ export type Database = {
           fail_count: number | null
           frequency_fail_count: number | null
           id: string
-          mid: string | null
           recipients: string[]
           send_code: string
           send_time: string | null
@@ -160,7 +159,6 @@ export type Database = {
           fail_count?: number | null
           frequency_fail_count?: number | null
           id?: string
-          mid?: string | null
           recipients: string[]
           send_code: string
           send_time?: string | null
@@ -177,7 +175,6 @@ export type Database = {
           fail_count?: number | null
           frequency_fail_count?: number | null
           id?: string
-          mid?: string | null
           recipients?: string[]
           send_code?: string
           send_time?: string | null
