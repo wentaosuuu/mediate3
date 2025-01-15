@@ -29,13 +29,31 @@ export const useSmsSubmit = () => {
     }
 
     try {
+      // 获取当前用户信息
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('用户未登录');
+      }
+
+      // 获取用户的 tenant_id
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('tenant_id')
+        .eq('id', user.id)
+        .single();
+
+      if (userError || !userData) {
+        throw new Error('获取用户信息失败');
+      }
+
       // 调用发送短信的 Edge Function
       const { data, error } = await supabase.functions.invoke('send-sms', {
         body: {
           phoneNumbers: phoneNumbers.join(','),
           content,
           smsType,
-          templateName
+          templateName,
+          tenantId: userData.tenant_id
         }
       });
 

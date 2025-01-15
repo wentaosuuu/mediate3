@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { createClient } from 'https://esm.sh/@supabase_supabase-js@2.7.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,8 +19,12 @@ serve(async (req) => {
     )
 
     // 获取请求参数
-    const { phoneNumbers, content, smsType, templateName } = await req.json()
-    console.log('收到发送短信请求:', { phoneNumbers, content, smsType, templateName })
+    const { phoneNumbers, content, smsType, templateName, tenantId } = await req.json()
+    console.log('收到发送短信请求:', { phoneNumbers, content, smsType, templateName, tenantId })
+
+    if (!tenantId) {
+      throw new Error('租户ID不能为空')
+    }
 
     // API 参数
     const account = Deno.env.get('SMS_ACCOUNT')
@@ -65,14 +69,14 @@ serve(async (req) => {
         }
 
         // 根据 API 响应判断是否发送成功
-        const success = result.result === '0' // 修正：使用 result.result 而不是 status
+        const success = result.result === '0'
         const message = success ? '发送成功' : `发送失败: ${result.desc || '未知错误'}`
         
         return { 
           phone, 
           success,
           result,
-          mid: result.msgid, // 保存消息ID用于后续状态更新
+          mid: result.msgid,
           message
         }
       } catch (error) {
@@ -97,6 +101,7 @@ serve(async (req) => {
     const { error: dbError } = await supabaseClient
       .from('sms_records')
       .insert({
+        tenant_id: tenantId,
         send_code: sendCode,
         template_name: templateName,
         sms_type: smsType,
@@ -106,7 +111,7 @@ serve(async (req) => {
         fail_count: failCount,
         status: successCount === results.length ? 'success' : 
                 failCount === results.length ? 'failed' : 'partial',
-        mid: results[0]?.mid // 保存消息ID用于后续状态更新
+        mid: results[0]?.mid
       })
 
     if (dbError) {
