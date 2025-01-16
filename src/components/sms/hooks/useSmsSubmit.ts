@@ -56,58 +56,65 @@ export const useSmsSubmit = ({ onClose }: UseSmsSubmitProps) => {
       // 先关闭弹窗
       onClose();
 
-      if (data.success) {
-        // 保存发送记录
-        const { error: dbError } = await supabase
-          .from('sms_records')
-          .insert([
-            {
-              tenant_id: '12345',
-              send_code: Math.random().toString(36).substring(7),
-              template_name: selectedTemplate,
-              sms_type: smsType,
-              recipients: phoneNumbers.split(',').map(n => n.trim()),
-              content: smsContent,
-              success_count: data.summary.success,
-              fail_count: data.summary.failed,
-              status: 'sent'
-            }
-          ]);
+      // 延迟显示 toast，确保在弹窗关闭动画后显示
+      setTimeout(() => {
+        if (data.success) {
+          // 保存发送记录
+          supabase
+            .from('sms_records')
+            .insert([
+              {
+                tenant_id: '12345',
+                send_code: Math.random().toString(36).substring(7),
+                template_name: selectedTemplate,
+                sms_type: smsType,
+                recipients: phoneNumbers.split(',').map(n => n.trim()),
+                content: smsContent,
+                success_count: data.summary.success,
+                fail_count: data.summary.failed,
+                status: 'sent'
+              }
+            ])
+            .then(({ error: dbError }) => {
+              if (dbError) {
+                console.error('保存短信记录错误:', dbError);
+                toast({
+                  title: "发送成功但记录保存失败",
+                  description: "短信已发送但保存记录时发生错误",
+                  variant: "destructive",
+                });
+                return;
+              }
 
-        if (dbError) {
-          console.error('保存短信记录错误:', dbError);
+              // 显示成功提示
+              toast({
+                title: "发送成功",
+                description: `成功发送 ${data.summary.success} 条短信`,
+                className: "bg-green-500 text-white border-green-600",
+              });
+            });
+        } else {
+          // 显示失败提示
           toast({
-            title: "发送成功但记录保存失败",
-            description: "短信已发送但保存记录时发生错误",
+            title: "发送失败",
+            description: data.error || "短信发送失败，请检查手机号码是否正确",
             variant: "destructive",
           });
-          return;
         }
+      }, 300); // 等待300ms，让弹窗关闭动画完成
 
-        // 显示成功提示
-        toast({
-          title: "发送成功",
-          description: `成功发送 ${data.summary.success} 条短信`,
-          className: "bg-green-500 text-white border-green-600",
-        });
-      } else {
-        // 显示失败提示
-        toast({
-          title: "发送失败",
-          description: data.error || "短信发送失败，请检查手机号码是否正确",
-          variant: "destructive",
-        });
-      }
     } catch (error) {
       console.error('发送短信失败:', error);
       // 先关闭弹窗
       onClose();
-      // 显示错误提示
-      toast({
-        title: "发送失败",
-        description: "发送短信时发生错误，请稍后重试",
-        variant: "destructive",
-      });
+      // 延迟显示错误提示
+      setTimeout(() => {
+        toast({
+          title: "发送失败",
+          description: "发送短信时发生错误，请稍后重试",
+          variant: "destructive",
+        });
+      }, 300);
     } finally {
       setIsSubmitting(false);
     }

@@ -5,6 +5,7 @@ import { TopBar } from '@/components/dashboard/TopBar';
 import { MainContent } from '@/components/dashboard/MainContent';
 import { SmsSearchForm } from '@/components/sms/SmsSearchForm';
 import { SmsTable } from '@/components/sms/SmsTable';
+import { Toaster } from "@/components/ui/toaster";
 
 const SmsService = () => {
   const navigate = useNavigate();
@@ -46,6 +47,7 @@ const SmsService = () => {
           </div>
         </MainContent>
       </div>
+      <Toaster />
     </div>
   );
 };
