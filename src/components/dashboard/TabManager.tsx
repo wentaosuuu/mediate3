@@ -39,20 +39,25 @@ const getTabLabel = (path: string): string => {
 export const TabManager = ({ currentPath }: TabManagerProps) => {
   const navigate = useNavigate();
   const [tabs, setTabs] = useState<Tab[]>(() => {
-    // 从 localStorage 恢复标签页状态
-    const savedTabs = localStorage.getItem('openTabs');
-    if (savedTabs) {
-      const parsedTabs = JSON.parse(savedTabs);
-      // 确保首页标签始终存在
-      if (!parsedTabs.find((tab: Tab) => tab.path === '/dashboard')) {
-        parsedTabs.unshift({
-          path: '/dashboard',
-          label: '首页',
-          closeable: false
-        });
+    try {
+      // 从 localStorage 恢复标签页状态
+      const savedTabs = localStorage.getItem('openTabs');
+      if (savedTabs) {
+        const parsedTabs = JSON.parse(savedTabs);
+        // 确保首页标签始终存在
+        if (!parsedTabs.find((tab: Tab) => tab.path === '/dashboard')) {
+          parsedTabs.unshift({
+            path: '/dashboard',
+            label: '首页',
+            closeable: false
+          });
+        }
+        return parsedTabs;
       }
-      return parsedTabs;
+    } catch (error) {
+      console.error('Error loading tabs from localStorage:', error);
     }
+    // 如果出现任何错误或没有保存的标签，返回默认值
     return [{
       path: '/dashboard',
       label: '首页',
@@ -62,7 +67,11 @@ export const TabManager = ({ currentPath }: TabManagerProps) => {
 
   // 保存标签页状态到 localStorage
   useEffect(() => {
-    localStorage.setItem('openTabs', JSON.stringify(tabs));
+    try {
+      localStorage.setItem('openTabs', JSON.stringify(tabs));
+    } catch (error) {
+      console.error('Error saving tabs to localStorage:', error);
+    }
   }, [tabs]);
 
   // 处理新标签页的添加
@@ -92,11 +101,22 @@ export const TabManager = ({ currentPath }: TabManagerProps) => {
   const handleTabClose = (path: string) => {
     setTabs(prev => {
       const newTabs = prev.filter(tab => tab.path !== path);
+      
+      // 确保至少保留首页标签
+      if (newTabs.length === 0) {
+        newTabs.push({
+          path: '/dashboard',
+          label: '首页',
+          closeable: false
+        });
+      }
+
       if (path === currentPath) {
         // 如果关闭的是当前标签，跳转到最后一个标签
         const lastTab = newTabs[newTabs.length - 1];
         navigate(lastTab.path);
       }
+      
       return newTabs;
     });
   };
