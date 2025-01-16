@@ -6,6 +6,67 @@ interface UseSmsSubmitProps {
   onClose: () => void;
 }
 
+interface SmsRecord {
+  tenant_id: string;
+  send_code: string;
+  template_name: string;
+  sms_type: string;
+  recipients: string[];
+  content: string;
+  success_count: number;
+  fail_count: number;
+  status: string;
+}
+
+// 验证表单数据
+const validateForm = (selectedTemplate: string, phoneNumbers: string) => {
+  if (!selectedTemplate) {
+    return "请选择短信模板";
+  }
+  if (!phoneNumbers) {
+    return "请输入手机号码";
+  }
+  return null;
+};
+
+// 创建短信记录对象
+const createSmsRecord = (
+  selectedTemplate: string,
+  smsType: string,
+  phoneNumbers: string,
+  smsContent: string,
+  summary: { success: number; failed: number }
+): SmsRecord => ({
+  tenant_id: '12345',
+  send_code: Math.random().toString(36).substring(7),
+  template_name: selectedTemplate,
+  sms_type: smsType,
+  recipients: phoneNumbers.split(',').map(n => n.trim()),
+  content: smsContent,
+  success_count: summary.success,
+  fail_count: summary.failed,
+  status: 'sent'
+});
+
+// 保存短信记录到数据库
+const saveSmsRecord = async (record: SmsRecord) => {
+  const { error } = await supabase
+    .from('sms_records')
+    .insert([record]);
+  
+  if (error) {
+    console.error('保存短信记录错误:', error);
+    throw new Error('保存短信记录失败');
+  }
+};
+
+// 显示延迟的 toast 消息
+const showDelayedToast = (toast: any, message: { title: string; description: string; variant?: string; className?: string }) => {
+  setTimeout(() => {
+    toast(message);
+  }, 300);
+};
+
 export const useSmsSubmit = ({ onClose }: UseSmsSubmitProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -17,19 +78,11 @@ export const useSmsSubmit = ({ onClose }: UseSmsSubmitProps) => {
     smsContent: string
   ) => {
     // 验证表单
-    if (!selectedTemplate) {
+    const validationError = validateForm(selectedTemplate, phoneNumbers);
+    if (validationError) {
       toast({
         title: "提示",
-        description: "请选择短信模板",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!phoneNumbers) {
-      toast({
-        title: "提示",
-        description: "请输入手机号码",
+        description: validationError,
         variant: "destructive",
       });
       return;
@@ -56,65 +109,47 @@ export const useSmsSubmit = ({ onClose }: UseSmsSubmitProps) => {
       // 先关闭弹窗
       onClose();
 
-      // 延迟显示 toast，确保在弹窗关闭动画后显示
-      setTimeout(() => {
-        if (data.success) {
-          // 保存发送记录
-          supabase
-            .from('sms_records')
-            .insert([
-              {
-                tenant_id: '12345',
-                send_code: Math.random().toString(36).substring(7),
-                template_name: selectedTemplate,
-                sms_type: smsType,
-                recipients: phoneNumbers.split(',').map(n => n.trim()),
-                content: smsContent,
-                success_count: data.summary.success,
-                fail_count: data.summary.failed,
-                status: 'sent'
-              }
-            ])
-            .then(({ error: dbError }) => {
-              if (dbError) {
-                console.error('保存短信记录错误:', dbError);
-                toast({
-                  title: "发送成功但记录保存失败",
-                  description: "短信已发送但保存记录时发生错误",
-                  variant: "destructive",
-                });
-                return;
-              }
-
-              // 显示成功提示
-              toast({
-                title: "发送成功",
-                description: `成功发送 ${data.summary.success} 条短信`,
-                className: "bg-green-500 text-white border-green-600",
-              });
-            });
-        } else {
-          // 显示失败提示
-          toast({
-            title: "发送失败",
-            description: data.error || "短信发送失败，请检查手机号码是否正确",
+      if (data.success) {
+        try {
+          // 创建并保存短信记录
+          const smsRecord = createSmsRecord(
+            selectedTemplate,
+            smsType,
+            phoneNumbers,
+            smsContent,
+            data.summary
+          );
+          await saveSmsRecord(smsRecord);
+          
+          // 显示成功提示
+          showDelayedToast(toast, {
+            title: "发送成功",
+            description: `成功发送 ${data.summary.success} 条短信`,
+            className: "bg-green-500 text-white border-green-600",
+          });
+        } catch (dbError) {
+          showDelayedToast(toast, {
+            title: "发送成功但记录保存失败",
+            description: "短信已发送但保存记录时发生错误",
             variant: "destructive",
           });
         }
-      }, 300); // 等待300ms，让弹窗关闭动画完成
-
-    } catch (error) {
-      console.error('发送短信失败:', error);
-      // 先关闭弹窗
-      onClose();
-      // 延迟显示错误提示
-      setTimeout(() => {
-        toast({
+      } else {
+        // 显示失败提示
+        showDelayedToast(toast, {
           title: "发送失败",
-          description: "发送短信时发生错误，请稍后重试",
+          description: data.error || "短信发送失败，请检查手机号码是否正确",
           variant: "destructive",
         });
-      }, 300);
+      }
+    } catch (error) {
+      console.error('发送短信失败:', error);
+      onClose();
+      showDelayedToast(toast, {
+        title: "发送失败",
+        description: "发送短信时发生错误，请稍后重试",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
