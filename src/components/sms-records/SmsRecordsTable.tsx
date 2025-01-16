@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { Trash2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Pagination,
   PaginationContent,
@@ -23,7 +24,7 @@ interface SmsRecordsTableProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-  refetch: () => void; // 添加refetch属性用于刷新数据
+  refetch: () => void;
 }
 
 export const SmsRecordsTable = ({ 
@@ -72,7 +73,6 @@ export const SmsRecordsTable = ({
     }
   };
 
-  // 处理删除记录
   const handleDelete = async (id: string) => {
     try {
       const { error } = await supabase
@@ -87,7 +87,6 @@ export const SmsRecordsTable = ({
         description: "短信记录已删除",
       });
       
-      // 刷新数据
       refetch();
     } catch (error) {
       console.error('Delete error:', error);
@@ -106,88 +105,98 @@ export const SmsRecordsTable = ({
           <Button variant="outline" onClick={handleExport}>导出Excel</Button>
         </div>
       </div>
-      <div className="w-full overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>流水ID</TableHead>
-              <TableHead>批次号</TableHead>
-              <TableHead>客户姓名/手机</TableHead>
-              <TableHead>短信类型</TableHead>
-              <TableHead>短信内容</TableHead>
-              <TableHead>发送数量</TableHead>
-              <TableHead>发送状态</TableHead>
-              <TableHead className="whitespace-normal">
-                发送时间
-                <br />
-                接收时间
-              </TableHead>
-              <TableHead>创建时间</TableHead>
-              <TableHead>发送人</TableHead>
-              <TableHead>操作</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={11} className="text-center py-8">
-                  加载中...
-                </TableCell>
-              </TableRow>
-            ) : data.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={11} className="text-center py-8 text-gray-500">
-                  暂无数据
-                </TableCell>
-              </TableRow>
-            ) : (
-              data.map((record) => (
-                <TableRow key={record.id}>
-                  <TableCell>{record.id}</TableCell>
-                  <TableCell>{record.send_code}</TableCell>
-                  <TableCell>{record.recipients.join(', ')}</TableCell>
-                  <TableCell>{record.sms_type}</TableCell>
-                  <TableCell className="max-w-[300px] truncate">{record.content}</TableCell>
-                  <TableCell>
-                    成功：{record.success_count || 0}
-                    <br />
-                    失败：{record.fail_count || 0}
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getStatusBadgeStyle(record.status)}>
-                      {record.status === 'success' ? '发送成功' :
-                       record.status === 'failed' ? '发送失败' :
-                       record.status === 'pending' ? '发送中' : '未知状态'}
-                    </Badge>
-                    {record.delivery_message && (
-                      <div className="text-xs text-gray-500 mt-1">
-                        {record.delivery_message}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="whitespace-normal">
-                    {formatDate(record.send_time)}
-                    <br />
-                    {record.delivery_time ? formatDate(record.delivery_time) : '-'}
-                  </TableCell>
-                  <TableCell>{formatDate(record.created_at)}</TableCell>
-                  <TableCell>{record.created_by || '-'}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(record.id)}
-                      className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+      
+      {/* 使用相对定位包装器来实现固定列 */}
+      <div className="relative">
+        {/* 可滚动区域 */}
+        <div className="overflow-x-auto">
+          <div className="inline-block min-w-full align-middle">
+            <div className="overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="whitespace-nowrap">流水ID</TableHead>
+                    <TableHead className="whitespace-nowrap">批次号</TableHead>
+                    <TableHead className="whitespace-nowrap">客户姓名/手机</TableHead>
+                    <TableHead className="whitespace-nowrap">短信类型</TableHead>
+                    <TableHead className="whitespace-nowrap">短信内容</TableHead>
+                    <TableHead className="whitespace-nowrap">发送数量</TableHead>
+                    <TableHead className="whitespace-nowrap">发送状态</TableHead>
+                    <TableHead className="whitespace-nowrap">发送时间/接收时间</TableHead>
+                    <TableHead className="whitespace-nowrap">创建时间</TableHead>
+                    <TableHead className="whitespace-nowrap">发送人</TableHead>
+                    {/* 固定操作列 */}
+                    <TableHead className="whitespace-nowrap sticky right-0 bg-white shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)]">
+                      操作
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {isLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={11} className="text-center py-8">
+                        加载中...
+                      </TableCell>
+                    </TableRow>
+                  ) : data.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={11} className="text-center py-8 text-gray-500">
+                        暂无数据
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    data.map((record) => (
+                      <TableRow key={record.id}>
+                        <TableCell className="whitespace-nowrap">{record.id}</TableCell>
+                        <TableCell className="whitespace-nowrap">{record.send_code}</TableCell>
+                        <TableCell className="whitespace-nowrap">{record.recipients.join(', ')}</TableCell>
+                        <TableCell className="whitespace-nowrap">{record.sms_type}</TableCell>
+                        <TableCell className="max-w-[300px] truncate">{record.content}</TableCell>
+                        <TableCell className="whitespace-nowrap">
+                          成功：{record.success_count || 0}
+                          <br />
+                          失败：{record.fail_count || 0}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap">
+                          <Badge className={getStatusBadgeStyle(record.status)}>
+                            {record.status === 'success' ? '发送成功' :
+                             record.status === 'failed' ? '发送失败' :
+                             record.status === 'pending' ? '发送中' : '未知状态'}
+                          </Badge>
+                          {record.delivery_message && (
+                            <div className="text-xs text-gray-500 mt-1">
+                              {record.delivery_message}
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap">
+                          {formatDate(record.send_time)}
+                          <br />
+                          {record.delivery_time ? formatDate(record.delivery_time) : '-'}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap">{formatDate(record.created_at)}</TableCell>
+                        <TableCell className="whitespace-nowrap">{record.created_by || '-'}</TableCell>
+                        {/* 固定操作列单元格 */}
+                        <TableCell className="whitespace-nowrap sticky right-0 bg-white shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)]">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(record.id)}
+                            className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        </div>
       </div>
+
       <div className="p-4 border-t">
         <Pagination>
           <PaginationContent>
