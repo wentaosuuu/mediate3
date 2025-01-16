@@ -26,13 +26,13 @@ enabled = true
 enabled = true
 
 [[functions]]
-name = "check-sms-status"
+[functions.check-sms-status]
 verify_jwt = false
 
 [[functions]]
-name = "send-sms"
+[functions.send-sms]
 verify_jwt = false
 
 [[functions]]
-name = "sms-callback"
+[functions.sms-callback]
 verify_jwt = false
