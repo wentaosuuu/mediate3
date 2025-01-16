@@ -140,6 +140,10 @@ export type Database = {
           content: string
           created_at: string | null
           created_by: string | null
+          delivery_code: string | null
+          delivery_message: string | null
+          delivery_status: string | null
+          delivery_time: string | null
           fail_count: number | null
           frequency_fail_count: number | null
           id: string
@@ -157,6 +161,10 @@ export type Database = {
           content: string
           created_at?: string | null
           created_by?: string | null
+          delivery_code?: string | null
+          delivery_message?: string | null
+          delivery_status?: string | null
+          delivery_time?: string | null
           fail_count?: number | null
           frequency_fail_count?: number | null
           id?: string
@@ -174,6 +182,10 @@ export type Database = {
           content?: string
           created_at?: string | null
           created_by?: string | null
+          delivery_code?: string | null
+          delivery_message?: string | null
+          delivery_status?: string | null
+          delivery_time?: string | null
           fail_count?: number | null
           frequency_fail_count?: number | null
           id?: string
