@@ -115,6 +115,7 @@ const SmsRecords = () => {
               currentPage={currentPage}
               totalPages={data?.totalPages || 1}
               onPageChange={handlePageChange}
+              refetch={refetch}
             />
           </div>
         </MainContent>

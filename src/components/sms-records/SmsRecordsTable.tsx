@@ -1,5 +1,6 @@
 import React from 'react';
 import { format } from 'date-fns';
+import { Trash2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { exportSmsRecordsToExcel } from '@/utils/exportUtils';
 import type { SmsRecord } from '@/types/sms';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SmsRecordsTableProps {
   data: SmsRecord[];
@@ -21,6 +23,7 @@ interface SmsRecordsTableProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  refetch: () => void; // 添加refetch属性用于刷新数据
 }
 
 export const SmsRecordsTable = ({ 
@@ -29,6 +32,7 @@ export const SmsRecordsTable = ({
   currentPage, 
   totalPages,
   onPageChange,
+  refetch,
 }: SmsRecordsTableProps) => {
   const { toast } = useToast();
   
@@ -68,6 +72,33 @@ export const SmsRecordsTable = ({
     }
   };
 
+  // 处理删除记录
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('sms_records')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "删除成功",
+        description: "短信记录已删除",
+      });
+      
+      // 刷新数据
+      refetch();
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast({
+        title: "删除失败",
+        description: "请稍后重试",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm">
       <div className="p-4 border-b">
@@ -93,18 +124,19 @@ export const SmsRecordsTable = ({
               </TableHead>
               <TableHead>创建时间</TableHead>
               <TableHead>发送人</TableHead>
+              <TableHead>操作</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={10} className="text-center py-8">
+                <TableCell colSpan={11} className="text-center py-8">
                   加载中...
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={10} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={11} className="text-center py-8 text-gray-500">
                   暂无数据
                 </TableCell>
               </TableRow>
@@ -140,6 +172,16 @@ export const SmsRecordsTable = ({
                   </TableCell>
                   <TableCell>{formatDate(record.created_at)}</TableCell>
                   <TableCell>{record.created_by || '-'}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(record.id)}
+                      className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))
             )}
