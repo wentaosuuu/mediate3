@@ -15,8 +15,8 @@ export const SmsTableHeader = () => {
         <TableHead className="whitespace-nowrap">发送时间/接收时间</TableHead>
         <TableHead className="whitespace-nowrap">创建时间</TableHead>
         <TableHead className="whitespace-nowrap">发送人</TableHead>
-        {/* 固定操作列 */}
-        <TableHead className="whitespace-nowrap sticky right-0 bg-white shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)]">
+        {/* 固定操作列表头 */}
+        <TableHead className="!sticky !right-0 !bg-white shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)]">
           操作
         </TableHead>
       </TableRow>

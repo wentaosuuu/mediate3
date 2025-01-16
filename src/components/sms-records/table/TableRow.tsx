@@ -62,7 +62,7 @@ export const SmsTableRow = ({ record, onDelete }: SmsTableRowProps) => {
       <TableCell className="whitespace-nowrap">{formatDate(record.created_at)}</TableCell>
       <TableCell className="whitespace-nowrap">{record.created_by || '-'}</TableCell>
       {/* 固定操作列单元格 */}
-      <TableCell className="whitespace-nowrap sticky right-0 bg-white shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)]">
+      <TableCell className="!sticky !right-0 !bg-white shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)]">
         <Button
           variant="ghost"
           size="icon"

@@ -78,41 +78,34 @@ export const SmsRecordsTable = ({
         </div>
       </div>
       
-      {/* 使用相对定位包装器来实现固定列 */}
-      <div className="relative">
-        {/* 可滚动区域 */}
-        <div className="overflow-x-auto">
-          <div className="inline-block min-w-full align-middle">
-            <div className="overflow-hidden">
-              <Table>
-                <SmsTableHeader />
-                <TableBody>
-                  {isLoading ? (
-                    <tr>
-                      <td colSpan={11} className="text-center py-8">
-                        加载中...
-                      </td>
-                    </tr>
-                  ) : data.length === 0 ? (
-                    <tr>
-                      <td colSpan={11} className="text-center py-8 text-gray-500">
-                        暂无数据
-                      </td>
-                    </tr>
-                  ) : (
-                    data.map((record) => (
-                      <SmsTableRow 
-                        key={record.id} 
-                        record={record}
-                        onDelete={handleDelete}
-                      />
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-        </div>
+      {/* 表格容器 */}
+      <div className="relative overflow-x-auto">
+        <Table>
+          <SmsTableHeader />
+          <TableBody>
+            {isLoading ? (
+              <tr>
+                <td colSpan={11} className="text-center py-8">
+                  加载中...
+                </td>
+              </tr>
+            ) : data.length === 0 ? (
+              <tr>
+                <td colSpan={11} className="text-center py-8 text-gray-500">
+                  暂无数据
+                </td>
+              </tr>
+            ) : (
+              data.map((record) => (
+                <SmsTableRow 
+                  key={record.id} 
+                  record={record}
+                  onDelete={handleDelete}
+                />
+              ))
+            )}
+          </TableBody>
+        </Table>
       </div>
 
       <TablePagination 
