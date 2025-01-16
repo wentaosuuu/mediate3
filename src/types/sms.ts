@@ -13,6 +13,8 @@ export interface SmsRecord {
   created_at: string | null;
   created_by: string | null;
   status: string | null;
+  delivery_message: string | null;  // 添加发送状态消息字段
+  delivery_time: string | null;     // 添加发送完成时间字段
 }
 
 export interface SmsSearchParams {
