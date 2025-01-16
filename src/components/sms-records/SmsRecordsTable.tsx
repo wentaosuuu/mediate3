@@ -10,6 +10,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Badge } from "@/components/ui/badge";
 import { exportSmsRecordsToExcel } from '@/utils/exportUtils';
 import type { SmsRecord } from '@/types/sms';
 import { useToast } from '@/hooks/use-toast';
@@ -34,6 +35,20 @@ export const SmsRecordsTable = ({
   const formatDate = (date: string | null) => {
     if (!date) return '-';
     return format(new Date(date), 'yyyy-MM-dd HH:mm:ss');
+  };
+
+  // 获取状态标签的样式
+  const getStatusBadgeStyle = (status: string | null) => {
+    switch (status) {
+      case 'success':
+        return 'bg-green-500 hover:bg-green-600';
+      case 'failed':
+        return 'bg-red-500 hover:bg-red-600';
+      case 'pending':
+        return 'bg-yellow-500 hover:bg-yellow-600';
+      default:
+        return 'bg-gray-500 hover:bg-gray-600';
+    }
   };
 
   const handleExport = () => {
@@ -70,6 +85,7 @@ export const SmsRecordsTable = ({
               <TableHead>短信类型</TableHead>
               <TableHead>短信内容</TableHead>
               <TableHead>发送数量</TableHead>
+              <TableHead>发送状态</TableHead>
               <TableHead className="whitespace-normal">
                 发送时间
                 <br />
@@ -82,13 +98,13 @@ export const SmsRecordsTable = ({
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8">
+                <TableCell colSpan={10} className="text-center py-8">
                   加载中...
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={10} className="text-center py-8 text-gray-500">
                   暂无数据
                 </TableCell>
               </TableRow>
@@ -105,10 +121,22 @@ export const SmsRecordsTable = ({
                     <br />
                     失败：{record.fail_count || 0}
                   </TableCell>
+                  <TableCell>
+                    <Badge className={getStatusBadgeStyle(record.status)}>
+                      {record.status === 'success' ? '发送成功' :
+                       record.status === 'failed' ? '发送失败' :
+                       record.status === 'pending' ? '发送中' : '未知状态'}
+                    </Badge>
+                    {record.delivery_message && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        {record.delivery_message}
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell className="whitespace-normal">
                     {formatDate(record.send_time)}
                     <br />
-                    {record.status === 'success' ? formatDate(record.send_time) : '-'}
+                    {record.delivery_time ? formatDate(record.delivery_time) : '-'}
                   </TableCell>
                   <TableCell>{formatDate(record.created_at)}</TableCell>
                   <TableCell>{record.created_by || '-'}</TableCell>
