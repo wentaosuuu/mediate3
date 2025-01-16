@@ -22,37 +22,14 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   const [phoneNumbers, setPhoneNumbers] = useState<string>("");
   const [pushTime, setPushTime] = useState<string>("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // 短信内容 - 后续可以根据模板动态生成
   const smsContent = "【云宝宝】V3.0测试：您的验证码是123456，请在5分钟内完成验证。";
 
   // 提交逻辑
-  const { submit } = useSmsSubmit();
-
-  // 处理提交
-  const handleSubmit = async () => {
-    if (!phoneNumbers || !smsContent) {
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const result = await submit({
-        phoneNumbers: phoneNumbers.split(',').map(p => p.trim()),
-        content: smsContent,
-        smsType,
-        templateName: selectedTemplate
-      });
-      
-      // 只有在发送成功时才关闭弹窗
-      if (result && result.success) {
-        onOpenChange(false);
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const { isSubmitting, handleSubmit } = useSmsSubmit({
+    onClose: () => onOpenChange(false)
+  });
 
   // 处理短信类型变更
   const handleSmsTypeChange = (type: string) => {
@@ -91,7 +68,7 @@ export const CreateSmsDialog = ({ open, onOpenChange }: CreateSmsDialogProps) =>
             onPhoneNumbersChange={setPhoneNumbers}
             onPushTimeChange={setPushTime}
             onCancel={() => onOpenChange(false)}
-            onSubmit={handleSubmit}
+            onSubmit={() => handleSubmit(selectedTemplate, phoneNumbers, smsType, smsContent)}
           />
 
           {/* 右侧手机预览 */}
