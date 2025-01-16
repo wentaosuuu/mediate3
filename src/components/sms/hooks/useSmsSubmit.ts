@@ -53,6 +53,9 @@ export const useSmsSubmit = ({ onClose }: UseSmsSubmitProps) => {
         throw error;
       }
 
+      // 先关闭弹窗
+      onClose();
+
       if (data.success) {
         // 保存发送记录
         const { error: dbError } = await supabase
@@ -76,18 +79,19 @@ export const useSmsSubmit = ({ onClose }: UseSmsSubmitProps) => {
           toast({
             title: "发送成功但记录保存失败",
             description: "短信已发送但保存记录时发生错误",
-            className: "bg-yellow-500",
+            variant: "destructive",
           });
           return;
         }
 
+        // 显示成功提示
         toast({
           title: "发送成功",
           description: `成功发送 ${data.summary.success} 条短信`,
           className: "bg-green-500 text-white border-green-600",
         });
-        onClose();
       } else {
+        // 显示失败提示
         toast({
           title: "发送失败",
           description: data.error || "短信发送失败，请检查手机号码是否正确",
@@ -96,6 +100,9 @@ export const useSmsSubmit = ({ onClose }: UseSmsSubmitProps) => {
       }
     } catch (error) {
       console.error('发送短信失败:', error);
+      // 先关闭弹窗
+      onClose();
+      // 显示错误提示
       toast({
         title: "发送失败",
         description: "发送短信时发生错误，请稍后重试",
