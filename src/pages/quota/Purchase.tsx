@@ -25,6 +25,24 @@ const Purchase = () => {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const { toast } = useToast();
 
+  // 获取当前用户信息
+  const { data: currentUser } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('未登录');
+
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      
+      if (error) throw error;
+      return userData;
+    }
+  });
+
   // 获取钱包信息
   const { data: wallet } = useQuery({
     queryKey: ['wallet'],
@@ -83,6 +101,15 @@ const Purchase = () => {
   // 处理提交订单
   const handleSubmitOrder = async () => {
     try {
+      if (!currentUser?.tenant_id) {
+        toast({
+          variant: "destructive",
+          title: "无法提交",
+          description: "用户信息获取失败",
+        });
+        return;
+      }
+
       if (orderItems.length === 0) {
         toast({
           variant: "destructive",
@@ -101,7 +128,8 @@ const Purchase = () => {
         .insert({
           order_number: orderNumber,
           total_amount: totalAmount,
-          status: 'PENDING'
+          status: 'PENDING',
+          tenant_id: currentUser.tenant_id
         })
         .select()
         .single();
