@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Balance from './pages/quota/Balance';
 import Purchase from './pages/quota/Purchase';
+import Orders from './pages/quota/Orders';
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
           <Route path="/" element={<Dashboard />}>
             <Route path="/quota/balance" element={<Balance />} />
             <Route path="/quota/purchase" element={<Purchase />} />
-            <Route path="/quota/orders" element={<div>订单管理页面</div>} />
+            <Route path="/quota/orders" element={<Orders />} />
             <Route path="/case" element={<div>案件管理页面</div>} />
             <Route path="/mediation" element={<div>调解管理页面</div>} />
             <Route path="/dashboard-stats" element={<div>仪表盘页面</div>} />
