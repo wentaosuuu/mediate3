@@ -36,10 +36,7 @@ export const Navigation = ({ currentPath, onMenuClick }: NavigationProps) => {
     if (item.children) {
       // 如果点击的是当前展开的菜单，则折叠
       // 如果点击的是其他菜单，则展开新菜单
-      const currentParentPath = getCurrentParentPath(currentPath);
-      if (currentParentPath !== item.path) {
-        setExpandedMenu(item.path);
-      }
+      setExpandedMenu(expandedMenu === item.path ? null : item.path);
     } else {
       // 如果是叶子节点，才进行页面跳转
       onMenuClick(item.path);
