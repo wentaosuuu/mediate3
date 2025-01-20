@@ -22,10 +22,10 @@ export const MenuItem = ({
   onMenuClick,
   onSubMenuClick 
 }: MenuItemProps) => {
-  // 分别处理菜单项点击和折叠图标点击
+  // 处理菜单项点击
   const handleMenuItemClick = (e: React.MouseEvent) => {
-    // 如果点击的是折叠图标,阻止事件冒泡
-    if((e.target as HTMLElement).closest('.chevron-icon')) {
+    // 如果是有子菜单的项目，直接触发展开/折叠
+    if(item.children) {
       e.preventDefault();
       e.stopPropagation();
       onMenuClick(item);
@@ -33,9 +33,7 @@ export const MenuItem = ({
     }
     
     // 如果是叶子节点,才进行页面跳转
-    if(!item.children) {
-      onMenuClick(item);
-    }
+    onMenuClick(item);
   };
 
   return (
@@ -59,7 +57,7 @@ export const MenuItem = ({
           </div>
           {item.children && (
             <ChevronRight 
-              className={`h-4 w-4 transition-transform duration-300 linear chevron-icon ${
+              className={`h-4 w-4 transition-transform duration-300 linear ${
                 isExpanded ? 'rotate-90' : ''
               }`}
             />
