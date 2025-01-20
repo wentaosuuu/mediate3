@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 
 // 订单状态映射
-const orderStatusMap = {
+const orderStatusMap: Record<string, { label: string; variant: "default" | "secondary" | "destructive" }> = {
   'PENDING': { label: '待审核', variant: 'secondary' },
   'APPROVED': { label: '已通过', variant: 'default' },
   'REJECTED': { label: '已拒绝', variant: 'destructive' }
@@ -76,8 +76,8 @@ const Orders = () => {
                 </TableCell>
                 <TableCell>
                   <div className="flex justify-center">
-                    <Badge variant={orderStatusMap[order.status as keyof typeof orderStatusMap].variant}>
-                      {orderStatusMap[order.status as keyof typeof orderStatusMap].label}
+                    <Badge variant={orderStatusMap[order.status]?.variant || 'secondary'}>
+                      {orderStatusMap[order.status]?.label || order.status}
                     </Badge>
                   </div>
                 </TableCell>
