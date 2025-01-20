@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 const Balance = () => {
   // 获取钱包余额
-  const { data: wallet } = useQuery({
+  const { data: wallet, isLoading: isWalletLoading } = useQuery({
     queryKey: ['wallet'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -21,7 +21,7 @@ const Balance = () => {
   });
 
   // 获取最近的交易记录
-  const { data: transactions } = useQuery({
+  const { data: transactions, isLoading: isTransactionsLoading } = useQuery({
     queryKey: ['wallet-transactions'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -53,6 +53,10 @@ const Balance = () => {
       minute: '2-digit'
     });
   };
+
+  if (isWalletLoading || isTransactionsLoading) {
+    return <div className="flex justify-center items-center h-full">加载中...</div>;
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -102,7 +106,7 @@ const Balance = () => {
                   {formatAmount(transaction.amount)}
                 </TableCell>
                 <TableCell className="text-gray-500">
-                  {transaction.description}
+                  {transaction.description || '-'}
                 </TableCell>
               </TableRow>
             ))}
