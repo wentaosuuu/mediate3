@@ -42,13 +42,13 @@ const Recharge = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'APPROVED':
-        return <Badge variant="success">已通过</Badge>;
+        return <Badge variant="default">已通过</Badge>;
       case 'REJECTED':
         return <Badge variant="destructive">已拒绝</Badge>;
       case 'PENDING':
         return <Badge variant="secondary">待审核</Badge>;
       default:
-        return <Badge>{status}</Badge>;
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
 

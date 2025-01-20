@@ -56,7 +56,7 @@ const AccountManage = () => {
                 {new Date(user.created_at).toLocaleString()}
               </TableCell>
               <TableCell>
-                <Badge variant="success">正常</Badge>
+                <Badge variant="default">正常</Badge>
               </TableCell>
             </TableRow>
           ))}
