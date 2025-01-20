@@ -38,7 +38,7 @@ export const menuItems: MenuItem[] = [
       { label: "债务人管理", path: "/mediation/debtor" },
       { label: "案件公示信息", path: "/mediation/case-info" },
       { label: "案件公示信息管理", path: "/mediation/case-info-manage" },
-      { label: "短信触达服务", path: "/mediation/sms-service" },
+      { label: "短信触达服务", path: "/mediation/sms" },
       { label: "短信发送记录", path: "/mediation/sms-records" }
     ]
   },
@@ -48,7 +48,7 @@ export const menuItems: MenuItem[] = [
     path: "/wallet",
     children: [
       { label: "钱包余额", path: "/wallet/balance" },
-      { label: "购买额度", path: "/wallet/recharge" },
+      { label: "购买额度", path: "/wallet/purchase" },
       { label: "订单管理", path: "/wallet/orders" }
     ]
   },
