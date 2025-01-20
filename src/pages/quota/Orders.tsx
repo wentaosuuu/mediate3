@@ -1,15 +1,15 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Table } from '@/components/ui/table';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 
 // 订单状态映射
 const orderStatusMap = {
-  'PENDING': { label: '待审核', color: 'bg-yellow-100 text-yellow-800' },
-  'APPROVED': { label: '已通过', color: 'bg-green-100 text-green-800' },
-  'REJECTED': { label: '已拒绝', color: 'bg-red-100 text-red-800' }
+  'PENDING': { label: '待审核', variant: 'secondary' },
+  'APPROVED': { label: '已通过', variant: 'default' },
+  'REJECTED': { label: '已拒绝', variant: 'destructive' }
 };
 
 const Orders = () => {
@@ -45,24 +45,24 @@ const Orders = () => {
       
       <div className="bg-white rounded-lg shadow">
         <Table>
-          <thead>
-            <tr className="border-b">
-              <th className="py-4 px-6 text-left">订单编号</th>
-              <th className="py-4 px-6 text-left">创建时间</th>
-              <th className="py-4 px-6 text-left">服务项目</th>
-              <th className="py-4 px-6 text-right">总金额</th>
-              <th className="py-4 px-6 text-center">状态</th>
-              <th className="py-4 px-6 text-left">备注</th>
-            </tr>
-          </thead>
-          <tbody>
+          <TableHeader>
+            <TableRow>
+              <TableHead>订单编号</TableHead>
+              <TableHead>创建时间</TableHead>
+              <TableHead>服务项目</TableHead>
+              <TableHead className="text-right">总金额</TableHead>
+              <TableHead className="text-center">状态</TableHead>
+              <TableHead>备注</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {orders?.map((order) => (
-              <tr key={order.id} className="border-b hover:bg-gray-50">
-                <td className="py-4 px-6">{order.order_number}</td>
-                <td className="py-4 px-6">
+              <TableRow key={order.id} className="hover:bg-gray-50">
+                <TableCell>{order.order_number}</TableCell>
+                <TableCell>
                   {format(new Date(order.created_at), 'yyyy-MM-dd HH:mm:ss')}
-                </td>
-                <td className="py-4 px-6">
+                </TableCell>
+                <TableCell>
                   <div className="space-y-1">
                     {order.recharge_order_items?.map((item, index) => (
                       <div key={index} className="text-sm">
@@ -70,25 +70,23 @@ const Orders = () => {
                       </div>
                     ))}
                   </div>
-                </td>
-                <td className="py-4 px-6 text-right">
+                </TableCell>
+                <TableCell className="text-right">
                   ¥{order.total_amount.toFixed(2)}
-                </td>
-                <td className="py-4 px-6">
+                </TableCell>
+                <TableCell>
                   <div className="flex justify-center">
-                    <Badge 
-                      className={`${orderStatusMap[order.status as keyof typeof orderStatusMap].color}`}
-                    >
+                    <Badge variant={orderStatusMap[order.status as keyof typeof orderStatusMap].variant}>
                       {orderStatusMap[order.status as keyof typeof orderStatusMap].label}
                     </Badge>
                   </div>
-                </td>
-                <td className="py-4 px-6 text-sm text-gray-500">
+                </TableCell>
+                <TableCell className="text-sm text-gray-500">
                   {order.reject_reason || '-'}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
+          </TableBody>
         </Table>
       </div>
     </div>

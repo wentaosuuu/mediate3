@@ -36,34 +36,18 @@ const Purchase = () => {
         .from('users')
         .select('*')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
       return userData;
     }
   });
 
-  // 获取钱包信息
-  const { data: wallet } = useQuery({
-    queryKey: ['wallet'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('wallets')
-        .select('*')
-        .single();
-      
-      if (error) throw error;
-      return data;
-    }
-  });
-
   // 处理添加订单项
   const handleAddItem = (item: OrderItem) => {
-    // 检查是否已存在相同服务类型
     const existingIndex = orderItems.findIndex(i => i.serviceType === item.serviceType);
     
     if (existingIndex >= 0) {
-      // 更新已存在的项目
       const newItems = [...orderItems];
       newItems[existingIndex] = {
         ...item,
@@ -72,7 +56,6 @@ const Purchase = () => {
       };
       setOrderItems(newItems);
     } else {
-      // 添加新项目
       setOrderItems([...orderItems, item]);
     }
 

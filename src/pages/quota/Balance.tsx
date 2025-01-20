@@ -13,7 +13,7 @@ const Balance = () => {
       const { data, error } = await supabase
         .from('wallets')
         .select('*')
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
       return data;
