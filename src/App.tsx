@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Balance from './pages/quota/Balance';
 import Purchase from './pages/quota/Purchase';
 import Orders from './pages/quota/Orders';
+import CaseManagement from './pages/case/CaseManagement';
 
 function App() {
   return (
@@ -14,7 +15,7 @@ function App() {
             <Route path="/quota/balance" element={<Balance />} />
             <Route path="/quota/purchase" element={<Purchase />} />
             <Route path="/quota/orders" element={<Orders />} />
-            <Route path="/case" element={<div>案件管理页面</div>} />
+            <Route path="/case" element={<CaseManagement />} />
             <Route path="/mediation" element={<div>调解管理页面</div>} />
             <Route path="/dashboard-stats" element={<div>仪表盘页面</div>} />
             <Route path="/sms" element={<div>短信管理页面</div>} />
