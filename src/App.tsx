@@ -6,6 +6,7 @@ import CaseDistribution from './pages/case/CaseDistribution';
 import SmsService from './pages/mediation/SmsService';
 import SmsRecords from './pages/mediation/SmsRecords';
 import Balance from './pages/wallet/Balance';
+import Purchase from './pages/wallet/Purchase';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/mediation/sms-service" element={<SmsService />} />
         <Route path="/mediation/sms-records" element={<SmsRecords />} />
         <Route path="/wallet/balance" element={<Balance />} />
+        <Route path="/wallet/purchase" element={<Purchase />} />
       </Routes>
     </Router>
   );
