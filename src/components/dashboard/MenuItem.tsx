@@ -22,12 +22,28 @@ export const MenuItem = ({
   onMenuClick,
   onSubMenuClick 
 }: MenuItemProps) => {
+  // 分别处理菜单项点击和折叠图标点击
+  const handleMenuItemClick = (e: React.MouseEvent) => {
+    // 如果点击的是折叠图标,阻止事件冒泡
+    if((e.target as HTMLElement).closest('.chevron-icon')) {
+      e.preventDefault();
+      e.stopPropagation();
+      onMenuClick(item);
+      return;
+    }
+    
+    // 如果是叶子节点,才进行页面跳转
+    if(!item.children) {
+      onMenuClick(item);
+    }
+  };
+
   return (
     <SidebarMenuItem className="mb-4">
       <SidebarMenuButton
         asChild
         isActive={currentPath === item.path}
-        onClick={() => onMenuClick(item)}
+        onClick={handleMenuItemClick}
       >
         <div className={`
           flex items-center justify-between px-8 py-4 mx-4 rounded-lg 
@@ -43,7 +59,7 @@ export const MenuItem = ({
           </div>
           {item.children && (
             <ChevronRight 
-              className={`h-4 w-4 transition-transform duration-300 linear ${
+              className={`h-4 w-4 transition-transform duration-300 linear chevron-icon ${
                 isExpanded ? 'rotate-90' : ''
               }`}
             />
