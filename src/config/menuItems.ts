@@ -11,6 +11,7 @@ import {
   UserCircle,
   Settings,
   Globe,
+  Wallet,
 } from 'lucide-react';
 import { MenuItem } from '@/types/navigation';
 
@@ -39,6 +40,16 @@ export const menuItems: MenuItem[] = [
       { label: "案件公示信息管理", path: "/mediation/case-info-manage" },
       { label: "短信触达服务", path: "/mediation/sms-service" },
       { label: "短信发送记录", path: "/mediation/sms-records" }
+    ]
+  },
+  { 
+    icon: Wallet, 
+    label: "额度中心", 
+    path: "/wallet",
+    children: [
+      { label: "钱包余额", path: "/wallet/balance" },
+      { label: "购买额度", path: "/wallet/recharge" },
+      { label: "订单管理", path: "/wallet/orders" }
     ]
   },
   { 

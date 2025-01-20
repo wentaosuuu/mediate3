@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import CaseDistribution from './pages/case/CaseDistribution';
 import SmsService from './pages/mediation/SmsService';
 import SmsRecords from './pages/mediation/SmsRecords';
+import Balance from './pages/wallet/Balance';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/case/distribution" element={<CaseDistribution />} />
         <Route path="/mediation/sms-service" element={<SmsService />} />
         <Route path="/mediation/sms-records" element={<SmsRecords />} />
+        <Route path="/wallet/balance" element={<Balance />} />
       </Routes>
     </Router>
   );
