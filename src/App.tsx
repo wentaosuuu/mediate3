@@ -1,23 +1,32 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Index from './pages/Index';
-import Register from './pages/Register';
+import React, { Suspense } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
-import CaseDistribution from './pages/case/CaseDistribution';
-import SmsService from './pages/mediation/SmsService';
-import SmsRecords from './pages/mediation/SmsRecords';
+import Balance from './pages/quota/Balance';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/case/distribution" element={<CaseDistribution />} />
-        <Route path="/mediation/sms-service" element={<SmsService />} />
-        <Route path="/mediation/sms-records" element={<SmsRecords />} />
-      </Routes>
-    </Router>
+    <BrowserRouter>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          <Route path="/" element={<Dashboard />}>
+            <Route path="/quota/balance" element={<Balance />} />
+            <Route path="/quota/purchase" element={<div>购买额度页面</div>} />
+            <Route path="/quota/orders" element={<div>订单管理页面</div>} />
+            <Route path="/case" element={<div>案件管理页面</div>} />
+            <Route path="/mediation" element={<div>调解管理页面</div>} />
+            <Route path="/dashboard-stats" element={<div>仪表盘页面</div>} />
+            <Route path="/sms" element={<div>短信管理页面</div>} />
+            <Route path="/call-center" element={<div>呼叫中心页面</div>} />
+            <Route path="/mediation-records" element={<div>调解记录页面</div>} />
+            <Route path="/operation" element={<div>运营中心页面</div>} />
+            <Route path="/tenant" element={<div>租户管理页面</div>} />
+            <Route path="/account" element={<div>账户中心页面</div>} />
+            <Route path="/system" element={<div>系统管理页面</div>} />
+            <Route path="/global" element={<div>全局管理页面</div>} />
+          </Route>
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
   );
 }
 

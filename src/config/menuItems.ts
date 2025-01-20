@@ -11,6 +11,9 @@ import {
   UserCircle,
   Settings,
   Globe,
+  Wallet,
+  ShoppingCart,
+  ClipboardList
 } from 'lucide-react';
 import { MenuItem } from '@/types/navigation';
 
@@ -19,6 +22,16 @@ export const menuItems: MenuItem[] = [
     icon: Home, 
     label: "首页", 
     path: "/dashboard"
+  },
+  { 
+    icon: Wallet, 
+    label: "额度中心", 
+    path: "/quota",
+    children: [
+      { label: "钱包余额", path: "/quota/balance" },
+      { label: "购买额度", path: "/quota/purchase" },
+      { label: "订单管理", path: "/quota/orders" }
+    ]
   },
   { 
     icon: FileText, 
