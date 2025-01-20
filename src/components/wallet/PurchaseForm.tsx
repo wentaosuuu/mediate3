@@ -78,6 +78,26 @@ export const PurchaseForm = () => {
     }
 
     try {
+      // 获取当前用户信息
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('请先登录');
+        return;
+      }
+
+      // 获取用户的 tenant_id
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('tenant_id')
+        .eq('id', user.id)
+        .single();
+
+      if (userError || !userData) {
+        console.error('Error fetching user data:', userError);
+        toast.error('获取用户信息失败');
+        return;
+      }
+
       // 生成订单号
       const orderNumber = `PO${Date.now()}`;
       
@@ -86,8 +106,10 @@ export const PurchaseForm = () => {
         .from('recharge_orders')
         .insert({
           order_number: orderNumber,
+          tenant_id: userData.tenant_id,
           total_amount: calculateTotal(),
-          status: 'PENDING'
+          status: 'PENDING',
+          created_by: user.id
         })
         .select()
         .single();
