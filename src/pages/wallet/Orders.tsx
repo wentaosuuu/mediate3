@@ -77,9 +77,11 @@ const Orders = () => {
       }
     },
     retry: 1,
-    onError: (error) => {
-      console.error('订单数据查询失败:', error);
-      toast.error('获取订单数据失败，请稍后重试');
+    meta: {
+      onError: (error: Error) => {
+        console.error('订单数据查询失败:', error);
+        toast.error('获取订单数据失败，请稍后重试');
+      }
     }
   });
 
