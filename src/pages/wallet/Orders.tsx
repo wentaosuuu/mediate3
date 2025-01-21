@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { OrdersTable } from '@/components/wallet/OrdersTable';
@@ -7,10 +7,17 @@ import { useLocation } from 'react-router-dom';
 
 const Orders = () => {
   const location = useLocation();
+  const [username, setUsername] = useState<string | null>(null);
   
   // 获取当前用户信息
-  const { data: { user } } = await supabase.auth.getUser();
-  const username = user?.email?.split('@')[0] || null;
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUsername(user?.email?.split('@')[0] || null);
+    };
+    
+    fetchUser();
+  }, []);
   
   // 获取订单数据
   const { data: orders, isLoading } = useQuery({
