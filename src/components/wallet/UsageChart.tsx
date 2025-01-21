@@ -12,7 +12,6 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-// 模拟数据生成函数
 const generateChartData = (selectedServices: string[], timeRange: string, department: string, staff: string) => {
   // 基础数据
   const baseData = {
@@ -95,7 +94,6 @@ export const UsageChart = () => {
       } else {
         newServices = [...currentServices, value];
       }
-      // 如果没有选中任何服务，默认选中"全部服务"
       if (newServices.length === 0) {
         newServices = ['all'];
       }
@@ -121,7 +119,6 @@ export const UsageChart = () => {
             </SelectContent>
           </Select>
 
-          {/* 服务类型多选下拉框 */}
           <Select 
             value={selectedServices[0]} 
             onValueChange={handleServiceChange}

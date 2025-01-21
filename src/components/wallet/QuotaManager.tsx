@@ -33,20 +33,14 @@ export const QuotaManager = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {serviceTypes.map(service => (
-          <Card key={service.id} className="p-4 space-y-3">
-            <div className="flex justify-between items-start">
+          <Card key={service.id} className="p-4">
+            <div className="flex justify-between items-center">
               <div>
                 <h3 className="font-medium">{service.name}</h3>
-                <p className="text-sm text-gray-500">
-                  剩余: {service.quota} {service.unit}
+                <p className="text-sm text-gray-500 mt-1">
+                  剩余：<span className="text-primary font-medium">{service.quota}</span> {service.unit}
                 </p>
               </div>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
-              <div 
-                className="bg-primary h-2.5 rounded-full" 
-                style={{ width: '70%' }}
-              ></div>
             </div>
           </Card>
         ))}
