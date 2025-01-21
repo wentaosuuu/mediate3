@@ -62,6 +62,20 @@ export const ChartFilters: React.FC<ChartFiltersProps> = ({
   isServiceDropdownOpen,
   setIsServiceDropdownOpen,
 }) => {
+  // 处理服务选择的显示文本
+  const getServiceDisplayText = () => {
+    if (selectedServices.includes('all')) {
+      return '全部服务';
+    }
+    if (selectedServices.length === 0) {
+      return '全部服务';
+    }
+    if (selectedServices.length === 1) {
+      return serviceTypes.find(s => s.value === selectedServices[0])?.label || '全部服务';
+    }
+    return `已选择 ${selectedServices.length} 项`;
+  };
+
   return (
     <div className="flex flex-wrap gap-4">
       <Select value={timeRange} onValueChange={setTimeRange}>
@@ -95,7 +109,9 @@ export const ChartFilters: React.FC<ChartFiltersProps> = ({
               setIsServiceDropdownOpen(!isServiceDropdownOpen);
             }}
           >
-            <SelectValue placeholder="选择服务类型" />
+            <SelectValue>
+              {getServiceDisplayText()}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent 
             className="bg-white"
