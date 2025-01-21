@@ -19,8 +19,8 @@ export const QuotaManager = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="flex flex-col gap-6">
+      <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">额度监测</h2>
         <Button 
           onClick={() => navigate('/wallet/purchase')}

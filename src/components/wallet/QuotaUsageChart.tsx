@@ -51,7 +51,7 @@ export const QuotaUsageChart = () => {
   });
 
   return (
-    <Card className="p-6 mb-6">
+    <Card className="p-6">
       <div className="mb-6 space-y-4">
         <h3 className="text-lg font-semibold mb-4">额度使用统计</h3>
         
@@ -113,8 +113,8 @@ export const QuotaUsageChart = () => {
         </div>
       </div>
 
-      {/* 图表展示区域 */}
-      <div className="h-[400px] w-full">
+      {/* 图表展示区域 - 调整高度 */}
+      <div className="h-[300px] w-full">
         <ChartContainer
           config={{
             使用量: { color: '#409EFF' },

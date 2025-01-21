@@ -37,9 +37,9 @@ const Quota = () => {
           onSearch={() => {}}
           searchQuery=""
         />
-        <MainContent username={mockUser.username} currentPath="/wallet/quota">
+        <div className="pt-16 px-6 pb-6">
           <QuotaManager />
-        </MainContent>
+        </div>
       </div>
     </div>
   );
