@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart } from 'lucide-react';
+import { UsageChart } from './UsageChart';
 
 // 服务类型定义
 const serviceTypes = [
@@ -18,9 +19,9 @@ export const QuotaManager = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">额度管理</h2>
+    <div className="space-y-8 max-w-7xl mx-auto px-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">额度使用监测</h2>
         <Button 
           onClick={() => navigate('/wallet/purchase')}
           className="flex items-center gap-2"
@@ -50,6 +51,8 @@ export const QuotaManager = () => {
           </Card>
         ))}
       </div>
+
+      <UsageChart />
     </div>
   );
 };
