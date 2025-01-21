@@ -49,10 +49,10 @@ export const UsageChart = () => {
         <h3 className="text-lg font-medium">额度使用统计</h3>
         <div className="flex flex-wrap gap-4">
           <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[140px] bg-white">
               <SelectValue placeholder="选择时间范围" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               {timeRanges.map((range) => (
                 <SelectItem key={range.value} value={range.value}>
                   {range.label}
@@ -62,10 +62,10 @@ export const UsageChart = () => {
           </Select>
 
           <Select value={department} onValueChange={setDepartment}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="选择部门" />
+            <SelectTrigger className="w-[140px] bg-white">
+              <SelectValue placeholder="部门" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               {departments.map((dept) => (
                 <SelectItem key={dept.value} value={dept.value}>
                   {dept.label}
@@ -76,14 +76,14 @@ export const UsageChart = () => {
 
           <Tabs value={viewType} onValueChange={setViewType} className="w-[200px]">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="department">部门维度</TabsTrigger>
-              <TabsTrigger value="staff">人员维度</TabsTrigger>
+              <TabsTrigger value="department">部门</TabsTrigger>
+              <TabsTrigger value="staff">作业员</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
       </div>
 
-      <div className="h-[400px] w-full">
+      <div className="h-[240px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
