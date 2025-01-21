@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   BarChart,
   Bar,
@@ -38,10 +37,17 @@ const departments = [
   { value: 'operation', label: '运营部' },
 ];
 
+const staffMembers = [
+  { value: 'all', label: '全部作业员' },
+  { value: 'staff1', label: '张三' },
+  { value: 'staff2', label: '李四' },
+  { value: 'staff3', label: '王五' },
+];
+
 export const UsageChart = () => {
   const [timeRange, setTimeRange] = useState('today');
   const [department, setDepartment] = useState('all');
-  const [viewType, setViewType] = useState('department'); // department | staff
+  const [staff, setStaff] = useState('all');
 
   return (
     <Card className="p-6 space-y-6">
@@ -74,12 +80,18 @@ export const UsageChart = () => {
             </SelectContent>
           </Select>
 
-          <Tabs value={viewType} onValueChange={setViewType} className="w-[200px]">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="department">部门</TabsTrigger>
-              <TabsTrigger value="staff">作业员</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <Select value={staff} onValueChange={setStaff}>
+            <SelectTrigger className="w-[140px] bg-white">
+              <SelectValue placeholder="作业员" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              {staffMembers.map((member) => (
+                <SelectItem key={member.value} value={member.value}>
+                  {member.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
