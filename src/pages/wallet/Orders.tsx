@@ -82,7 +82,7 @@ const Orders = () => {
         />
         <MainContent username={mockUser.username} currentPath="/wallet/orders">
           <OrdersTable 
-            orders={orders || []} 
+            data={orders || []} 
             isLoading={isLoadingOrders} 
           />
         </MainContent>
