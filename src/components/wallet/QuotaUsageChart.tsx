@@ -5,14 +5,15 @@ import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { addDays } from 'date-fns';
+import { DateRange } from "react-day-picker";
 
 // 模拟数据 - 实际项目中应该从后端获取
 const mockData = [
-  { name: '短信服务', 使用量: 400, 剩余量: 600 },
-  { name: '彩信服务', 使用量: 300, 剩余量: 200 },
-  { name: '外呼服务', 使用量: 200, 剩余量: 100 },
-  { name: 'H5案件公示系统', 使用量: 1, 剩余量: 1 },
-  { name: '坐席服务', 使用量: 3, 剩余量: 2 },
+  { name: '短信服务', 使用量: 400 },
+  { name: '彩信服务', 使用量: 300 },
+  { name: '外呼服务', 使用量: 200 },
+  { name: 'H5案件公示系统', 使用量: 1 },
+  { name: '坐席服务', 使用量: 3 },
 ];
 
 // 部门数据
@@ -43,13 +44,13 @@ export const QuotaUsageChart = () => {
   const [timeRange, setTimeRange] = useState('day');
   const [department, setDepartment] = useState('all');
   const [operator, setOperator] = useState('all');
-  const [date, setDate] = useState({
+  const [date, setDate] = useState<DateRange>({
     from: new Date(),
     to: addDays(new Date(), 7),
   });
 
   return (
-    <Card className="p-6 mb-6">
+    <Card className="p-6">
       <div className="mb-6 space-y-4">
         <h3 className="text-lg font-semibold mb-4">额度使用统计</h3>
         
@@ -116,7 +117,6 @@ export const QuotaUsageChart = () => {
         <ChartContainer
           config={{
             使用量: { color: '#409EFF' },
-            剩余量: { color: '#67C23A' },
           }}
         >
           <ResponsiveContainer width="100%" height="100%">
@@ -127,7 +127,6 @@ export const QuotaUsageChart = () => {
               <Tooltip content={<ChartTooltipContent />} />
               <Legend />
               <Bar dataKey="使用量" fill="#409EFF" />
-              <Bar dataKey="剩余量" fill="#67C23A" />
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>

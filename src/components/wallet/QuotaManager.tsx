@@ -31,9 +31,10 @@ export const QuotaManager = () => {
         </Button>
       </div>
 
-      {/* 添加统计图表 */}
+      {/* 统计图表 */}
       <QuotaUsageChart />
 
+      {/* 剩余额度展示 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {serviceTypes.map(service => (
           <Card key={service.id} className="p-4 space-y-3">
