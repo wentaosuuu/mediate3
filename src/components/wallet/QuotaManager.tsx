@@ -19,7 +19,7 @@ export const QuotaManager = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="container mx-auto max-w-7xl">
+    <div className="w-full max-w-6xl mx-auto">
       <div className="flex flex-col gap-6">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">额度监测</h2>
@@ -36,7 +36,7 @@ export const QuotaManager = () => {
         <QuotaUsageChart />
 
         {/* 剩余额度展示 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           {serviceTypes.map(service => (
             <Card key={service.id} className="p-4 space-y-3">
               <div className="flex justify-between items-start">

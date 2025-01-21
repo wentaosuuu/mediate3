@@ -51,13 +51,13 @@ export const QuotaUsageChart = () => {
   });
 
   return (
-    <Card className="p-6">
-      <div className="mb-6 space-y-4">
+    <Card className="p-4">
+      <div className="mb-4">
         <h3 className="text-lg font-semibold mb-4">额度使用统计</h3>
         
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-3">
           {/* 时间维度选择器 */}
-          <div className="w-48">
+          <div className="w-40">
             <Select value={timeRange} onValueChange={setTimeRange}>
               <SelectTrigger className="bg-white">
                 <SelectValue placeholder="选择时间维度" />
@@ -74,13 +74,13 @@ export const QuotaUsageChart = () => {
 
           {/* 自定义日期范围选择器 */}
           {timeRange === 'custom' && (
-            <div className="w-[300px]">
+            <div className="w-[280px]">
               <DatePickerWithRange date={date} setDate={setDate} />
             </div>
           )}
 
           {/* 部门选择器 */}
-          <div className="w-48">
+          <div className="w-40">
             <Select value={department} onValueChange={setDepartment}>
               <SelectTrigger className="bg-white">
                 <SelectValue placeholder="选择部门" />
@@ -96,7 +96,7 @@ export const QuotaUsageChart = () => {
           </div>
 
           {/* 作业员选择器 */}
-          <div className="w-48">
+          <div className="w-40">
             <Select value={operator} onValueChange={setOperator}>
               <SelectTrigger className="bg-white">
                 <SelectValue placeholder="选择作业员" />
@@ -113,15 +113,18 @@ export const QuotaUsageChart = () => {
         </div>
       </div>
 
-      {/* 图表展示区域 - 限制高度并保持响应式 */}
-      <div className="h-[240px] w-full">
+      {/* 图表展示区域 */}
+      <div className="h-[200px] w-full">
         <ChartContainer
           config={{
             使用量: { color: '#409EFF' },
           }}
         >
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={mockData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            <BarChart 
+              data={mockData} 
+              margin={{ top: 10, right: 30, left: 20, bottom: 20 }}
+            >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
