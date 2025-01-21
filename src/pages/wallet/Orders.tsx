@@ -28,10 +28,20 @@ const Orders = () => {
     queryKey: ['recharge-orders'],
     queryFn: async () => {
       try {
+        // 获取当前用户信息
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          throw new Error('未登录');
+        }
+
+        // 获取订单数据
         const { data, error } = await supabase
           .from('recharge_orders')
           .select(`
             *,
+            created_by (
+              username
+            ),
             recharge_order_items (*)
           `)
           .order('created_at', { ascending: false });

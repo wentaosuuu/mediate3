@@ -24,6 +24,9 @@ interface Order {
   status: string;
   total_amount: number;
   recharge_order_items: OrderItem[];
+  created_by?: {
+    username: string;
+  } | null;
 }
 
 interface OrdersTableProps {
@@ -85,12 +88,13 @@ export const OrdersTable = ({ data, isLoading }: OrdersTableProps) => {
             <TableHead>服务项目</TableHead>
             <TableHead>总金额</TableHead>
             <TableHead>订单状态</TableHead>
+            <TableHead>创建人</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-4">
+              <TableCell colSpan={6} className="text-center py-4">
                 暂无订单数据
               </TableCell>
             </TableRow>
@@ -108,6 +112,7 @@ export const OrdersTable = ({ data, isLoading }: OrdersTableProps) => {
                     {getStatusText(order.status)}
                   </Badge>
                 </TableCell>
+                <TableCell>{order.created_by?.username || '-'}</TableCell>
               </TableRow>
             ))
           )}
