@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart } from 'lucide-react';
+import { QuotaUsageChart } from './QuotaUsageChart';
 
 // 服务类型定义
 const serviceTypes = [
@@ -29,6 +30,9 @@ export const QuotaManager = () => {
           购买额度
         </Button>
       </div>
+
+      {/* 添加统计图表 */}
+      <QuotaUsageChart />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {serviceTypes.map(service => (
