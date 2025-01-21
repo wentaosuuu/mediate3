@@ -43,16 +43,6 @@ export const menuItems: MenuItem[] = [
     ]
   },
   { 
-    icon: Wallet, 
-    label: "额度中心", 
-    path: "/wallet",
-    children: [
-      { label: "钱包余额", path: "/wallet/balance" },
-      { label: "购买额度", path: "/wallet/purchase" },
-      { label: "订单管理", path: "/wallet/orders" }
-    ]
-  },
-  { 
     icon: BarChart2, 
     label: "仪表盘", 
     path: "/dashboard-stats",
@@ -122,6 +112,16 @@ export const menuItems: MenuItem[] = [
       { label: "账户管理", path: "/account/manage" },
       { label: "账户消费总表", path: "/account/consumption" },
       { label: "充值记录", path: "/account/recharge" }
+    ]
+  },
+  { 
+    icon: Wallet, 
+    label: "额度中心", 
+    path: "/wallet",
+    children: [
+      { label: "钱包余额", path: "/wallet/balance" },
+      { label: "购买额度", path: "/wallet/purchase" },
+      { label: "订单管理", path: "/wallet/orders" }
     ]
   },
   { 

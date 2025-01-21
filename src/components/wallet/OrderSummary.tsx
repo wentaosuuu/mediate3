@@ -1,31 +1,57 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { OrderItem } from './types';
 
 interface OrderSummaryProps {
   items: OrderItem[];
   onSubmit: () => void;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
-export const OrderSummary = ({ items, onSubmit }: OrderSummaryProps) => {
+export const OrderSummary = ({ items, onSubmit, isOpen, onToggle }: OrderSummaryProps) => {
   const total = items.reduce((sum, item) => sum + item.totalPrice, 0);
 
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center pt-4 border-t">
-        <span className="text-lg font-semibold">总计</span>
-        <span className="text-xl font-bold text-primary">
-          {total.toFixed(2)} 元
-        </span>
-      </div>
+  if (items.length === 0) {
+    return null;
+  }
 
-      <Button 
-        className="w-full mt-4" 
-        size="lg"
-        onClick={onSubmit}
-      >
-        提交订单
-      </Button>
-    </div>
+  return (
+    <Card className="fixed bottom-0 left-64 right-0 p-4 bg-white shadow-lg border-t">
+      <Collapsible open={isOpen}>
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <CollapsibleTrigger onClick={onToggle}>
+              {isOpen ? <ChevronDown className="h-5 w-5" /> : <ChevronUp className="h-5 w-5" />}
+              <span className="ml-2">费用明细</span>
+            </CollapsibleTrigger>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-lg">
+              总计: <span className="font-bold text-primary">{total.toFixed(2)} 元</span>
+            </span>
+            <Button onClick={onSubmit} disabled={items.length === 0}>
+              提交订单
+            </Button>
+          </div>
+        </div>
+
+        <CollapsibleContent>
+          <div className="mt-4 space-y-2">
+            {items.map((item, index) => (
+              <div key={index} className="flex justify-between items-center py-2 border-t">
+                <span>{item.serviceType}</span>
+                <span className="text-gray-600">
+                  {item.quantity} × {item.unitPrice} = {item.totalPrice.toFixed(2)} 元
+                </span>
+              </div>
+            ))}
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+    </Card>
   );
 };

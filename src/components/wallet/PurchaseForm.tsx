@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { ServiceSelector } from './ServiceSelector';
-import { OrderItemList } from './OrderItemList';
 import { OrderSummary } from './OrderSummary';
 import { OrderItem, ServiceType } from './types';
 
@@ -21,48 +19,35 @@ const serviceTypes: ServiceType[] = [
 
 export const PurchaseForm = () => {
   const navigate = useNavigate();
-  const [selectedService, setSelectedService] = useState('');
-  const [quantity, setQuantity] = useState('');
-  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [selectedServices, setSelectedServices] = useState<Record<string, number>>({});
+  const [isDetailsOpen, setIsDetailsOpen] = useState(true);
 
-  // 获取选中服务的详细信息
-  const getServiceDetails = (serviceId: string) => {
-    return serviceTypes.find(service => service.id === serviceId);
-  };
+  // 计算订单项
+  const orderItems: OrderItem[] = Object.entries(selectedServices)
+    .filter(([_, quantity]) => quantity > 0)
+    .map(([serviceId, quantity]) => {
+      const service = serviceTypes.find(s => s.id === serviceId)!;
+      return {
+        serviceType: service.name,
+        quantity: quantity,
+        unitPrice: service.price,
+        totalPrice: service.price * quantity
+      };
+    });
 
-  // 添加到订单
-  const handleAddToOrder = () => {
-    if (!selectedService || !quantity || Number(quantity) <= 0) {
-      toast.error('请选择服务类型并输入有效的数量');
-      return;
-    }
-
-    const serviceDetails = getServiceDetails(selectedService);
-    if (!serviceDetails) return;
-
-    const newItem: OrderItem = {
-      serviceType: serviceDetails.name,
-      quantity: Number(quantity),
-      unitPrice: serviceDetails.price,
-      totalPrice: serviceDetails.price * Number(quantity)
-    };
-
-    setOrderItems([...orderItems, newItem]);
-    setSelectedService('');
-    setQuantity('');
-    toast.success('已添加到订单');
-  };
-
-  // 删除订单项
-  const handleRemoveItem = (index: number) => {
-    const newItems = orderItems.filter((_, i) => i !== index);
-    setOrderItems(newItems);
+  // 处理数量变更
+  const handleQuantityChange = (serviceId: string, value: string) => {
+    const quantity = parseInt(value) || 0;
+    setSelectedServices(prev => ({
+      ...prev,
+      [serviceId]: quantity
+    }));
   };
 
   // 提交订单
   const handleSubmitOrder = async () => {
     if (orderItems.length === 0) {
-      toast.error('请至少添加一项服务');
+      toast.error('请至少选择一项服务');
       return;
     }
 
@@ -130,34 +115,22 @@ export const PurchaseForm = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-32">
       <Card className="p-6">
-        <h2 className="text-xl font-semibold mb-4">购买额度</h2>
-        
+        <h2 className="text-xl font-semibold mb-6">购买额度</h2>
         <ServiceSelector
-          selectedService={selectedService}
-          quantity={quantity}
           serviceTypes={serviceTypes}
-          onServiceChange={setSelectedService}
-          onQuantityChange={setQuantity}
+          selectedServices={selectedServices}
+          onQuantityChange={handleQuantityChange}
         />
-
-        <Button onClick={handleAddToOrder}>添加到订单</Button>
       </Card>
 
-      {orderItems.length > 0 && (
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">订单明细</h3>
-          <OrderItemList
-            items={orderItems}
-            onRemoveItem={handleRemoveItem}
-          />
-          <OrderSummary
-            items={orderItems}
-            onSubmit={handleSubmitOrder}
-          />
-        </Card>
-      )}
+      <OrderSummary
+        items={orderItems}
+        onSubmit={handleSubmitOrder}
+        isOpen={isDetailsOpen}
+        onToggle={() => setIsDetailsOpen(!isDetailsOpen)}
+      />
     </div>
   );
 };
