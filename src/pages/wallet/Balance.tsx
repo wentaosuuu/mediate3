@@ -22,12 +22,17 @@ const Balance = () => {
   const { data: wallet, isLoading: isLoadingWallet } = useQuery({
     queryKey: ['wallet'],
     queryFn: async () => {
+      console.log('Fetching wallet data...'); // 添加日志
       const { data, error } = await supabase
         .from('wallets')
         .select('*')
         .maybeSingle();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching wallet:', error); // 添加错误日志
+        throw error;
+      }
+      console.log('Wallet data:', data); // 添加日志
       return data;
     }
   });
@@ -36,6 +41,7 @@ const Balance = () => {
   const { data: transactions, isLoading: isLoadingTransactions } = useQuery({
     queryKey: ['transactions'],
     queryFn: async () => {
+      console.log('Fetching transactions...'); // 添加日志
       const { data, error } = await supabase
         .from('wallet_transactions')
         .select(`
@@ -47,7 +53,11 @@ const Balance = () => {
         .order('created_at', { ascending: false })
         .limit(10);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching transactions:', error); // 添加错误日志
+        throw error;
+      }
+      console.log('Transactions data:', data); // 添加日志
       return data;
     }
   });
