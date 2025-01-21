@@ -42,7 +42,7 @@ const Orders = () => {
   });
 
   return (
-    <MainContent currentPath={location.pathname} username={username}>
+    <MainContent username={username} currentPath={location.pathname}>
       <div className="container mx-auto py-4">
         <h1 className="text-2xl font-bold mb-6">充值订单管理</h1>
         <OrdersTable data={orders || []} isLoading={isLoading} />
