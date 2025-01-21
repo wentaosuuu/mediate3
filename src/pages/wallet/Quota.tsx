@@ -1,48 +1,32 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
-import { MainContent } from '@/components/dashboard/MainContent';
 import { QuotaManager } from '@/components/wallet/QuotaManager';
 
-const Quota = () => {
-  const navigate = useNavigate();
+// Mock user data - 实际项目中应该从用户认证系统获取
+const mockUser = {
+  username: 'Demo User',
+  avatar: '/placeholder.svg'
+};
 
-  // Mock user data - 实际项目中应该从认证系统获取
-  const mockUser = {
-    username: '张三',
-    department: '技术部',
-    role: '管理员'
-  };
-
-  const handleLogout = () => {
-    navigate('/');
-  };
-
+export const Quota = () => {
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="fixed left-0 top-0 h-full w-64 z-30">
-        <Navigation
-          currentPath="/wallet/quota"
-          onMenuClick={(path) => navigate(path)}
-        />
-      </div>
+    <div className="min-h-screen flex">
+      {/* 左侧导航 */}
+      <Navigation />
 
-      <div className="pl-64 min-h-screen">
-        <TopBar
+      {/* 主内容区 */}
+      <div className="flex-1 flex flex-col">
+        <TopBar 
           username={mockUser.username}
-          department={mockUser.department}
-          role={mockUser.role}
-          onLogout={handleLogout}
+          avatar={mockUser.avatar}
           onSearch={() => {}}
           searchQuery=""
         />
-        <div className="pt-16 px-6 pb-6">
+        <div className="flex-1 overflow-auto pt-16 px-6 pb-6">
           <QuotaManager />
         </div>
       </div>
     </div>
   );
 };
-
-export default Quota;

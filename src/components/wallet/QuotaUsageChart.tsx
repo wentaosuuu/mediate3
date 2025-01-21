@@ -113,7 +113,7 @@ export const QuotaUsageChart = () => {
         </div>
       </div>
 
-      {/* 图表展示区域 - 调整高度 */}
+      {/* 图表展示区域 */}
       <div className="h-[300px] w-full">
         <ChartContainer
           config={{
