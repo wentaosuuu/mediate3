@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { MainContent } from '@/components/dashboard/MainContent';
-import { Card } from '@/components/ui/card';
 import { WalletBalance } from '@/components/wallet/WalletBalance';
 import { TransactionHistory } from '@/components/wallet/TransactionHistory';
 import { supabase } from '@/integrations/supabase/client';
