@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
@@ -12,16 +12,30 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-// 模拟数据
-const data = [
-  { name: '短信服务', 使用量: 400 },
-  { name: '彩信服务', 使用量: 300 },
-  { name: '外呼服务', 使用量: 200 },
-  { name: 'H5系统', 使用量: 100 },
-  { name: '坐席服务', 使用量: 150 },
-  { name: '号码认证', 使用量: 50 },
-];
+// 模拟数据生成函数
+const generateChartData = (selectedServices: string[], timeRange: string, department: string, staff: string) => {
+  // 基础数据
+  const baseData = {
+    '短信服务': { name: '短信服务', 使用量: 400 },
+    '彩信服务': { name: '彩信服务', 使用量: 300 },
+    '外呼服务': { name: '外呼服务', 使用量: 200 },
+    'H5系统': { name: 'H5系统', 使用量: 100 },
+    '坐席服务': { name: '坐席服务', 使用量: 150 },
+    '号码认证': { name: '号码认证', 使用量: 50 },
+  };
 
+  // 如果选择了特定服务，只返回这些服务的数据
+  if (selectedServices.includes('all')) {
+    return Object.values(baseData);
+  }
+
+  return selectedServices.map(service => {
+    const serviceKey = serviceTypes.find(s => s.value === service)?.label || '';
+    return baseData[serviceKey] || { name: serviceKey, 使用量: 0 };
+  });
+};
+
+// 时间范围选项
 const timeRanges = [
   { value: 'today', label: '本日' },
   { value: 'week', label: '本周' },
@@ -57,22 +71,36 @@ const staffMembers = [
 
 export const UsageChart = () => {
   const [timeRange, setTimeRange] = useState('today');
-  const [selectedServices, setSelectedServices] = useState(['all']); // 默认选择全部服务
+  const [selectedServices, setSelectedServices] = useState(['all']);
   const [department, setDepartment] = useState('all');
   const [staff, setStaff] = useState('all');
+  const [chartData, setChartData] = useState([]);
+  const [isServiceDropdownOpen, setIsServiceDropdownOpen] = useState(false);
+
+  // 更新图表数据
+  useEffect(() => {
+    const newData = generateChartData(selectedServices, timeRange, department, staff);
+    setChartData(newData);
+  }, [selectedServices, timeRange, department, staff]);
 
   // 处理服务类型多选
   const handleServiceChange = (value: string) => {
+    let newServices;
     if (value === 'all') {
-      setSelectedServices(['all']);
+      newServices = ['all'];
     } else {
-      const newServices = selectedServices.filter(s => s !== 'all');
-      if (newServices.includes(value)) {
-        setSelectedServices(newServices.filter(s => s !== value));
+      const currentServices = selectedServices.filter(s => s !== 'all');
+      if (currentServices.includes(value)) {
+        newServices = currentServices.filter(s => s !== value);
       } else {
-        setSelectedServices([...newServices, value]);
+        newServices = [...currentServices, value];
+      }
+      // 如果没有选中任何服务，默认选中"全部服务"
+      if (newServices.length === 0) {
+        newServices = ['all'];
       }
     }
+    setSelectedServices(newServices);
   };
 
   return (
@@ -97,6 +125,8 @@ export const UsageChart = () => {
           <Select 
             value={selectedServices[0]} 
             onValueChange={handleServiceChange}
+            open={isServiceDropdownOpen}
+            onOpenChange={setIsServiceDropdownOpen}
           >
             <SelectTrigger className="w-[160px] bg-white">
               <SelectValue placeholder="选择服务类型" />
@@ -106,6 +136,11 @@ export const UsageChart = () => {
                 <SelectItem 
                   key={service.value} 
                   value={service.value}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleServiceChange(service.value);
+                  }}
                 >
                   <div className="flex items-center gap-2">
                     <input
@@ -151,7 +186,7 @@ export const UsageChart = () => {
 
       <div className="h-[240px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
             <YAxis />
