@@ -8,6 +8,10 @@ import { useLocation } from 'react-router-dom';
 const Orders = () => {
   const location = useLocation();
   
+  // 获取当前用户信息
+  const { data: { user } } = await supabase.auth.getUser();
+  const username = user?.email?.split('@')[0] || null;
+  
   // 获取订单数据
   const { data: orders, isLoading } = useQuery({
     queryKey: ['recharge-orders'],
@@ -31,7 +35,7 @@ const Orders = () => {
   });
 
   return (
-    <MainContent currentPath={location.pathname}>
+    <MainContent currentPath={location.pathname} username={username}>
       <div className="container mx-auto py-4">
         <h1 className="text-2xl font-bold mb-6">充值订单管理</h1>
         <OrdersTable data={orders || []} isLoading={isLoading} />
