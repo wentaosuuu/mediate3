@@ -1,6 +1,5 @@
 import React from 'react';
 import { format } from 'date-fns';
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -9,6 +8,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { OrderStatusBadge } from './OrderStatusBadge';
+import { OrderServiceItems } from './OrderServiceItems';
 
 interface OrderItem {
   service_type: string;
@@ -35,82 +36,51 @@ interface OrdersTableProps {
 }
 
 export const OrdersTable = ({ data, isLoading }: OrdersTableProps) => {
-  // 获取订单状态对应的样式
-  const getStatusBadgeStyle = (status: string) => {
-    switch (status.toUpperCase()) {
-      case 'PENDING':
-        return 'bg-yellow-500 hover:bg-yellow-600';
-      case 'APPROVED':
-        return 'bg-green-500 hover:bg-green-600';
-      case 'REJECTED':
-        return 'bg-red-500 hover:bg-red-600';
-      default:
-        return 'bg-gray-500 hover:bg-gray-600';
-    }
-  };
-
-  // 格式化订单状态显示文本
-  const getStatusText = (status: string) => {
-    switch (status.toUpperCase()) {
-      case 'PENDING':
-        return '待审核';
-      case 'APPROVED':
-        return '已通过';
-      case 'REJECTED':
-        return '已拒绝';
-      default:
-        return '未知状态';
-    }
-  };
-
-  // 格式化服务项目显示
-  const formatServiceItems = (items: OrderItem[]) => {
-    return items.map(item => (
-      `${item.service_type} × ${item.quantity}`
-    )).join(', ');
-  };
-
   if (isLoading) {
     return (
-      <div className="text-center py-8">
-        加载中...
+      <div className="min-h-[200px] flex items-center justify-center">
+        <p className="text-gray-500">加载中...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
+    <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>订单号</TableHead>
-            <TableHead>创建时间</TableHead>
+            <TableHead className="w-[120px]">订单号</TableHead>
+            <TableHead className="w-[180px]">创建时间</TableHead>
             <TableHead>服务项目</TableHead>
-            <TableHead>总金额</TableHead>
-            <TableHead>订单状态</TableHead>
-            <TableHead>创建人</TableHead>
+            <TableHead className="w-[120px] text-right">总金额</TableHead>
+            <TableHead className="w-[100px]">订单状态</TableHead>
+            <TableHead className="w-[100px]">创建人</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-4">
+              <TableCell colSpan={6} className="text-center py-8 text-gray-500">
                 暂无订单数据
               </TableCell>
             </TableRow>
           ) : (
             data.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell>{order.order_number}</TableCell>
+              <TableRow key={order.id} className="group hover:bg-gray-50">
+                <TableCell className="font-medium">
+                  {order.order_number}
+                </TableCell>
                 <TableCell>
                   {format(new Date(order.created_at), 'yyyy-MM-dd HH:mm:ss')}
                 </TableCell>
-                <TableCell>{formatServiceItems(order.recharge_order_items)}</TableCell>
-                <TableCell>¥ {order.total_amount.toFixed(2)}</TableCell>
                 <TableCell>
-                  <Badge className={getStatusBadgeStyle(order.status)}>
-                    {getStatusText(order.status)}
-                  </Badge>
+                  <OrderServiceItems items={order.recharge_order_items} />
+                </TableCell>
+                <TableCell className="text-right">
+                  ¥ {order.total_amount.toFixed(2)}
+                </TableCell>
+                <TableCell>
+                  <OrderStatusBadge status={order.status} />
                 </TableCell>
                 <TableCell>{order.created_by?.username || '-'}</TableCell>
               </TableRow>
