@@ -34,12 +34,12 @@ const Orders = () => {
           throw new Error('未登录');
         }
 
-        // 获取订单数据
+        // 获取订单数据，明确指定关联关系的列名
         const { data, error } = await supabase
           .from('recharge_orders')
           .select(`
             *,
-            created_by (
+            created_by:users!recharge_orders_created_by_fkey (
               username
             ),
             recharge_order_items (*)
