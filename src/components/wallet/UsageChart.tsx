@@ -119,28 +119,18 @@ export const UsageChart = () => {
             onValueChange={handleServiceChange}
             open={isServiceDropdownOpen}
             onOpenChange={(open) => {
-              // 只在点击触发器或下拉框外部区域时改变打开状态
-              if (!open) {
-                setIsServiceDropdownOpen(false);
-              } else {
-                setIsServiceDropdownOpen(true);
+              if (!open || open) {
+                setIsServiceDropdownOpen(open);
               }
             }}
           >
-            <SelectTrigger className="w-[160px] bg-white">
+            <SelectTrigger 
+              className="w-[160px] bg-white"
+              onClick={() => setIsServiceDropdownOpen(!isServiceDropdownOpen)}
+            >
               <SelectValue placeholder="选择服务类型" />
             </SelectTrigger>
-            <SelectContent 
-              className="bg-white"
-              onInteractOutside={(e) => {
-                // 点击下拉框外部区域时关闭
-                setIsServiceDropdownOpen(false);
-              }}
-              onPointerDownOutside={(e) => {
-                // 点击下拉框外部区域时关闭
-                setIsServiceDropdownOpen(false);
-              }}
-            >
+            <SelectContent className="bg-white">
               {serviceTypes.map((service) => (
                 <SelectItem 
                   key={service.value} 
