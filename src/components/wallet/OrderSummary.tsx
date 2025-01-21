@@ -10,9 +10,10 @@ interface OrderSummaryProps {
   onSubmit: () => void;
   isOpen: boolean;
   onToggle: () => void;
+  isSubmitting?: boolean;
 }
 
-export const OrderSummary = ({ items, onSubmit, isOpen, onToggle }: OrderSummaryProps) => {
+export const OrderSummary = ({ items, onSubmit, isOpen, onToggle, isSubmitting = false }: OrderSummaryProps) => {
   const total = items.reduce((sum, item) => sum + item.totalPrice, 0);
 
   if (items.length === 0) {
@@ -33,8 +34,11 @@ export const OrderSummary = ({ items, onSubmit, isOpen, onToggle }: OrderSummary
             <span className="text-lg">
               总计: <span className="font-bold text-primary">{total.toFixed(2)} 元</span>
             </span>
-            <Button onClick={onSubmit} disabled={items.length === 0}>
-              提交订单
+            <Button 
+              onClick={onSubmit} 
+              disabled={items.length === 0 || isSubmitting}
+            >
+              {isSubmitting ? "提交中..." : "提交订单"}
             </Button>
           </div>
         </div>

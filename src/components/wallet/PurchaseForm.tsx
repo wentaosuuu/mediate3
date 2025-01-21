@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { ServiceSelector } from './ServiceSelector';
 import { OrderSummary } from './OrderSummary';
@@ -21,6 +21,7 @@ export const PurchaseForm = () => {
   const navigate = useNavigate();
   const [selectedServices, setSelectedServices] = useState<Record<string, number>>({});
   const [isDetailsOpen, setIsDetailsOpen] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 计算订单项
   const orderItems: OrderItem[] = Object.entries(selectedServices)
@@ -47,15 +48,25 @@ export const PurchaseForm = () => {
   // 提交订单
   const handleSubmitOrder = async () => {
     if (orderItems.length === 0) {
-      toast.error('请至少选择一项服务');
+      toast({
+        title: "提交失败",
+        description: "请至少选择一项服务",
+        variant: "destructive"
+      });
       return;
     }
+
+    setIsSubmitting(true);
 
     try {
       // 获取当前用户信息
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        toast.error('请先登录');
+        toast({
+          title: "提交失败",
+          description: "请先登录",
+          variant: "destructive"
+        });
         return;
       }
 
@@ -68,7 +79,11 @@ export const PurchaseForm = () => {
 
       if (userError || !userData) {
         console.error('Error fetching user data:', userError);
-        toast.error('获取用户信息失败');
+        toast({
+          title: "提交失败",
+          description: "获取用户信息失败",
+          variant: "destructive"
+        });
         return;
       }
 
@@ -106,11 +121,23 @@ export const PurchaseForm = () => {
 
       if (itemsError) throw itemsError;
 
-      toast.success('订单提交成功');
+      toast({
+        title: "提交成功",
+        description: "订单已提交，请等待审核",
+      });
+      
+      // 重置表单
+      setSelectedServices({});
       navigate('/wallet/orders');
     } catch (error) {
       console.error('Error submitting order:', error);
-      toast.error('订单提交失败，请重试');
+      toast({
+        title: "提交失败",
+        description: "订单提交失败，请重试",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -130,6 +157,7 @@ export const PurchaseForm = () => {
         onSubmit={handleSubmitOrder}
         isOpen={isDetailsOpen}
         onToggle={() => setIsDetailsOpen(!isDetailsOpen)}
+        isSubmitting={isSubmitting}
       />
     </div>
   );
