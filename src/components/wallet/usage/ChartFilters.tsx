@@ -77,47 +77,51 @@ export const ChartFilters: React.FC<ChartFiltersProps> = ({
         </SelectContent>
       </Select>
 
-      <Select 
-        value={selectedServices[0]} 
-        onValueChange={handleServiceChange}
-        open={isServiceDropdownOpen}
-        onOpenChange={(open) => {
-          // 只在点击触发器或下拉框外部区域时改变打开状态
-          setIsServiceDropdownOpen(open);
-        }}
-      >
-        <SelectTrigger 
-          className="w-[160px] bg-white"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsServiceDropdownOpen(!isServiceDropdownOpen);
+      <div className="relative">
+        <Select 
+          value={selectedServices[0]} 
+          open={isServiceDropdownOpen}
+          onOpenChange={(open) => {
+            // 只在点击触发器时切换下拉框状态
+            if (!open) {
+              setIsServiceDropdownOpen(false);
+            }
           }}
         >
-          <SelectValue placeholder="选择服务类型" />
-        </SelectTrigger>
-        <SelectContent className="bg-white">
-          {serviceTypes.map((service) => (
-            <SelectItem 
-              key={service.value} 
-              value={service.value}
-              onSelect={(e) => {
-                e.preventDefault();
-                handleServiceChange(service.value);
-              }}
-            >
-              <div className="flex items-center gap-2">
+          <SelectTrigger 
+            className="w-[160px] bg-white"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsServiceDropdownOpen(!isServiceDropdownOpen);
+            }}
+          >
+            <SelectValue placeholder="选择服务类型" />
+          </SelectTrigger>
+          <SelectContent 
+            className="bg-white"
+          >
+            {serviceTypes.map((service) => (
+              <div
+                key={service.value}
+                className="flex items-center px-2 py-1.5 hover:bg-accent hover:text-accent-foreground cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleServiceChange(service.value);
+                }}
+              >
                 <input
                   type="checkbox"
                   checked={selectedServices.includes(service.value)}
                   onChange={() => {}}
-                  className="h-4 w-4"
+                  className="h-4 w-4 mr-2"
                 />
                 {service.label}
               </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       <Select value={department} onValueChange={setDepartment}>
         <SelectTrigger className="w-[140px] bg-white">
