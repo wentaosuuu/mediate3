@@ -30,6 +30,17 @@ const timeRanges = [
   { value: 'custom', label: '自定义' },
 ];
 
+// 服务类型选项
+const serviceTypes = [
+  { value: 'all', label: '全部服务' },
+  { value: 'sms', label: '短信服务' },
+  { value: 'mms', label: '彩信服务' },
+  { value: 'voice', label: '外呼服务' },
+  { value: 'h5_system', label: 'H5案件公示系统' },
+  { value: 'seat', label: '坐席服务' },
+  { value: 'number_auth', label: '号码认证' },
+];
+
 const departments = [
   { value: 'all', label: '全部部门' },
   { value: 'sales', label: '销售部' },
@@ -46,8 +57,23 @@ const staffMembers = [
 
 export const UsageChart = () => {
   const [timeRange, setTimeRange] = useState('today');
+  const [selectedServices, setSelectedServices] = useState(['all']); // 默认选择全部服务
   const [department, setDepartment] = useState('all');
   const [staff, setStaff] = useState('all');
+
+  // 处理服务类型多选
+  const handleServiceChange = (value: string) => {
+    if (value === 'all') {
+      setSelectedServices(['all']);
+    } else {
+      const newServices = selectedServices.filter(s => s !== 'all');
+      if (newServices.includes(value)) {
+        setSelectedServices(newServices.filter(s => s !== value));
+      } else {
+        setSelectedServices([...newServices, value]);
+      }
+    }
+  };
 
   return (
     <Card className="p-6 space-y-6">
@@ -62,6 +88,34 @@ export const UsageChart = () => {
               {timeRanges.map((range) => (
                 <SelectItem key={range.value} value={range.value}>
                   {range.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* 服务类型多选下拉框 */}
+          <Select 
+            value={selectedServices[0]} 
+            onValueChange={handleServiceChange}
+          >
+            <SelectTrigger className="w-[160px] bg-white">
+              <SelectValue placeholder="选择服务类型" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              {serviceTypes.map((service) => (
+                <SelectItem 
+                  key={service.value} 
+                  value={service.value}
+                >
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedServices.includes(service.value)}
+                      onChange={() => {}}
+                      className="h-4 w-4"
+                    />
+                    {service.label}
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
