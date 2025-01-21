@@ -119,7 +119,7 @@ export const menuItems: MenuItem[] = [
     label: "额度中心", 
     path: "/wallet",
     children: [
-      { label: "额度监测", path: "/wallet/quota" },
+      { label: "额度管理", path: "/wallet/quota" },
       { label: "钱包余额", path: "/wallet/balance" },
       { label: "购买额度", path: "/wallet/purchase" },
       { label: "订单管理", path: "/wallet/orders" }
