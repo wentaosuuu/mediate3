@@ -32,9 +32,7 @@ const Orders = () => {
           .from('recharge_orders')
           .select(`
             *,
-            recharge_order_items (
-              *
-            )
+            recharge_order_items (*)
           `)
           .order('created_at', { ascending: false });
 
@@ -59,7 +57,8 @@ const Orders = () => {
         throw error;
       }
     },
-    retry: 1
+    retry: 1,
+    refetchOnWindowFocus: false // 防止频繁刷新
   });
 
   return (
