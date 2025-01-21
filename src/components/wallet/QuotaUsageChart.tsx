@@ -113,15 +113,15 @@ export const QuotaUsageChart = () => {
         </div>
       </div>
 
-      {/* 图表展示区域 */}
-      <div className="h-[300px] w-full">
+      {/* 图表展示区域 - 限制高度并保持响应式 */}
+      <div className="h-[240px] w-full">
         <ChartContainer
           config={{
             使用量: { color: '#409EFF' },
           }}
         >
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={mockData}>
+            <BarChart data={mockData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />

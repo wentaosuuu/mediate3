@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { QuotaManager } from '@/components/wallet/QuotaManager';
-import { MainContent } from '@/components/dashboard/MainContent';
 
 // 定义 Quota 组件
 const Quota: React.FC = () => {
@@ -32,24 +31,25 @@ const Quota: React.FC = () => {
 
       {/* 主内容区 */}
       <div className="flex-1 flex flex-col">
-        <TopBar 
-          username={mockUser.username}
-          department={mockUser.department}
-          role={mockUser.role}
-          onLogout={handleLogout}
-          onSearch={setSearchQuery}
-          searchQuery={searchQuery}
-        />
-        <MainContent 
-          username={mockUser.username}
-          currentPath="/wallet/quota"
-        >
+        {/* 固定顶部导航栏 */}
+        <div className="sticky top-0 z-50">
+          <TopBar 
+            username={mockUser.username}
+            department={mockUser.department}
+            role={mockUser.role}
+            onLogout={handleLogout}
+            onSearch={setSearchQuery}
+            searchQuery={searchQuery}
+          />
+        </div>
+
+        {/* 内容区域 */}
+        <div className="flex-1 overflow-auto p-6">
           <QuotaManager />
-        </MainContent>
+        </div>
       </div>
     </div>
   );
 };
 
-// 使用 export default 导出组件
 export default Quota;
