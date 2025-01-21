@@ -16,10 +16,6 @@ interface OrderSummaryProps {
 export const OrderSummary = ({ items, onSubmit, isOpen, onToggle, isSubmitting = false }: OrderSummaryProps) => {
   const total = items.reduce((sum, item) => sum + item.totalPrice, 0);
 
-  if (items.length === 0) {
-    return null;
-  }
-
   return (
     <Card className="fixed bottom-0 left-64 right-0 p-4 bg-white shadow-lg border-t">
       <Collapsible open={isOpen}>
@@ -45,14 +41,20 @@ export const OrderSummary = ({ items, onSubmit, isOpen, onToggle, isSubmitting =
 
         <CollapsibleContent>
           <div className="mt-4 space-y-2">
-            {items.map((item, index) => (
-              <div key={index} className="flex justify-between items-center py-2 border-t">
-                <span>{item.serviceType}</span>
-                <span className="text-gray-600">
-                  {item.quantity} × {item.unitPrice} = {item.totalPrice.toFixed(2)} 元
-                </span>
+            {items.length === 0 ? (
+              <div className="text-center text-gray-500 py-2">
+                暂无选购服务
               </div>
-            ))}
+            ) : (
+              items.map((item, index) => (
+                <div key={index} className="flex justify-between items-center py-2 border-t">
+                  <span>{item.serviceType}</span>
+                  <span className="text-gray-600">
+                    {item.quantity} × {item.unitPrice} = {item.totalPrice.toFixed(2)} 元
+                  </span>
+                </div>
+              ))
+            )}
           </div>
         </CollapsibleContent>
       </Collapsible>

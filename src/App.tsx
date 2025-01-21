@@ -8,6 +8,7 @@ import SmsRecords from './pages/mediation/SmsRecords';
 import Balance from './pages/wallet/Balance';
 import Purchase from './pages/wallet/Purchase';
 import Orders from './pages/wallet/Orders';
+import Quota from './pages/wallet/Quota';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/case/distribution" element={<CaseDistribution />} />
         <Route path="/mediation/sms" element={<SmsService />} />
         <Route path="/mediation/sms-records" element={<SmsRecords />} />
+        <Route path="/wallet/quota" element={<Quota />} />
         <Route path="/wallet/balance" element={<Balance />} />
         <Route path="/wallet/purchase" element={<Purchase />} />
         <Route path="/wallet/orders" element={<Orders />} />
