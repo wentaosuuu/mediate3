@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { QuotaManager } from '@/components/wallet/QuotaManager';
+import { MainContent } from '@/components/dashboard/MainContent';
 
-const Quota = () => {
+// 定义 Quota 组件
+const Quota: React.FC = () => {
   const navigate = useNavigate();
 
   // Mock user data - 实际项目中应该从用户认证系统获取
@@ -17,6 +19,8 @@ const Quota = () => {
   const handleLogout = () => {
     navigate('/');
   };
+
+  const [searchQuery, setSearchQuery] = React.useState('');
 
   return (
     <div className="min-h-screen flex">
@@ -33,16 +37,19 @@ const Quota = () => {
           department={mockUser.department}
           role={mockUser.role}
           onLogout={handleLogout}
-          onSearch={() => {}}
-          searchQuery=""
+          onSearch={setSearchQuery}
+          searchQuery={searchQuery}
         />
-        <div className="flex-1 overflow-auto pt-16 px-6 pb-6">
+        <MainContent 
+          username={mockUser.username}
+          currentPath="/wallet/quota"
+        >
           <QuotaManager />
-        </div>
+        </MainContent>
       </div>
     </div>
   );
 };
 
-// 修改为默认导出
+// 使用 export default 导出组件
 export default Quota;
