@@ -23,7 +23,6 @@ const generateChartData = (selectedServices: string[], timeRange: string, depart
     '号码认证': { name: '号码认证', 使用量: 50 },
   };
 
-  // 如果选择了特定服务，只返回这些服务的数据
   if (selectedServices.includes('all')) {
     return Object.values(baseData);
   }
@@ -34,7 +33,6 @@ const generateChartData = (selectedServices: string[], timeRange: string, depart
   });
 };
 
-// 时间范围选项
 const timeRanges = [
   { value: 'today', label: '本日' },
   { value: 'week', label: '本周' },
@@ -43,7 +41,6 @@ const timeRanges = [
   { value: 'custom', label: '自定义' },
 ];
 
-// 服务类型选项
 const serviceTypes = [
   { value: 'all', label: '全部服务' },
   { value: 'sms', label: '短信服务' },
@@ -76,13 +73,11 @@ export const UsageChart = () => {
   const [chartData, setChartData] = useState([]);
   const [isServiceDropdownOpen, setIsServiceDropdownOpen] = useState(false);
 
-  // 更新图表数据
   useEffect(() => {
     const newData = generateChartData(selectedServices, timeRange, department, staff);
     setChartData(newData);
   }, [selectedServices, timeRange, department, staff]);
 
-  // 处理服务类型多选
   const handleServiceChange = (value: string) => {
     let newServices;
     if (value === 'all') {
@@ -123,19 +118,35 @@ export const UsageChart = () => {
             value={selectedServices[0]} 
             onValueChange={handleServiceChange}
             open={isServiceDropdownOpen}
-            onOpenChange={setIsServiceDropdownOpen}
+            onOpenChange={(open) => {
+              // 只在点击触发器或下拉框外部区域时改变打开状态
+              if (!open) {
+                setIsServiceDropdownOpen(false);
+              } else {
+                setIsServiceDropdownOpen(true);
+              }
+            }}
           >
             <SelectTrigger className="w-[160px] bg-white">
               <SelectValue placeholder="选择服务类型" />
             </SelectTrigger>
-            <SelectContent className="bg-white">
+            <SelectContent 
+              className="bg-white"
+              onInteractOutside={(e) => {
+                // 点击下拉框外部区域时关闭
+                setIsServiceDropdownOpen(false);
+              }}
+              onPointerDownOutside={(e) => {
+                // 点击下拉框外部区域时关闭
+                setIsServiceDropdownOpen(false);
+              }}
+            >
               {serviceTypes.map((service) => (
                 <SelectItem 
                   key={service.value} 
                   value={service.value}
-                  onClick={(e) => {
+                  onSelect={(e) => {
                     e.preventDefault();
-                    e.stopPropagation();
                     handleServiceChange(service.value);
                   }}
                 >
