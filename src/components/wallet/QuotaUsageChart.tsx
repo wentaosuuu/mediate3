@@ -34,14 +34,15 @@ const operators = [
 
 // 时间维度选项
 const timeRanges = [
-  { value: 'day', label: '按日' },
-  { value: 'month', label: '按月' },
-  { value: 'year', label: '按年' },
+  { value: 'today', label: '本日' },
+  { value: 'week', label: '本周' },
+  { value: 'month', label: '本月' },
+  { value: 'lastMonth', label: '上月' },
   { value: 'custom', label: '自定义' },
 ];
 
 export const QuotaUsageChart = () => {
-  const [timeRange, setTimeRange] = useState('day');
+  const [timeRange, setTimeRange] = useState('today');
   const [department, setDepartment] = useState('all');
   const [operator, setOperator] = useState('all');
   const [date, setDate] = useState<DateRange>({
@@ -50,7 +51,7 @@ export const QuotaUsageChart = () => {
   });
 
   return (
-    <Card className="p-6">
+    <Card className="p-6 mb-6">
       <div className="mb-6 space-y-4">
         <h3 className="text-lg font-semibold mb-4">额度使用统计</h3>
         
@@ -58,10 +59,10 @@ export const QuotaUsageChart = () => {
           {/* 时间维度选择器 */}
           <div className="w-48">
             <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger>
+              <SelectTrigger className="bg-white">
                 <SelectValue placeholder="选择时间维度" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 {timeRanges.map((range) => (
                   <SelectItem key={range.value} value={range.value}>
                     {range.label}
@@ -81,10 +82,10 @@ export const QuotaUsageChart = () => {
           {/* 部门选择器 */}
           <div className="w-48">
             <Select value={department} onValueChange={setDepartment}>
-              <SelectTrigger>
+              <SelectTrigger className="bg-white">
                 <SelectValue placeholder="选择部门" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 {departments.map((dept) => (
                   <SelectItem key={dept.value} value={dept.value}>
                     {dept.label}
@@ -97,10 +98,10 @@ export const QuotaUsageChart = () => {
           {/* 作业员选择器 */}
           <div className="w-48">
             <Select value={operator} onValueChange={setOperator}>
-              <SelectTrigger>
+              <SelectTrigger className="bg-white">
                 <SelectValue placeholder="选择作业员" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 {operators.map((op) => (
                   <SelectItem key={op.value} value={op.value}>
                     {op.label}

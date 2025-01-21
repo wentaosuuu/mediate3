@@ -21,7 +21,7 @@ export const QuotaManager = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">额度管理</h2>
+        <h2 className="text-xl font-semibold">额度监测</h2>
         <Button 
           onClick={() => navigate('/wallet/purchase')}
           className="flex items-center gap-2"
