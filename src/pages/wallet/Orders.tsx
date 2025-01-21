@@ -2,8 +2,12 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { OrdersTable } from '@/components/wallet/OrdersTable';
+import { MainContent } from '@/components/dashboard/MainContent';
+import { useLocation } from 'react-router-dom';
 
 const Orders = () => {
+  const location = useLocation();
+  
   // 获取订单数据
   const { data: orders, isLoading } = useQuery({
     queryKey: ['recharge-orders'],
@@ -27,10 +31,12 @@ const Orders = () => {
   });
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold mb-6">充值订单管理</h1>
-      <OrdersTable data={orders || []} isLoading={isLoading} />
-    </div>
+    <MainContent currentPath={location.pathname}>
+      <div className="container mx-auto py-4">
+        <h1 className="text-2xl font-bold mb-6">充值订单管理</h1>
+        <OrdersTable data={orders || []} isLoading={isLoading} />
+      </div>
+    </MainContent>
   );
 };
 
