@@ -11,13 +11,6 @@ import {
 import { DepartmentQuota } from '@/types/quota';
 import { QuotaHistoryRow } from './QuotaHistoryRow';
 
-// 定义从数据库返回的数据结构
-interface DepartmentQuotaWithDepartment extends Omit<DepartmentQuota, 'department'> {
-  departments: {
-    name: string;
-  } | null;
-}
-
 export const DepartmentQuotaHistory = () => {
   const { data: quotas, isLoading } = useQuery({
     queryKey: ['department-quotas'],
@@ -37,32 +30,41 @@ export const DepartmentQuotaHistory = () => {
         throw new Error('获取租户信息失败');
       }
 
-      // 修改查询语句，使用正确的连接方式
-      const { data, error } = await supabase
+      // 先获取部门配额数据
+      const { data: quotasData, error: quotasError } = await supabase
         .from('department_quotas')
-        .select(`
-          *,
-          departments:department_id (
-            name
-          )
-        `)
+        .select('*')
         .eq('tenant_id', userData.tenant_id)
         .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error('查询错误:', error);
-        throw error;
+
+      if (quotasError) {
+        console.error('查询配额错误:', quotasError);
+        throw quotasError;
       }
 
-      if (!data) return [];
+      // 如果有配额数据，获取对应的部门信息
+      if (quotasData && quotasData.length > 0) {
+        const departmentIds = quotasData.map(quota => quota.department_id);
+        const { data: departmentsData, error: departmentsError } = await supabase
+          .from('departments')
+          .select('id, name')
+          .in('id', departmentIds);
 
-      // 转换数据格式以匹配 DepartmentQuota 类型
-      return data.map(quota => ({
-        ...quota,
-        department: {
-          name: quota.departments?.name || '-'
+        if (departmentsError) {
+          console.error('查询部门错误:', departmentsError);
+          throw departmentsError;
         }
-      })) as DepartmentQuota[];
+
+        // 将部门信息合并到配额数据中
+        const quotasWithDepartments = quotasData.map(quota => ({
+          ...quota,
+          department: departmentsData?.find(dept => dept.id === quota.department_id) || null
+        }));
+
+        return quotasWithDepartments as DepartmentQuota[];
+      }
+
+      return [];
     },
   });
 
