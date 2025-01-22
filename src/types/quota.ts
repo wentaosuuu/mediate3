@@ -1,3 +1,5 @@
+import { DateRange } from 'react-day-picker';
+
 export interface Department {
   name: string | null;
 }
@@ -16,4 +18,12 @@ export interface DepartmentQuota {
   created_by: string;
   updated_at: string;
   department?: Department | null;
+}
+
+export interface DepartmentQuotaFormData {
+  timeUnit: string;
+  departmentId: string;
+  serviceType: string;
+  amount: number;
+  dateRange?: DateRange;
 }
