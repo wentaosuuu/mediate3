@@ -53,6 +53,17 @@ export const DepartmentQuotaForm = () => {
         return;
       }
 
+      // 检查必填字段
+      if (!data.departmentId || !data.serviceType || !data.amount) {
+        toast({
+          variant: 'destructive',
+          title: '表单错误',
+          description: '请填写所有必填字段',
+          className: 'fixed top-4 left-1/2 -translate-x-1/2',
+        });
+        return;
+      }
+
       // 获取当前用户的tenant_id
       const userResponse = await supabase.auth.getUser();
       if (!userResponse.data.user) throw new Error('未登录');
@@ -86,18 +97,24 @@ export const DepartmentQuotaForm = () => {
       }
 
       // 创建部门额度记录
-      const { error: insertError } = await supabase.from('department_quotas').insert({
-        tenant_id: userData.data.tenant_id,
-        department_id: data.departmentId,
-        service_type: data.serviceType,
-        quota_amount: data.amount,
-        remaining_amount: data.amount,
-        time_unit: data.timeUnit,
-        start_date: startDate.toISOString(),
-        end_date: endDate.toISOString(),
-      });
+      const { error: insertError } = await supabase
+        .from('department_quotas')
+        .insert({
+          tenant_id: userData.data.tenant_id,
+          department_id: data.departmentId,
+          service_type: data.serviceType,
+          quota_amount: data.amount,
+          remaining_amount: data.amount,
+          time_unit: data.timeUnit,
+          start_date: startDate.toISOString(),
+          end_date: endDate.toISOString(),
+          created_by: userResponse.data.user.id,
+        });
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('插入错误:', insertError);
+        throw insertError;
+      }
 
       // 重置表单
       reset();

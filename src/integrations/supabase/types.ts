@@ -144,6 +144,7 @@ export type Database = {
           id: string
           quota_amount: number
           remaining_amount: number
+          service_type: string | null
           start_date: string
           tenant_id: string
           time_unit: string
@@ -157,6 +158,7 @@ export type Database = {
           id?: string
           quota_amount?: number
           remaining_amount?: number
+          service_type?: string | null
           start_date: string
           tenant_id: string
           time_unit: string
@@ -170,6 +172,7 @@ export type Database = {
           id?: string
           quota_amount?: number
           remaining_amount?: number
+          service_type?: string | null
           start_date?: string
           tenant_id?: string
           time_unit?: string
