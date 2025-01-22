@@ -4,6 +4,7 @@ import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { DepartmentQuotaForm } from '@/components/quota/department/DepartmentQuotaForm';
 import { DepartmentQuotaHistory } from '@/components/quota/department/DepartmentQuotaHistory';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const DepartmentQuota = () => {
   const location = useLocation();
@@ -42,18 +43,28 @@ const DepartmentQuota = () => {
         <div className="mt-16 p-6">
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-semibold">部门额度分配</h2>
+              <h2 className="text-2xl font-semibold text-gray-800">部门额度分配</h2>
             </div>
             
             {/* 额度分配表单 */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <DepartmentQuotaForm />
-            </div>
+            <Card className="border-none shadow-lg bg-white/90 backdrop-blur-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-medium text-gray-700">配额设置</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <DepartmentQuotaForm />
+              </CardContent>
+            </Card>
 
             {/* 历史记录 */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <DepartmentQuotaHistory />
-            </div>
+            <Card className="border-none shadow-lg bg-white/90 backdrop-blur-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-medium text-gray-700">历史记录</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <DepartmentQuotaHistory />
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
