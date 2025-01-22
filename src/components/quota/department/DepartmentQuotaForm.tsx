@@ -19,7 +19,7 @@ interface DepartmentQuotaFormData {
 export const DepartmentQuotaForm = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { register, handleSubmit, watch, setValue, reset } = useForm<DepartmentQuotaFormData>({
+  const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm<DepartmentQuotaFormData>({
     defaultValues: {
       timeUnit: 'day',
       departmentId: '',
@@ -33,7 +33,17 @@ export const DepartmentQuotaForm = () => {
   const { data: wallet } = useQuery({
     queryKey: ['wallet'],
     queryFn: async () => {
-      return { balance: 6666 };
+      const { data: walletData, error } = await supabase
+        .from('wallets')
+        .select('balance')
+        .single();
+      
+      if (error) {
+        console.error('获取钱包余额失败:', error);
+        throw error;
+      }
+      
+      return walletData || { balance: 0 };
     },
   });
 
@@ -43,7 +53,7 @@ export const DepartmentQuotaForm = () => {
   const onSubmit = async (data: DepartmentQuotaFormData) => {
     try {
       // 检查钱包余额
-      if (wallet && data.amount > wallet.balance) {
+      if (isExceedingBalance) {
         toast({
           variant: 'destructive',
           title: '余额不足',
@@ -64,22 +74,27 @@ export const DepartmentQuotaForm = () => {
         return;
       }
 
-      // 获取当前用户的tenant_id
-      const userResponse = await supabase.auth.getUser();
-      if (!userResponse.data.user) throw new Error('未登录');
+      // 获取当前用户信息
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        throw new Error('未登录或获取用户信息失败');
+      }
 
-      const userData = await supabase
+      // 获取用户的tenant_id
+      const { data: userData, error: tenantError } = await supabase
         .from('users')
         .select('tenant_id')
-        .eq('id', userResponse.data.user.id)
+        .eq('id', user.id)
         .single();
 
-      if (!userData.data) throw new Error('未找到用户信息');
+      if (tenantError || !userData) {
+        throw new Error('获取租户信息失败');
+      }
 
+      // 设置日期范围
       let startDate = new Date();
       let endDate = new Date();
       
-      // 根据时间维度设置结束时间
       if (data.timeUnit === 'custom' && data.dateRange) {
         startDate = data.dateRange.from || new Date();
         endDate = data.dateRange.to || new Date();
@@ -100,7 +115,7 @@ export const DepartmentQuotaForm = () => {
       const { error: insertError } = await supabase
         .from('department_quotas')
         .insert({
-          tenant_id: userData.data.tenant_id,
+          tenant_id: userData.tenant_id,
           department_id: data.departmentId,
           service_type: data.serviceType,
           quota_amount: data.amount,
@@ -108,12 +123,18 @@ export const DepartmentQuotaForm = () => {
           time_unit: data.timeUnit,
           start_date: startDate.toISOString(),
           end_date: endDate.toISOString(),
-          created_by: userResponse.data.user.id,
+          created_by: user.id,
         });
 
       if (insertError) {
         console.error('插入错误:', insertError);
-        throw insertError;
+        toast({
+          variant: 'destructive',
+          title: '提交失败',
+          description: `错误信息: ${insertError.message}`,
+          className: 'fixed top-4 left-1/2 -translate-x-1/2',
+        });
+        return;
       }
 
       // 重置表单
@@ -133,7 +154,7 @@ export const DepartmentQuotaForm = () => {
       toast({
         variant: 'destructive',
         title: '分配失败',
-        description: '分配部门额度时发生错误',
+        description: error instanceof Error ? error.message : '分配部门额度时发生错误',
         className: 'fixed top-4 left-1/2 -translate-x-1/2',
       });
     }
