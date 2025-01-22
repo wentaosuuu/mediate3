@@ -36,7 +36,7 @@ export const DepartmentQuotaForm = () => {
       const { data: walletData, error } = await supabase
         .from('wallets')
         .select('balance')
-        .single();
+        .maybeSingle();
       
       if (error) {
         console.error('获取钱包余额失败:', error);

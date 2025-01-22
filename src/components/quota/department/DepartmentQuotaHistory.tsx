@@ -15,8 +15,20 @@ export const DepartmentQuotaHistory = () => {
   const { data: quotas, isLoading } = useQuery({
     queryKey: ['department-quotas'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      // 获取当前用户信息
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (!user) throw new Error('未登录');
+
+      // 获取用户的tenant_id
+      const { data: userData, error: tenantError } = await supabase
+        .from('users')
+        .select('tenant_id')
+        .eq('id', user.id)
+        .single();
+
+      if (tenantError || !userData) {
+        throw new Error('获取租户信息失败');
+      }
 
       const { data, error } = await supabase
         .from('department_quotas')
@@ -24,7 +36,7 @@ export const DepartmentQuotaHistory = () => {
           *,
           department:departments(name)
         `)
-        .eq('tenant_id', user.id)
+        .eq('tenant_id', userData.tenant_id)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
