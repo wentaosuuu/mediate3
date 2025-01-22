@@ -11,6 +11,12 @@ import {
 import { DepartmentQuota } from '@/types/quota';
 import { QuotaHistoryRow } from './QuotaHistoryRow';
 
+interface DepartmentQuotaWithDepartment extends Omit<DepartmentQuota, 'department'> {
+  departments: {
+    name: string;
+  };
+}
+
 export const DepartmentQuotaHistory = () => {
   const { data: quotas, isLoading } = useQuery({
     queryKey: ['department-quotas'],
@@ -46,7 +52,7 @@ export const DepartmentQuotaHistory = () => {
       }
 
       // 转换数据格式以匹配 DepartmentQuota 类型
-      return data.map(quota => ({
+      return (data as DepartmentQuotaWithDepartment[]).map(quota => ({
         ...quota,
         department: {
           name: quota.departments.name
