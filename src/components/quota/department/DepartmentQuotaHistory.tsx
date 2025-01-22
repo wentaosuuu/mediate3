@@ -66,6 +66,8 @@ export const DepartmentQuotaHistory = () => {
 
       return [];
     },
+    refetchInterval: 1000, // 每秒自动刷新一次
+    staleTime: 0, // 数据始终被视为过期，需要重新获取
   });
 
   return (
