@@ -10,11 +10,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
+// 更新接口定义，使service_type为可选字段
 interface DepartmentQuota {
   id: string;
   tenant_id: string;
   department_id: string;
-  service_type: string;
+  service_type?: string; // 改为可选字段
   time_unit: string;
   quota_amount: number;
   remaining_amount: number;
@@ -73,14 +74,14 @@ export const DepartmentQuotaHistory = () => {
   };
 
   // 获取服务类型名称
-  const getServiceTypeName = (type: string) => {
+  const getServiceTypeName = (type?: string) => { // 修改参数类型为可选
     const serviceMap: Record<string, string> = {
       'all': '全部服务',
       'sms': '短信服务',
       'voice': '语音服务',
       'h5': 'H5案件公示',
     };
-    return serviceMap[type] || type;
+    return type ? (serviceMap[type] || type) : '-';
   };
 
   return (
