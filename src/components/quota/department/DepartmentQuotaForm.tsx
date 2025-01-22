@@ -1,15 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { TimeUnitSelector } from './components/TimeUnitSelector';
-import { DepartmentSelector } from './components/DepartmentSelector';
-import { ServiceTypeSelector } from './components/ServiceTypeSelector';
-import { QuotaAmountInput } from './components/QuotaAmountInput';
 import { DateRange } from 'react-day-picker';
-import { Card } from '@/components/ui/card';
+import { QuotaFormLeft } from './components/QuotaFormLeft';
+import { QuotaFormRight } from './components/QuotaFormRight';
 
 interface DepartmentQuotaFormData {
   timeUnit: string;
@@ -121,56 +117,23 @@ export const DepartmentQuotaForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* 左侧表单 */}
-        <div className="space-y-4 h-full">
-          <TimeUnitSelector
-            value={watch('timeUnit')}
-            onValueChange={(value) => setValue('timeUnit', value)}
-            dateRange={watch('dateRange')}
-            onDateRangeChange={(range) => setValue('dateRange', range)}
-          />
+        <QuotaFormLeft
+          timeUnit={watch('timeUnit')}
+          dateRange={watch('dateRange')}
+          departmentId={watch('departmentId')}
+          serviceType={watch('serviceType')}
+          onTimeUnitChange={(value) => setValue('timeUnit', value)}
+          onDateRangeChange={(range) => setValue('dateRange', range)}
+          onDepartmentChange={(value) => setValue('departmentId', value)}
+          onServiceTypeChange={(value) => setValue('serviceType', value)}
+        />
 
-          <DepartmentSelector
-            value={watch('departmentId')}
-            onValueChange={(value) => setValue('departmentId', value)}
-          />
-
-          <ServiceTypeSelector
-            value={watch('serviceType')}
-            onValueChange={(value) => setValue('serviceType', value)}
-          />
-        </div>
-
-        {/* 右侧表单 */}
-        <div className="space-y-4 h-full flex flex-col justify-between">
-          <div className="space-y-4">
-            <QuotaAmountInput
-              value={watch('amount')}
-              onChange={(e) => setValue('amount', Number(e.target.value))}
-            />
-            
-            {isExceedingBalance && (
-              <div className="text-red-500 text-sm">
-                输入金额超出当前钱包余额
-              </div>
-            )}
-
-            {wallet && (
-              <Card className="p-6 bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-blue-700 font-medium">当前钱包余额</span>
-                  <span className="text-2xl font-semibold text-blue-800">
-                    {wallet.balance} 元
-                  </span>
-                </div>
-              </Card>
-            )}
-          </div>
-
-          <Button type="submit" className="w-full h-11">
-            确认分配
-          </Button>
-        </div>
+        <QuotaFormRight
+          amount={watch('amount')}
+          walletBalance={wallet?.balance}
+          isExceedingBalance={isExceedingBalance}
+          onAmountChange={(value) => setValue('amount', value)}
+        />
       </div>
     </form>
   );
