@@ -19,6 +19,9 @@ interface DepartmentQuota {
   start_date: string;
   end_date: string;
   department_id: string;
+  created_at?: string;
+  created_by?: string;
+  updated_at?: string;
 }
 
 interface Department {
