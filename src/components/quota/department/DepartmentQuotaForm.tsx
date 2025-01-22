@@ -35,6 +35,18 @@ export const DepartmentQuotaForm = () => {
   // 提交表单
   const onSubmit = async (data: QuotaFormValues) => {
     try {
+      // 获取当前用户的tenant_id
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('未登录');
+
+      const { data: userData } = await supabase
+        .from('users')
+        .select('tenant_id')
+        .eq('id', user.id)
+        .single();
+      
+      if (!userData?.tenant_id) throw new Error('无法获取租户信息');
+
       // 计算开始和结束时间
       const now = new Date();
       let startDate = new Date(now);
@@ -57,12 +69,14 @@ export const DepartmentQuotaForm = () => {
         .from('department_quotas')
         .insert(
           data.departments.map(dept => ({
+            tenant_id: userData.tenant_id,
             department_id: dept.departmentId,
             time_unit: data.timeUnit,
             quota_amount: dept.quotaAmount,
             remaining_amount: dept.quotaAmount,
             start_date: startDate.toISOString(),
             end_date: endDate.toISOString(),
+            created_by: user.id
           }))
         );
 
