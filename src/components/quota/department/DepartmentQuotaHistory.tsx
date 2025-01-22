@@ -36,13 +36,7 @@ export const DepartmentQuotaHistory = () => {
         // 获取部门配额数据
         const { data: quotasData, error: quotasError } = await supabase
           .from('department_quotas')
-          .select(`
-            *,
-            departments (
-              id,
-              name
-            )
-          `)
+          .select('*')
           .eq('tenant_id', userData.tenant_id)
           .order('created_at', { ascending: false });
 
@@ -51,11 +45,28 @@ export const DepartmentQuotaHistory = () => {
           throw quotasError;
         }
 
-        // 处理返回的数据，确保类型正确
-        return (quotasData || []).map(quota => ({
+        // 获取所有相关部门的信息
+        const departmentIds = quotasData?.map(quota => quota.department_id) || [];
+        const { data: departmentsData, error: departmentsError } = await supabase
+          .from('departments')
+          .select('id, name')
+          .in('id', departmentIds);
+
+        if (departmentsError) {
+          console.error('查询部门错误:', departmentsError);
+          throw departmentsError;
+        }
+
+        // 合并配额和部门数据
+        const quotasWithDepartments = (quotasData || []).map(quota => ({
           ...quota,
-          department: quota.departments
-        })) as DepartmentQuota[];
+          department: departmentsData?.find(dept => dept.id === quota.department_id) || { 
+            id: quota.department_id,
+            name: '未知部门'
+          }
+        }));
+
+        return quotasWithDepartments as DepartmentQuota[];
       } catch (error) {
         console.error('获取配额历史记录失败:', error);
         throw error;
