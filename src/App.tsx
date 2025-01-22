@@ -9,6 +9,7 @@ import Balance from './pages/wallet/Balance';
 import Purchase from './pages/wallet/Purchase';
 import Orders from './pages/wallet/Orders';
 import Quota from './pages/wallet/Quota';
+import DepartmentQuota from './pages/quota/DepartmentQuota';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/wallet/balance" element={<Balance />} />
         <Route path="/wallet/purchase" element={<Purchase />} />
         <Route path="/wallet/orders" element={<Orders />} />
+        <Route path="/quota/department" element={<DepartmentQuota />} />
       </Routes>
     </BrowserRouter>
   );
