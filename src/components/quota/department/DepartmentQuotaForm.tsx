@@ -48,7 +48,7 @@ export const DepartmentQuotaForm = () => {
           variant: 'destructive',
           title: '余额不足',
           description: '当前钱包余额不足以完成此次分配',
-          className: 'fixed top-4 right-4 md:top-4 md:left-1/2 md:-translate-x-1/2',
+          className: 'fixed top-4 left-1/2 -translate-x-1/2',
         });
         return;
       }
@@ -99,17 +99,17 @@ export const DepartmentQuotaForm = () => {
 
       if (error) throw error;
 
-      // 刷新历史记录列表
-      await queryClient.invalidateQueries({ queryKey: ['department-quotas'] });
-
       // 重置表单
       reset();
+
+      // 刷新历史记录列表
+      await queryClient.invalidateQueries({ queryKey: ['department-quotas'] });
 
       // 显示成功消息
       toast({
         title: '分配成功',
         description: '部门额度已成功分配',
-        className: 'fixed top-4 right-4 md:top-4 md:left-1/2 md:-translate-x-1/2 bg-green-50 border-green-200',
+        className: 'fixed top-4 left-1/2 -translate-x-1/2 bg-green-50 border-green-200 text-green-800',
       });
     } catch (error) {
       console.error('分配额度失败:', error);
@@ -117,7 +117,7 @@ export const DepartmentQuotaForm = () => {
         variant: 'destructive',
         title: '分配失败',
         description: '分配部门额度时发生错误',
-        className: 'fixed top-4 right-4 md:top-4 md:left-1/2 md:-translate-x-1/2',
+        className: 'fixed top-4 left-1/2 -translate-x-1/2',
       });
     }
   };
