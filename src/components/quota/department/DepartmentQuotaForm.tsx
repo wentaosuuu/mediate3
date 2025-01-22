@@ -54,16 +54,16 @@ export const DepartmentQuotaForm = () => {
       }
 
       // 获取当前用户的tenant_id
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('未登录');
+      const userResponse = await supabase.auth.getUser();
+      if (!userResponse.data.user) throw new Error('未登录');
 
-      const { data: userData } = await supabase
+      const userData = await supabase
         .from('users')
         .select('tenant_id')
-        .eq('id', user.id)
+        .eq('id', userResponse.data.user.id)
         .single();
 
-      if (!userData) throw new Error('未找到用户信息');
+      if (!userData.data) throw new Error('未找到用户信息');
 
       let startDate = new Date();
       let endDate = new Date();
@@ -86,8 +86,8 @@ export const DepartmentQuotaForm = () => {
       }
 
       // 创建部门额度记录
-      const { error } = await supabase.from('department_quotas').insert({
-        tenant_id: userData.tenant_id,
+      const { error: insertError } = await supabase.from('department_quotas').insert({
+        tenant_id: userData.data.tenant_id,
         department_id: data.departmentId,
         service_type: data.serviceType,
         quota_amount: data.amount,
@@ -97,7 +97,7 @@ export const DepartmentQuotaForm = () => {
         end_date: endDate.toISOString(),
       });
 
-      if (error) throw error;
+      if (insertError) throw insertError;
 
       // 重置表单
       reset();
