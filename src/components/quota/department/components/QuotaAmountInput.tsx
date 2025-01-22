@@ -13,9 +13,9 @@ export const QuotaAmountInput = ({ value, onChange }: QuotaAmountInputProps) => 
       <Input
         type="number"
         placeholder="请输入分配额度"
-        value={value}
+        value={value || ''} // 当值为0时显示空字符串
         onChange={onChange}
-        className="w-full"
+        className="w-full bg-white"
       />
     </div>
   );

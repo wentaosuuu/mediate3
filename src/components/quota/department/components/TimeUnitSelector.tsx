@@ -21,7 +21,7 @@ export const TimeUnitSelector = ({ value, onValueChange }: TimeUnitSelectorProps
         <SelectTrigger className="w-[180px] bg-white">
           <SelectValue placeholder="选择时间维度" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-white">
           <SelectItem value="day">按天</SelectItem>
           <SelectItem value="week">按周</SelectItem>
           <SelectItem value="month">按月</SelectItem>

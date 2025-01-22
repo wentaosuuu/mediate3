@@ -23,7 +23,7 @@ export const DepartmentQuotaForm = () => {
       timeUnit: 'day',
       departmentId: '',
       serviceType: '',
-      amount: 0,
+      amount: undefined, // 将默认值改为 undefined
     },
   });
 
@@ -31,20 +31,6 @@ export const DepartmentQuotaForm = () => {
   const { data: wallet } = useQuery({
     queryKey: ['wallet'],
     queryFn: async () => {
-      // 在实际环境中使用这段代码
-      // const { data: { user } } = await supabase.auth.getUser();
-      // if (!user) throw new Error('未登录');
-
-      // const { data, error } = await supabase
-      //   .from('wallets')
-      //   .select('balance')
-      //   .eq('tenant_id', user.id)
-      //   .maybeSingle();
-      
-      // if (error) throw error;
-      // return data || { balance: 0 };
-      
-      // 返回测试数据
       return { balance: 6666 };
     },
   });
