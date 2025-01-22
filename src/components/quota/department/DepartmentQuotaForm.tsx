@@ -33,17 +33,41 @@ export const DepartmentQuotaForm = () => {
   const { data: wallet } = useQuery({
     queryKey: ['wallet'],
     queryFn: async () => {
-      const { data: walletData, error } = await supabase
-        .from('wallets')
-        .select('balance')
-        .maybeSingle();
-      
-      if (error) {
+      try {
+        // 获取当前用户信息
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError || !user) {
+          throw new Error('未登录或获取用户信息失败');
+        }
+
+        // 获取用户的tenant_id
+        const { data: userData, error: tenantError } = await supabase
+          .from('users')
+          .select('tenant_id')
+          .eq('id', user.id)
+          .single();
+
+        if (tenantError || !userData) {
+          throw new Error('获取租户信息失败');
+        }
+
+        // 使用tenant_id查询钱包余额
+        const { data: walletData, error } = await supabase
+          .from('wallets')
+          .select('balance')
+          .eq('tenant_id', userData.tenant_id)
+          .maybeSingle();
+        
+        if (error) {
+          console.error('获取钱包余额失败:', error);
+          throw error;
+        }
+        
+        return walletData || { balance: 0 };
+      } catch (error) {
         console.error('获取钱包余额失败:', error);
         throw error;
       }
-      
-      return walletData || { balance: 0 };
     },
   });
 
