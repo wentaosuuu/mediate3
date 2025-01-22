@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TimeUnitSelector } from './components/TimeUnitSelector';
 import { DepartmentSelector } from './components/DepartmentSelector';
 import { ServiceTypeSelector } from './components/ServiceTypeSelector';
 import { QuotaAmountInput } from './components/QuotaAmountInput';
 import { DateRange } from 'react-day-picker';
+import { Card } from '@/components/ui/card';
 
 interface DepartmentQuotaFormData {
   timeUnit: string;
@@ -20,6 +21,7 @@ interface DepartmentQuotaFormData {
 
 export const DepartmentQuotaForm = () => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { register, handleSubmit, watch, setValue } = useForm<DepartmentQuotaFormData>({
     defaultValues: {
       timeUnit: 'day',
@@ -37,6 +39,9 @@ export const DepartmentQuotaForm = () => {
       return { balance: 6666 };
     },
   });
+
+  const amount = watch('amount');
+  const isExceedingBalance = wallet && amount > wallet.balance;
 
   const onSubmit = async (data: DepartmentQuotaFormData) => {
     try {
@@ -96,6 +101,9 @@ export const DepartmentQuotaForm = () => {
 
       if (error) throw error;
 
+      // 刷新历史记录列表
+      await queryClient.invalidateQueries({ queryKey: ['department-quotas'] });
+
       toast({
         title: '分配成功',
         description: '部门额度已成功分配',
@@ -115,21 +123,12 @@ export const DepartmentQuotaForm = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* 左侧表单 */}
         <div className="space-y-4">
-          <div className="flex items-start gap-4">
-            <div className="w-[180px]">
-              <TimeUnitSelector
-                value={watch('timeUnit')}
-                onValueChange={(value) => setValue('timeUnit', value)}
-                dateRange={watch('dateRange')}
-                onDateRangeChange={(range) => setValue('dateRange', range)}
-              />
-            </div>
-            {watch('timeUnit') === 'custom' && (
-              <div className="flex-1">
-                {/* DateRangePicker 将在这里显示，与 TimeUnitSelector 同一行 */}
-              </div>
-            )}
-          </div>
+          <TimeUnitSelector
+            value={watch('timeUnit')}
+            onValueChange={(value) => setValue('timeUnit', value)}
+            dateRange={watch('dateRange')}
+            onDateRangeChange={(range) => setValue('dateRange', range)}
+          />
 
           <DepartmentSelector
             value={watch('departmentId')}
@@ -144,16 +143,29 @@ export const DepartmentQuotaForm = () => {
 
         {/* 右侧表单 */}
         <div className="space-y-4">
-          <QuotaAmountInput
-            value={watch('amount')}
-            onChange={(e) => setValue('amount', Number(e.target.value))}
-          />
+          <div className="space-y-4">
+            <QuotaAmountInput
+              value={watch('amount')}
+              onChange={(e) => setValue('amount', Number(e.target.value))}
+            />
+            
+            {isExceedingBalance && (
+              <div className="text-red-500 text-sm">
+                输入金额超出当前钱包余额
+              </div>
+            )}
 
-          {wallet && (
-            <div className="text-sm text-gray-500">
-              当前钱包余额：{wallet.balance} 元
-            </div>
-          )}
+            {wallet && (
+              <Card className="p-4 bg-blue-50 border-blue-200">
+                <div className="flex items-center justify-between">
+                  <span className="text-blue-700 font-medium">当前钱包余额</span>
+                  <span className="text-xl font-semibold text-blue-800">
+                    {wallet.balance} 元
+                  </span>
+                </div>
+              </Card>
+            )}
+          </div>
 
           <Button type="submit" className="w-full">
             确认分配

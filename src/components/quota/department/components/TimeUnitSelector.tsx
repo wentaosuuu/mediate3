@@ -24,7 +24,7 @@ export const TimeUnitSelector = ({
   onDateRangeChange 
 }: TimeUnitSelectorProps) => {
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-start gap-4">
       <div className="flex items-center gap-2">
         <Calendar className="h-5 w-5 text-gray-500" />
         <Select value={value} onValueChange={onValueChange}>
@@ -41,10 +41,11 @@ export const TimeUnitSelector = ({
       </div>
       
       {value === 'custom' && (
-        <div className="flex-1">
+        <div className="w-full">
           <DateRangePicker
             value={dateRange}
             onChange={onDateRangeChange}
+            className="w-full"
           />
         </div>
       )}
