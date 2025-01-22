@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface DepartmentQuotaFormData {
   timeUnit: string;
@@ -20,6 +21,8 @@ interface DepartmentQuotaFormData {
     departmentId: string;
     amount: number;
   }[];
+  useBatchMode: boolean;
+  batchAmount: number;
 }
 
 export const DepartmentQuotaForm = () => {
@@ -28,8 +31,13 @@ export const DepartmentQuotaForm = () => {
     defaultValues: {
       timeUnit: 'day',
       quotas: [],
+      useBatchMode: false,
+      batchAmount: 0,
     },
   });
+
+  const useBatchMode = watch('useBatchMode');
+  const batchAmount = watch('batchAmount');
 
   // 获取部门列表
   const { data: departments, isLoading } = useQuery({
@@ -44,8 +52,60 @@ export const DepartmentQuotaForm = () => {
     },
   });
 
+  // 获取钱包余额
+  const { data: wallet } = useQuery({
+    queryKey: ['wallet'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('未登录');
+
+      const { data, error } = await supabase
+        .from('wallets')
+        .select('balance')
+        .eq('tenant_id', user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const handleBatchModeChange = (checked: boolean) => {
+    setValue('useBatchMode', checked);
+    if (checked && departments) {
+      // 如果启用批量模式，将所有部门的额度设置为相同值
+      departments.forEach((_, index) => {
+        setValue(`quotas.${index}.amount`, batchAmount);
+      });
+    }
+  };
+
+  const handleBatchAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const amount = Number(e.target.value);
+    setValue('batchAmount', amount);
+    if (useBatchMode && departments) {
+      // 更新所有部门的额度
+      departments.forEach((_, index) => {
+        setValue(`quotas.${index}.amount`, amount);
+      });
+    }
+  };
+
   const onSubmit = async (data: DepartmentQuotaFormData) => {
     try {
+      // 计算总额度
+      const totalAmount = data.quotas.reduce((sum, quota) => sum + (quota.amount || 0), 0);
+      
+      // 检查钱包余额
+      if (wallet && totalAmount > wallet.balance) {
+        toast({
+          variant: 'destructive',
+          title: '余额不足',
+          description: '当前钱包余额不足以完成此次分配',
+        });
+        return;
+      }
+
       // 获取当前用户的tenant_id
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('未登录');
@@ -75,15 +135,17 @@ export const DepartmentQuotaForm = () => {
 
       // 批量插入部门额度记录
       const { error } = await supabase.from('department_quotas').insert(
-        data.quotas.map(quota => ({
-          tenant_id: userData.tenant_id,
-          department_id: quota.departmentId,
-          quota_amount: quota.amount,
-          remaining_amount: quota.amount, // 初始剩余额度等于总额度
-          time_unit: data.timeUnit,
-          start_date: now.toISOString(),
-          end_date: endDate.toISOString(),
-        }))
+        data.quotas
+          .filter(quota => quota.amount > 0) // 只插入额度大于0的记录
+          .map(quota => ({
+            tenant_id: userData.tenant_id,
+            department_id: quota.departmentId,
+            quota_amount: quota.amount,
+            remaining_amount: quota.amount, // 初始剩余额度等于总额度
+            time_unit: data.timeUnit,
+            start_date: now.toISOString(),
+            end_date: endDate.toISOString(),
+          }))
       );
 
       if (error) throw error;
@@ -125,6 +187,33 @@ export const DepartmentQuotaForm = () => {
         </Select>
       </div>
 
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="batchMode"
+          checked={useBatchMode}
+          onCheckedChange={handleBatchModeChange}
+        />
+        <label
+          htmlFor="batchMode"
+          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
+          批量设置额度
+        </label>
+      </div>
+
+      {useBatchMode && (
+        <div className="flex items-center gap-4">
+          <span className="w-32">批量额度：</span>
+          <Input
+            type="number"
+            placeholder="输入统一额度"
+            value={batchAmount}
+            onChange={handleBatchAmountChange}
+            className="w-32"
+          />
+        </div>
+      )}
+
       <div className="space-y-4">
         {departments?.map((dept, index) => (
           <div key={dept.id} className="flex items-center gap-4">
@@ -138,6 +227,7 @@ export const DepartmentQuotaForm = () => {
                 min: 0,
               })}
               className="w-32"
+              disabled={useBatchMode}
             />
             <input
               type="hidden"
@@ -147,6 +237,12 @@ export const DepartmentQuotaForm = () => {
           </div>
         ))}
       </div>
+
+      {wallet && (
+        <div className="text-sm text-gray-500">
+          当前钱包余额：{wallet.balance} 元
+        </div>
+      )}
 
       <Button type="submit">
         确认分配
