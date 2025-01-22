@@ -12,31 +12,30 @@ import {
 
 interface DepartmentQuota {
   id: string;
-  time_unit: string;
+  tenant_id: string;
+  department_id: string;
   service_type: string;
+  time_unit: string;
   quota_amount: number;
   remaining_amount: number;
   start_date: string;
   end_date: string;
-  department_id: string;
-  created_at?: string;
-  created_by?: string;
-  updated_at?: string;
-}
-
-interface Department {
-  id: string;
-  name: string;
+  created_at: string;
+  created_by: string;
+  updated_at: string;
 }
 
 export const DepartmentQuotaHistory = () => {
-  // 获取历史记录
-  const { data: quotas, isLoading: isLoadingQuotas } = useQuery({
-    queryKey: ['department-quotas-history'],
+  const { data: quotas, isLoading } = useQuery({
+    queryKey: ['department-quotas'],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('未登录');
+
       const { data, error } = await supabase
         .from('department_quotas')
         .select('*')
+        .eq('tenant_id', user.id)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
@@ -44,25 +43,27 @@ export const DepartmentQuotaHistory = () => {
     },
   });
 
-  // 获取部门信息
-  const { data: departments, isLoading: isLoadingDepartments } = useQuery({
-    queryKey: ['departments'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('departments')
-        .select('id, name');
-      
-      if (error) throw error;
-      return data as Department[];
-    },
-  });
+  // 获取时间单位名称
+  const getTimeUnitName = (unit: string) => {
+    const unitMap: Record<string, string> = {
+      'day': '天',
+      'week': '周',
+      'month': '月',
+    };
+    return unitMap[unit] || unit;
+  };
 
-  if (isLoadingQuotas || isLoadingDepartments) {
-    return <div>加载中...</div>;
-  }
-
-  // 创建部门ID到名称的映射
-  const departmentMap = new Map(departments?.map(dept => [dept.id, dept.name]));
+  // 格式化日期
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
   // 获取服务类型名称
   const getServiceTypeName = (type: string) => {
@@ -81,28 +82,23 @@ export const DepartmentQuotaHistory = () => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>部门</TableHead>
             <TableHead>服务类型</TableHead>
-            <TableHead>时间维度</TableHead>
-            <TableHead>额度</TableHead>
-            <TableHead>剩余额度</TableHead>
+            <TableHead>分配金额</TableHead>
+            <TableHead>剩余金额</TableHead>
+            <TableHead>时间单位</TableHead>
             <TableHead>开始时间</TableHead>
             <TableHead>结束时间</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {quotas?.map((record) => (
-            <TableRow key={record.id}>
-              <TableCell>{departmentMap.get(record.department_id) || '未知部门'}</TableCell>
-              <TableCell>{getServiceTypeName(record.service_type)}</TableCell>
-              <TableCell>
-                {record.time_unit === 'day' ? '按天' : 
-                 record.time_unit === 'week' ? '按周' : '按月'}
-              </TableCell>
-              <TableCell>{record.quota_amount}</TableCell>
-              <TableCell>{record.remaining_amount}</TableCell>
-              <TableCell>{new Date(record.start_date).toLocaleString()}</TableCell>
-              <TableCell>{new Date(record.end_date).toLocaleString()}</TableCell>
+          {!isLoading && quotas?.map((quota) => (
+            <TableRow key={quota.id}>
+              <TableCell>{getServiceTypeName(quota.service_type)}</TableCell>
+              <TableCell>{quota.quota_amount}</TableCell>
+              <TableCell>{quota.remaining_amount}</TableCell>
+              <TableCell>{getTimeUnitName(quota.time_unit)}</TableCell>
+              <TableCell>{formatDate(quota.start_date)}</TableCell>
+              <TableCell>{formatDate(quota.end_date)}</TableCell>
             </TableRow>
           ))}
         </TableBody>
