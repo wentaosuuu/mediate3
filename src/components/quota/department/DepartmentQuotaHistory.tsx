@@ -10,12 +10,16 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-// 更新接口定义，使service_type为可选字段
+// 更新接口定义
+interface Department {
+  name: string | null;
+}
+
 interface DepartmentQuota {
   id: string;
   tenant_id: string;
   department_id: string;
-  service_type?: string; // 改为可选字段
+  service_type?: string;
   time_unit: string;
   quota_amount: number;
   remaining_amount: number;
@@ -24,9 +28,7 @@ interface DepartmentQuota {
   created_at: string;
   created_by: string;
   updated_at: string;
-  department?: {
-    name: string;
-  }
+  department?: Department;
 }
 
 export const DepartmentQuotaHistory = () => {
@@ -46,7 +48,7 @@ export const DepartmentQuotaHistory = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return (data || []) as DepartmentQuota[];
+      return data as DepartmentQuota[];
     },
   });
 
@@ -74,7 +76,7 @@ export const DepartmentQuotaHistory = () => {
   };
 
   // 获取服务类型名称
-  const getServiceTypeName = (type?: string) => { // 修改参数类型为可选
+  const getServiceTypeName = (type?: string) => {
     const serviceMap: Record<string, string> = {
       'all': '全部服务',
       'sms': '短信服务',
