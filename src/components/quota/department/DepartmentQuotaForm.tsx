@@ -58,15 +58,31 @@ export const DepartmentQuotaForm = () => {
 
       if (!userData) throw new Error('未找到用户信息');
 
+      const now = new Date();
+      let endDate = new Date();
+      
+      // 根据时间维度设置结束时间
+      switch (data.timeUnit) {
+        case 'week':
+          endDate.setDate(now.getDate() + 7);
+          break;
+        case 'month':
+          endDate.setMonth(now.getMonth() + 1);
+          break;
+        default: // day
+          endDate.setDate(now.getDate() + 1);
+      }
+
       // 批量插入部门额度记录
       const { error } = await supabase.from('department_quotas').insert(
         data.quotas.map(quota => ({
           tenant_id: userData.tenant_id,
           department_id: quota.departmentId,
           quota_amount: quota.amount,
+          remaining_amount: quota.amount, // 初始剩余额度等于总额度
           time_unit: data.timeUnit,
-          start_date: new Date(),
-          end_date: new Date(Date.now() + 24 * 60 * 60 * 1000), // 默认一天
+          start_date: now.toISOString(),
+          end_date: endDate.toISOString(),
         }))
       );
 

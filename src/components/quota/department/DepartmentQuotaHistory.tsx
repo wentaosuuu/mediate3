@@ -10,6 +10,18 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
+interface DepartmentQuota {
+  id: string;
+  time_unit: string;
+  quota_amount: number;
+  remaining_amount: number;
+  start_date: string;
+  end_date: string;
+  departments: {
+    name: string;
+  } | null;
+}
+
 export const DepartmentQuotaHistory = () => {
   // 获取历史记录
   const { data: history, isLoading } = useQuery({
@@ -26,7 +38,7 @@ export const DepartmentQuotaHistory = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data;
+      return data as DepartmentQuota[];
     },
   });
 
