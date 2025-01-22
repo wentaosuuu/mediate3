@@ -19,7 +19,7 @@ interface DepartmentQuota {
   end_date: string;
   departments: {
     name: string;
-  } | null;
+  };
 }
 
 export const DepartmentQuotaHistory = () => {
@@ -30,7 +30,12 @@ export const DepartmentQuotaHistory = () => {
       const { data, error } = await supabase
         .from('department_quotas')
         .select(`
-          *,
+          id,
+          time_unit,
+          quota_amount,
+          remaining_amount,
+          start_date,
+          end_date,
           departments (
             name
           )
@@ -38,7 +43,7 @@ export const DepartmentQuotaHistory = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data as DepartmentQuota[];
+      return data as unknown as DepartmentQuota[];
     },
   });
 
