@@ -41,7 +41,9 @@ export const DepartmentQuotaHistory = () => {
         .from('department_quotas')
         .select(`
           *,
-          departments!inner(name)
+          departments (
+            name
+          )
         `)
         .eq('tenant_id', userData.tenant_id)
         .order('created_at', { ascending: false });
@@ -51,11 +53,13 @@ export const DepartmentQuotaHistory = () => {
         throw error;
       }
 
+      if (!data) return [];
+
       // 转换数据格式以匹配 DepartmentQuota 类型
-      return (data as DepartmentQuotaWithDepartment[]).map(quota => ({
+      return data.map(quota => ({
         ...quota,
         department: {
-          name: quota.departments.name
+          name: quota.departments?.name || '-'
         }
       })) as DepartmentQuota[];
     },
