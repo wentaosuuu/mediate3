@@ -111,40 +111,55 @@ export const DepartmentQuotaForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 bg-white p-6 rounded-lg shadow">
-      <TimeUnitSelector
-        value={watch('timeUnit')}
-        onValueChange={(value) => setValue('timeUnit', value)}
-        dateRange={watch('dateRange')}
-        onDateRangeChange={(range) => setValue('dateRange', range)}
-      />
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* 左侧表单 */}
+        <div className="space-y-4">
+          <div className="flex items-start gap-4">
+            <div className="w-[180px]">
+              <TimeUnitSelector
+                value={watch('timeUnit')}
+                onValueChange={(value) => setValue('timeUnit', value)}
+                dateRange={watch('dateRange')}
+                onDateRangeChange={(range) => setValue('dateRange', range)}
+              />
+            </div>
+            {watch('timeUnit') === 'custom' && (
+              <div className="flex-1">
+                {/* DateRangePicker 将在这里显示，与 TimeUnitSelector 同一行 */}
+              </div>
+            )}
+          </div>
 
-      <div className="space-y-4">
-        <DepartmentSelector
-          value={watch('departmentId')}
-          onValueChange={(value) => setValue('departmentId', value)}
-        />
+          <DepartmentSelector
+            value={watch('departmentId')}
+            onValueChange={(value) => setValue('departmentId', value)}
+          />
 
-        <ServiceTypeSelector
-          value={watch('serviceType')}
-          onValueChange={(value) => setValue('serviceType', value)}
-        />
-
-        <QuotaAmountInput
-          value={watch('amount')}
-          onChange={(e) => setValue('amount', Number(e.target.value))}
-        />
-      </div>
-
-      {wallet && (
-        <div className="text-sm text-gray-500">
-          当前钱包余额：{wallet.balance} 元
+          <ServiceTypeSelector
+            value={watch('serviceType')}
+            onValueChange={(value) => setValue('serviceType', value)}
+          />
         </div>
-      )}
 
-      <Button type="submit" className="w-full">
-        确认分配
-      </Button>
+        {/* 右侧表单 */}
+        <div className="space-y-4">
+          <QuotaAmountInput
+            value={watch('amount')}
+            onChange={(e) => setValue('amount', Number(e.target.value))}
+          />
+
+          {wallet && (
+            <div className="text-sm text-gray-500">
+              当前钱包余额：{wallet.balance} 元
+            </div>
+          )}
+
+          <Button type="submit" className="w-full">
+            确认分配
+          </Button>
+        </div>
+      </div>
     </form>
   );
 };
