@@ -8,12 +8,14 @@ import { TimeUnitSelector } from './components/TimeUnitSelector';
 import { DepartmentSelector } from './components/DepartmentSelector';
 import { ServiceTypeSelector } from './components/ServiceTypeSelector';
 import { QuotaAmountInput } from './components/QuotaAmountInput';
+import { DateRange } from 'react-day-picker';
 
 interface DepartmentQuotaFormData {
   timeUnit: string;
   departmentId: string;
   serviceType: string;
   amount: number;
+  dateRange?: DateRange;
 }
 
 export const DepartmentQuotaForm = () => {
@@ -23,11 +25,12 @@ export const DepartmentQuotaForm = () => {
       timeUnit: 'day',
       departmentId: '',
       serviceType: '',
-      amount: undefined, // 将默认值改为 undefined
+      amount: undefined,
+      dateRange: undefined,
     },
   });
 
-  // 获取钱包余额 (使用测试数据)
+  // 获取钱包余额
   const { data: wallet } = useQuery({
     queryKey: ['wallet'],
     queryFn: async () => {
@@ -59,19 +62,24 @@ export const DepartmentQuotaForm = () => {
 
       if (!userData) throw new Error('未找到用户信息');
 
-      const now = new Date();
+      let startDate = new Date();
       let endDate = new Date();
       
       // 根据时间维度设置结束时间
-      switch (data.timeUnit) {
-        case 'week':
-          endDate.setDate(now.getDate() + 7);
-          break;
-        case 'month':
-          endDate.setMonth(now.getMonth() + 1);
-          break;
-        default: // day
-          endDate.setDate(now.getDate() + 1);
+      if (data.timeUnit === 'custom' && data.dateRange) {
+        startDate = data.dateRange.from || new Date();
+        endDate = data.dateRange.to || new Date();
+      } else {
+        switch (data.timeUnit) {
+          case 'week':
+            endDate.setDate(startDate.getDate() + 7);
+            break;
+          case 'month':
+            endDate.setMonth(startDate.getMonth() + 1);
+            break;
+          default: // day
+            endDate.setDate(startDate.getDate() + 1);
+        }
       }
 
       // 创建部门额度记录
@@ -82,7 +90,7 @@ export const DepartmentQuotaForm = () => {
         quota_amount: data.amount,
         remaining_amount: data.amount,
         time_unit: data.timeUnit,
-        start_date: now.toISOString(),
+        start_date: startDate.toISOString(),
         end_date: endDate.toISOString(),
       });
 
@@ -107,6 +115,8 @@ export const DepartmentQuotaForm = () => {
       <TimeUnitSelector
         value={watch('timeUnit')}
         onValueChange={(value) => setValue('timeUnit', value)}
+        dateRange={watch('dateRange')}
+        onDateRangeChange={(range) => setValue('dateRange', range)}
       />
 
       <div className="space-y-4">

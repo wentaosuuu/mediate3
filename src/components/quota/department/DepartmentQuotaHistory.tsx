@@ -23,6 +23,9 @@ interface DepartmentQuota {
   created_at: string;
   created_by: string;
   updated_at: string;
+  department?: {
+    name: string;
+  }
 }
 
 export const DepartmentQuotaHistory = () => {
@@ -34,7 +37,10 @@ export const DepartmentQuotaHistory = () => {
 
       const { data, error } = await supabase
         .from('department_quotas')
-        .select('*')
+        .select(`
+          *,
+          department:departments(name)
+        `)
         .eq('tenant_id', user.id)
         .order('created_at', { ascending: false });
       
@@ -49,6 +55,7 @@ export const DepartmentQuotaHistory = () => {
       'day': '天',
       'week': '周',
       'month': '月',
+      'custom': '自定义',
     };
     return unitMap[unit] || unit;
   };
@@ -82,6 +89,7 @@ export const DepartmentQuotaHistory = () => {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>部门</TableHead>
             <TableHead>服务类型</TableHead>
             <TableHead>分配金额</TableHead>
             <TableHead>剩余金额</TableHead>
@@ -93,6 +101,7 @@ export const DepartmentQuotaHistory = () => {
         <TableBody>
           {!isLoading && quotas?.map((quota) => (
             <TableRow key={quota.id}>
+              <TableCell>{quota.department?.name || '-'}</TableCell>
               <TableCell>{getServiceTypeName(quota.service_type)}</TableCell>
               <TableCell>{quota.quota_amount}</TableCell>
               <TableCell>{quota.remaining_amount}</TableCell>
