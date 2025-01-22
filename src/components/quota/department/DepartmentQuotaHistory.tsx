@@ -40,7 +40,7 @@ export const DepartmentQuotaHistory = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data as DepartmentQuota[];
+      return (data || []) as DepartmentQuota[];
     },
   });
 
@@ -67,6 +67,7 @@ export const DepartmentQuotaHistory = () => {
   // 获取服务类型名称
   const getServiceTypeName = (type: string) => {
     const serviceMap: Record<string, string> = {
+      'all': '全部服务',
       'sms': '短信服务',
       'voice': '语音服务',
       'h5': 'H5案件公示',
@@ -75,7 +76,7 @@ export const DepartmentQuotaHistory = () => {
   };
 
   return (
-    <div>
+    <div className="bg-white p-6 rounded-lg shadow">
       <h3 className="text-lg font-medium mb-4">分配历史</h3>
       <Table>
         <TableHeader>

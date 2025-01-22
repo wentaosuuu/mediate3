@@ -14,6 +14,7 @@ interface ServiceType {
 }
 
 const serviceTypes: ServiceType[] = [
+  { id: 'all', name: '全部服务', unit: '元' },
   { id: 'sms', name: '短信服务', unit: '条' },
   { id: 'voice', name: '语音服务', unit: '分钟' },
   { id: 'h5', name: 'H5案件公示', unit: '月' },
@@ -29,12 +30,12 @@ export const ServiceTypeSelector = ({ value, onValueChange }: ServiceTypeSelecto
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">选择服务类型</label>
       <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger className="w-full bg-white">
+        <SelectTrigger className="w-full bg-white border-gray-300">
           <SelectValue placeholder="请选择服务类型" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-white">
           {serviceTypes.map((service) => (
-            <SelectItem key={service.id} value={service.id}>
+            <SelectItem key={service.id} value={service.id} className="hover:bg-gray-100">
               {service.name}
             </SelectItem>
           ))}

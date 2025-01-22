@@ -27,21 +27,25 @@ export const DepartmentQuotaForm = () => {
     },
   });
 
-  // 获取钱包余额
+  // 获取钱包余额 (使用测试数据)
   const { data: wallet } = useQuery({
     queryKey: ['wallet'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('未登录');
+      // 在实际环境中使用这段代码
+      // const { data: { user } } = await supabase.auth.getUser();
+      // if (!user) throw new Error('未登录');
 
-      const { data, error } = await supabase
-        .from('wallets')
-        .select('balance')
-        .eq('tenant_id', user.id)
-        .maybeSingle();
+      // const { data, error } = await supabase
+      //   .from('wallets')
+      //   .select('balance')
+      //   .eq('tenant_id', user.id)
+      //   .maybeSingle();
       
-      if (error) throw error;
-      return data || { balance: 0 };
+      // if (error) throw error;
+      // return data || { balance: 0 };
+      
+      // 返回测试数据
+      return { balance: 6666 };
     },
   });
 

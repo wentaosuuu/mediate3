@@ -15,15 +15,26 @@ interface DepartmentSelectorProps {
 }
 
 export const DepartmentSelector = ({ value, onValueChange }: DepartmentSelectorProps) => {
+  // 模拟测试数据
+  const testDepartments = [
+    { id: '1', name: '调解一部' },
+    { id: '2', name: '调解二部' },
+    { id: '3', name: '调解三部' },
+  ];
+
   const { data: departments, isLoading } = useQuery({
     queryKey: ['departments'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('departments')
-        .select('id, name');
+      // 在实际环境中使用这段代码
+      // const { data, error } = await supabase
+      //   .from('departments')
+      //   .select('id, name');
       
-      if (error) throw error;
-      return data;
+      // if (error) throw error;
+      // return data;
+      
+      // 使用测试数据
+      return testDepartments;
     },
   });
 
@@ -35,12 +46,12 @@ export const DepartmentSelector = ({ value, onValueChange }: DepartmentSelectorP
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">选择部门</label>
       <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger className="w-full bg-white">
+        <SelectTrigger className="w-full bg-white border-gray-300">
           <SelectValue placeholder="请选择部门" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-white">
           {departments?.map((dept) => (
-            <SelectItem key={dept.id} value={dept.id}>
+            <SelectItem key={dept.id} value={dept.id} className="hover:bg-gray-100">
               {dept.name}
             </SelectItem>
           ))}
