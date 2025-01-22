@@ -1,6 +1,6 @@
 import * as React from "react";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, X } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -14,10 +14,15 @@ import {
 interface DateRangePickerProps {
   value?: DateRange;
   onChange?: (value: DateRange | undefined) => void;
-  className?: string; // 添加 className 属性
+  className?: string;
 }
 
 export function DateRangePicker({ value, onChange, className }: DateRangePickerProps) {
+  // 添加重置功能
+  const handleReset = () => {
+    onChange?.(undefined);
+  };
+
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>
@@ -36,6 +41,14 @@ export function DateRangePicker({ value, onChange, className }: DateRangePickerP
                 <>
                   {format(value.from, "yyyy-MM-dd")} -{" "}
                   {format(value.to, "yyyy-MM-dd")}
+                  {/* 添加重置按钮 */}
+                  <X 
+                    className="ml-auto h-4 w-4 hover:text-destructive"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleReset();
+                    }}
+                  />
                 </>
               ) : (
                 format(value.from, "yyyy-MM-dd")
