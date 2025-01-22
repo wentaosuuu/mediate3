@@ -16,6 +16,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useQuery } from '@tanstack/react-query';
 
 // 部门数据类型
 interface Department {
@@ -37,10 +38,25 @@ const quotaFormSchema = z.object({
 
 type QuotaFormValues = z.infer<typeof quotaFormSchema>;
 
+// 获取部门列表
+const fetchDepartments = async () => {
+  const { data, error } = await supabase
+    .from('departments')
+    .select('id, name');
+  
+  if (error) throw error;
+  return data as Department[];
+};
+
 export const DepartmentQuotaForm = () => {
   const { toast } = useToast();
-  const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // 使用 React Query 获取部门列表
+  const { data: departments = [], isLoading: isDepartmentsLoading } = useQuery({
+    queryKey: ['departments'],
+    queryFn: fetchDepartments,
+  });
 
   const form = useForm<QuotaFormValues>({
     resolver: zodResolver(quotaFormSchema),
@@ -50,36 +66,16 @@ export const DepartmentQuotaForm = () => {
     },
   });
 
-  // 获取部门列表
+  // 当部门数据加载完成后，初始化表单数据
   useEffect(() => {
-    const fetchDepartments = async () => {
-      try {
-        // TODO: 替换为实际的部门数据获取逻辑
-        const mockDepartments = [
-          { id: '1', name: '技术部' },
-          { id: '2', name: '市场部' },
-          { id: '3', name: '销售部' },
-        ];
-        setDepartments(mockDepartments);
-        
-        // 初始化表单的部门数据
-        form.setValue('departments', mockDepartments.map(dept => ({
-          departmentId: dept.id,
-          departmentName: dept.name,
-          quotaAmount: 0,
-        })));
-      } catch (error) {
-        console.error('获取部门列表失败:', error);
-        toast({
-          variant: 'destructive',
-          title: '获取部门列表失败',
-          description: '请稍后重试',
-        });
-      }
-    };
-
-    fetchDepartments();
-  }, []);
+    if (departments.length > 0) {
+      form.setValue('departments', departments.map(dept => ({
+        departmentId: dept.id,
+        departmentName: dept.name,
+        quotaAmount: 0,
+      })));
+    }
+  }, [departments, form.setValue]);
 
   // 提交表单
   const onSubmit = async (data: QuotaFormValues) => {
@@ -155,6 +151,14 @@ export const DepartmentQuotaForm = () => {
     }
   };
 
+  if (isDepartmentsLoading) {
+    return <div className="text-center py-4">加载部门数据中...</div>;
+  }
+
+  if (departments.length === 0) {
+    return <div className="text-center py-4">暂无部门数据</div>;
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -183,33 +187,29 @@ export const DepartmentQuotaForm = () => {
         <div className="space-y-4">
           <Label>部门额度分配</Label>
           <div className="border rounded-lg p-4">
-            {departments.length === 0 ? (
-              <p className="text-muted-foreground">暂无部门数据</p>
-            ) : (
-              <div className="space-y-4">
-                {departments.map((dept, index) => (
-                  <FormField
-                    key={dept.id}
-                    control={form.control}
-                    name={`departments.${index}.quotaAmount`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{dept.name}</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="请输入额度"
-                            {...field}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                ))}
-              </div>
-            )}
+            <div className="space-y-4">
+              {departments.map((dept, index) => (
+                <FormField
+                  key={dept.id}
+                  control={form.control}
+                  name={`departments.${index}.quotaAmount`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{dept.name}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="请输入额度"
+                          {...field}
+                          onChange={(e) => field.onChange(Number(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
