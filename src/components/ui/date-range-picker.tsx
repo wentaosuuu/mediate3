@@ -14,11 +14,12 @@ import {
 interface DateRangePickerProps {
   value?: DateRange;
   onChange?: (value: DateRange | undefined) => void;
+  className?: string; // 添加 className 属性
 }
 
-export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
+export function DateRangePicker({ value, onChange, className }: DateRangePickerProps) {
   return (
-    <div className={cn("grid gap-2")}>
+    <div className={cn("grid gap-2", className)}>
       <Popover>
         <PopoverTrigger asChild>
           <Button
