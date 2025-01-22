@@ -17,7 +17,7 @@ interface DepartmentQuota {
   remaining_amount: number;
   start_date: string;
   end_date: string;
-  departments: {
+  department: {
     name: string;
   };
 }
@@ -36,9 +36,7 @@ export const DepartmentQuotaHistory = () => {
           remaining_amount,
           start_date,
           end_date,
-          departments (
-            name
-          )
+          department:departments(name)
         `)
         .order('created_at', { ascending: false });
       
@@ -68,7 +66,7 @@ export const DepartmentQuotaHistory = () => {
         <TableBody>
           {history?.map((record) => (
             <TableRow key={record.id}>
-              <TableCell>{record.departments?.name}</TableCell>
+              <TableCell>{record.department?.name}</TableCell>
               <TableCell>
                 {record.time_unit === 'day' ? '按天' : 
                  record.time_unit === 'week' ? '按周' : '按月'}

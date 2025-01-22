@@ -63,10 +63,10 @@ export const DepartmentQuotaForm = () => {
         .from('wallets')
         .select('balance')
         .eq('tenant_id', user.id)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
-      return data;
+      return data || { balance: 0 }; // 如果没有找到钱包，返回余额为0
     },
   });
 
