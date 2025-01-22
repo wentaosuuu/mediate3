@@ -126,6 +126,16 @@ export const menuItems: MenuItem[] = [
     ]
   },
   { 
+    icon: Wallet, 
+    label: "额度管理", 
+    path: "/quota",
+    children: [
+      { label: "部门额度分配", path: "/quota/department" },
+      { label: "作业员额度分配", path: "/quota/staff" },
+      { label: "额度使用统计", path: "/quota/statistics" }
+    ]
+  },
+  { 
     icon: Settings, 
     label: "系统管理", 
     path: "/system",

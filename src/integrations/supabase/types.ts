@@ -135,6 +135,104 @@ export type Database = {
         }
         Relationships: []
       }
+      department_quotas: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          department_id: string
+          end_date: string
+          id: string
+          quota_amount: number
+          remaining_amount: number
+          start_date: string
+          tenant_id: string
+          time_unit: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          department_id: string
+          end_date: string
+          id?: string
+          quota_amount?: number
+          remaining_amount?: number
+          start_date: string
+          tenant_id: string
+          time_unit: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          department_id?: string
+          end_date?: string
+          id?: string
+          quota_amount?: number
+          remaining_amount?: number
+          start_date?: string
+          tenant_id?: string
+          time_unit?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "department_quotas_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quota_usage_logs: {
+        Row: {
+          amount: number
+          created_at: string | null
+          description: string | null
+          id: string
+          service_type: string
+          staff_id: string | null
+          staff_quota_id: string | null
+          tenant_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          service_type: string
+          staff_id?: string | null
+          staff_quota_id?: string | null
+          tenant_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          service_type?: string
+          staff_id?: string | null
+          staff_quota_id?: string | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quota_usage_logs_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quota_usage_logs_staff_quota_id_fkey"
+            columns: ["staff_quota_id"]
+            isOneToOne: false
+            referencedRelation: "staff_quotas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recharge_order_items: {
         Row: {
           created_at: string | null
@@ -295,6 +393,64 @@ export type Database = {
           {
             foreignKeyName: "sms_records_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_quotas: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          department_quota_id: string | null
+          id: string
+          quota_amount: number
+          remaining_amount: number
+          staff_id: string | null
+          tenant_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          department_quota_id?: string | null
+          id?: string
+          quota_amount?: number
+          remaining_amount?: number
+          staff_id?: string | null
+          tenant_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          department_quota_id?: string | null
+          id?: string
+          quota_amount?: number
+          remaining_amount?: number
+          staff_id?: string | null
+          tenant_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_quotas_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_quotas_department_quota_id_fkey"
+            columns: ["department_quota_id"]
+            isOneToOne: false
+            referencedRelation: "department_quotas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_quotas_staff_id_fkey"
+            columns: ["staff_id"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
