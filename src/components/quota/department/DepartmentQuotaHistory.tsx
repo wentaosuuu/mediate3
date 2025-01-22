@@ -30,17 +30,28 @@ export const DepartmentQuotaHistory = () => {
         throw new Error('获取租户信息失败');
       }
 
+      // 修改查询语句，使用正确的连接方式
       const { data, error } = await supabase
         .from('department_quotas')
         .select(`
           *,
-          department:departments(name)
+          departments!inner(name)
         `)
         .eq('tenant_id', userData.tenant_id)
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
-      return (data as unknown) as DepartmentQuota[];
+      if (error) {
+        console.error('查询错误:', error);
+        throw error;
+      }
+
+      // 转换数据格式以匹配 DepartmentQuota 类型
+      return data.map(quota => ({
+        ...quota,
+        department: {
+          name: quota.departments.name
+        }
+      })) as DepartmentQuota[];
     },
   });
 

@@ -16,6 +16,7 @@ export const useQuotaFormSubmit = () => {
           title: '余额不足',
           description: '当前钱包余额不足以完成此次分配',
           className: 'fixed top-4 left-1/2 -translate-x-1/2',
+          duration: 2000, // 设置为2秒
         });
         return false;
       }
@@ -27,6 +28,7 @@ export const useQuotaFormSubmit = () => {
           title: '表单错误',
           description: '请填写所有必填字段',
           className: 'fixed top-4 left-1/2 -translate-x-1/2',
+          duration: 2000, // 设置为2秒
         });
         return false;
       }
@@ -90,6 +92,7 @@ export const useQuotaFormSubmit = () => {
           title: '提交失败',
           description: `错误信息: ${insertError.message}`,
           className: 'fixed top-4 left-1/2 -translate-x-1/2',
+          duration: 2000, // 设置为2秒
         });
         return false;
       }
@@ -102,6 +105,7 @@ export const useQuotaFormSubmit = () => {
         title: '分配成功',
         description: '部门额度已成功分配',
         className: 'fixed top-4 left-1/2 -translate-x-1/2 bg-green-50 border-green-200 text-green-800',
+        duration: 2000, // 设置为2秒
       });
 
       return true;
@@ -112,6 +116,7 @@ export const useQuotaFormSubmit = () => {
         title: '分配失败',
         description: error instanceof Error ? error.message : '分配部门额度时发生错误',
         className: 'fixed top-4 left-1/2 -translate-x-1/2',
+        duration: 2000, // 设置为2秒
       });
       return false;
     }
