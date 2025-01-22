@@ -13,41 +13,63 @@ import {
 interface DepartmentQuota {
   id: string;
   time_unit: string;
+  service_type: string;
   quota_amount: number;
   remaining_amount: number;
   start_date: string;
   end_date: string;
-  department: {
-    name: string;
-  };
+  department_id: string;
+}
+
+interface Department {
+  id: string;
+  name: string;
 }
 
 export const DepartmentQuotaHistory = () => {
   // 获取历史记录
-  const { data: history, isLoading } = useQuery({
+  const { data: quotas, isLoading: isLoadingQuotas } = useQuery({
     queryKey: ['department-quotas-history'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('department_quotas')
-        .select(`
-          id,
-          time_unit,
-          quota_amount,
-          remaining_amount,
-          start_date,
-          end_date,
-          department:departments(name)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data as unknown as DepartmentQuota[];
+      return data as DepartmentQuota[];
     },
   });
 
-  if (isLoading) {
+  // 获取部门信息
+  const { data: departments, isLoading: isLoadingDepartments } = useQuery({
+    queryKey: ['departments'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('departments')
+        .select('id, name');
+      
+      if (error) throw error;
+      return data as Department[];
+    },
+  });
+
+  if (isLoadingQuotas || isLoadingDepartments) {
     return <div>加载中...</div>;
   }
+
+  // 创建部门ID到名称的映射
+  const departmentMap = new Map(departments?.map(dept => [dept.id, dept.name]));
+
+  // 获取服务类型名称
+  const getServiceTypeName = (type: string) => {
+    const serviceMap: Record<string, string> = {
+      'sms': '短信服务',
+      'voice': '语音服务',
+      'h5': 'H5案件公示',
+    };
+    return serviceMap[type] || type;
+  };
 
   return (
     <div>
@@ -56,6 +78,7 @@ export const DepartmentQuotaHistory = () => {
         <TableHeader>
           <TableRow>
             <TableHead>部门</TableHead>
+            <TableHead>服务类型</TableHead>
             <TableHead>时间维度</TableHead>
             <TableHead>额度</TableHead>
             <TableHead>剩余额度</TableHead>
@@ -64,9 +87,10 @@ export const DepartmentQuotaHistory = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {history?.map((record) => (
+          {quotas?.map((record) => (
             <TableRow key={record.id}>
-              <TableCell>{record.department?.name}</TableCell>
+              <TableCell>{departmentMap.get(record.department_id) || '未知部门'}</TableCell>
+              <TableCell>{getServiceTypeName(record.service_type)}</TableCell>
               <TableCell>
                 {record.time_unit === 'day' ? '按天' : 
                  record.time_unit === 'week' ? '按周' : '按月'}

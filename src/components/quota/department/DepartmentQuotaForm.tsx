@@ -15,14 +15,18 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Checkbox } from '@/components/ui/checkbox';
 
+// 定义服务类型
+const serviceTypes = [
+  { id: 'sms', name: '短信服务', unit: '条' },
+  { id: 'voice', name: '语音服务', unit: '分钟' },
+  { id: 'h5', name: 'H5案件公示', unit: '月' },
+];
+
 interface DepartmentQuotaFormData {
   timeUnit: string;
-  quotas: {
-    departmentId: string;
-    amount: number;
-  }[];
-  useBatchMode: boolean;
-  batchAmount: number;
+  departmentId: string;
+  serviceType: string;
+  amount: number;
 }
 
 export const DepartmentQuotaForm = () => {
@@ -30,17 +34,14 @@ export const DepartmentQuotaForm = () => {
   const { register, handleSubmit, watch, setValue } = useForm<DepartmentQuotaFormData>({
     defaultValues: {
       timeUnit: 'day',
-      quotas: [],
-      useBatchMode: false,
-      batchAmount: 0,
+      departmentId: '',
+      serviceType: '',
+      amount: 0,
     },
   });
 
-  const useBatchMode = watch('useBatchMode');
-  const batchAmount = watch('batchAmount');
-
   // 获取部门列表
-  const { data: departments, isLoading } = useQuery({
+  const { data: departments, isLoading: isLoadingDepartments } = useQuery({
     queryKey: ['departments'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -70,34 +71,10 @@ export const DepartmentQuotaForm = () => {
     },
   });
 
-  const handleBatchModeChange = (checked: boolean) => {
-    setValue('useBatchMode', checked);
-    if (checked && departments) {
-      // 如果启用批量模式，将所有部门的额度设置为相同值
-      departments.forEach((_, index) => {
-        setValue(`quotas.${index}.amount`, batchAmount);
-      });
-    }
-  };
-
-  const handleBatchAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const amount = Number(e.target.value);
-    setValue('batchAmount', amount);
-    if (useBatchMode && departments) {
-      // 更新所有部门的额度
-      departments.forEach((_, index) => {
-        setValue(`quotas.${index}.amount`, amount);
-      });
-    }
-  };
-
   const onSubmit = async (data: DepartmentQuotaFormData) => {
     try {
-      // 计算总额度
-      const totalAmount = data.quotas.reduce((sum, quota) => sum + (quota.amount || 0), 0);
-      
       // 检查钱包余额
-      if (wallet && totalAmount > wallet.balance) {
+      if (wallet && data.amount > wallet.balance) {
         toast({
           variant: 'destructive',
           title: '余额不足',
@@ -133,20 +110,17 @@ export const DepartmentQuotaForm = () => {
           endDate.setDate(now.getDate() + 1);
       }
 
-      // 批量插入部门额度记录
-      const { error } = await supabase.from('department_quotas').insert(
-        data.quotas
-          .filter(quota => quota.amount > 0) // 只插入额度大于0的记录
-          .map(quota => ({
-            tenant_id: userData.tenant_id,
-            department_id: quota.departmentId,
-            quota_amount: quota.amount,
-            remaining_amount: quota.amount, // 初始剩余额度等于总额度
-            time_unit: data.timeUnit,
-            start_date: now.toISOString(),
-            end_date: endDate.toISOString(),
-          }))
-      );
+      // 创建部门额度记录
+      const { error } = await supabase.from('department_quotas').insert({
+        tenant_id: userData.tenant_id,
+        department_id: data.departmentId,
+        service_type: data.serviceType,
+        quota_amount: data.amount,
+        remaining_amount: data.amount,
+        time_unit: data.timeUnit,
+        start_date: now.toISOString(),
+        end_date: endDate.toISOString(),
+      });
 
       if (error) throw error;
 
@@ -164,19 +138,19 @@ export const DepartmentQuotaForm = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoadingDepartments) {
     return <div>加载中...</div>;
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 bg-white p-6 rounded-lg shadow">
       <div className="flex items-center gap-4">
         <Calendar className="h-5 w-5 text-gray-500" />
         <Select
           defaultValue="day"
           onValueChange={(value) => setValue('timeUnit', value)}
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[180px] bg-white">
             <SelectValue placeholder="选择时间维度" />
           </SelectTrigger>
           <SelectContent>
@@ -187,55 +161,48 @@ export const DepartmentQuotaForm = () => {
         </Select>
       </div>
 
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id="batchMode"
-          checked={useBatchMode}
-          onCheckedChange={handleBatchModeChange}
-        />
-        <label
-          htmlFor="batchMode"
-          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          批量设置额度
-        </label>
-      </div>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">选择部门</label>
+          <Select onValueChange={(value) => setValue('departmentId', value)}>
+            <SelectTrigger className="w-full bg-white">
+              <SelectValue placeholder="请选择部门" />
+            </SelectTrigger>
+            <SelectContent>
+              {departments?.map((dept) => (
+                <SelectItem key={dept.id} value={dept.id}>
+                  {dept.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-      {useBatchMode && (
-        <div className="flex items-center gap-4">
-          <span className="w-32">批量额度：</span>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">选择服务类型</label>
+          <Select onValueChange={(value) => setValue('serviceType', value)}>
+            <SelectTrigger className="w-full bg-white">
+              <SelectValue placeholder="请选择服务类型" />
+            </SelectTrigger>
+            <SelectContent>
+              {serviceTypes.map((service) => (
+                <SelectItem key={service.id} value={service.id}>
+                  {service.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">额度金额</label>
           <Input
             type="number"
-            placeholder="输入统一额度"
-            value={batchAmount}
-            onChange={handleBatchAmountChange}
-            className="w-32"
+            placeholder="请输入分配额度"
+            {...register('amount', { valueAsNumber: true })}
+            className="w-full"
           />
         </div>
-      )}
-
-      <div className="space-y-4">
-        {departments?.map((dept, index) => (
-          <div key={dept.id} className="flex items-center gap-4">
-            <span className="w-32">{dept.name}</span>
-            <Input
-              type="number"
-              placeholder="输入额度"
-              {...register(`quotas.${index}.amount` as const, {
-                valueAsNumber: true,
-                required: true,
-                min: 0,
-              })}
-              className="w-32"
-              disabled={useBatchMode}
-            />
-            <input
-              type="hidden"
-              {...register(`quotas.${index}.departmentId` as const)}
-              value={dept.id}
-            />
-          </div>
-        ))}
       </div>
 
       {wallet && (
@@ -244,7 +211,7 @@ export const DepartmentQuotaForm = () => {
         </div>
       )}
 
-      <Button type="submit">
+      <Button type="submit" className="w-full">
         确认分配
       </Button>
     </form>
