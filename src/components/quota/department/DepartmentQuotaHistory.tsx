@@ -11,10 +11,11 @@ import {
 import { DepartmentQuota } from '@/types/quota';
 import { QuotaHistoryRow } from './QuotaHistoryRow';
 
+// 定义从数据库返回的数据结构
 interface DepartmentQuotaWithDepartment extends Omit<DepartmentQuota, 'department'> {
   departments: {
     name: string;
-  };
+  } | null;
 }
 
 export const DepartmentQuotaHistory = () => {
@@ -41,7 +42,7 @@ export const DepartmentQuotaHistory = () => {
         .from('department_quotas')
         .select(`
           *,
-          departments (
+          departments:department_id (
             name
           )
         `)
