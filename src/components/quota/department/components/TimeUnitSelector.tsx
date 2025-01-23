@@ -24,17 +24,17 @@ export const TimeUnitSelector = ({
 }: TimeUnitSelectorProps) => {
   return (
     <div>
-      <label className="text-sm font-medium mb-2 block">选择时间</label>
+      <label className="block text-sm font-medium text-gray-700 mb-1">选择时间</label>
       <div className="space-y-2">
         <Select value={value} onValueChange={onValueChange}>
-          <SelectTrigger className="bg-white h-10">
-            <SelectValue placeholder="选择时间维度" />
+          <SelectTrigger className="w-full bg-white border-gray-300">
+            <SelectValue placeholder="请选择时间维度" />
           </SelectTrigger>
           <SelectContent className="bg-white">
-            <SelectItem value="day">按天</SelectItem>
-            <SelectItem value="week">按周</SelectItem>
-            <SelectItem value="month">按月</SelectItem>
-            <SelectItem value="custom">自定义</SelectItem>
+            <SelectItem value="day" className="hover:bg-gray-100">按天</SelectItem>
+            <SelectItem value="week" className="hover:bg-gray-100">按周</SelectItem>
+            <SelectItem value="month" className="hover:bg-gray-100">按月</SelectItem>
+            <SelectItem value="custom" className="hover:bg-gray-100">自定义</SelectItem>
           </SelectContent>
         </Select>
 
@@ -42,7 +42,7 @@ export const TimeUnitSelector = ({
           <DateRangePicker
             value={dateRange}
             onChange={onDateRangeChange}
-            className="h-10"
+            className="w-full bg-white border border-gray-300 rounded-md"
           />
         )}
       </div>
