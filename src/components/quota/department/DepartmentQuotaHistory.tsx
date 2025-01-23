@@ -34,46 +34,38 @@ export const DepartmentQuotaHistory = () => {
           throw tenantError;
         }
 
-        // 先获取部门配额数据
-        const quotasResult = await supabase
+        console.log('当前用户tenant_id:', userData.tenant_id); // 添加日志
+
+        // 获取部门配额数据，使用join查询同时获取部门信息
+        const { data: quotasData, error: quotasError } = await supabase
           .from('department_quotas')
-          .select('*')
+          .select(`
+            *,
+            departments:departments(id, name)
+          `)
           .eq('tenant_id', userData.tenant_id)
           .order('created_at', { ascending: false });
 
-        if (quotasResult.error) {
-          console.error('查询配额错误:', quotasResult.error);
-          throw quotasResult.error;
+        if (quotasError) {
+          console.error('查询配额错误:', quotasError);
+          throw quotasError;
         }
 
-        const quotasData = quotasResult.data || [];
-        
-        // 如果没有配额数据，直接返回空数组
-        if (quotasData.length === 0) {
-          return [];
-        }
+        console.log('获取到的配额数据:', quotasData); // 添加日志
 
-        // 获取所有相关部门的信息
-        const departmentIds = quotasData.map(quota => quota.department_id);
-        const departmentsResult = await supabase
-          .from('departments')
-          .select('id, name')
-          .in('id', departmentIds);
-
-        if (departmentsResult.error) {
-          console.error('查询部门错误:', departmentsResult.error);
-          throw departmentsResult.error;
-        }
-
-        // 合并配额和部门数据
-        return quotasData.map(quota => ({
+        // 处理数据格式
+        const formattedQuotas = quotasData?.map(quota => ({
           ...quota,
-          department: departmentsResult.data?.find(dept => dept.id === quota.department_id) || {
+          department: quota.departments ? {
+            id: quota.departments.id,
+            name: quota.departments.name
+          } : {
             id: quota.department_id,
             name: '未知部门'
           }
         })) as DepartmentQuota[];
 
+        return formattedQuotas;
       } catch (error) {
         console.error('获取配额历史记录失败:', error);
         throw error;
