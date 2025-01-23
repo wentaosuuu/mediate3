@@ -54,23 +54,21 @@ export const QuotaFormRight = ({
   });
 
   return (
-    <div className="space-y-4 h-full flex flex-col justify-between">
-      <div className="space-y-4">
-        {/* 显示团队长可分配额度 */}
-        <Card className="p-6 bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-blue-700 font-medium">当前可分配总额度</span>
-            <span className="text-2xl font-semibold text-blue-800">
-              {managerQuota || 0} 元
-            </span>
-          </div>
-        </Card>
+    <div className="space-y-6 h-full flex flex-col">
+      <QuotaAmountInput
+        value={amount}
+        onChange={(e) => onAmountChange(Number(e.target.value))}
+      />
 
-        <QuotaAmountInput
-          value={amount}
-          onChange={(e) => onAmountChange(Number(e.target.value))}
-        />
-      </div>
+      {/* 显示团队长可分配额度 */}
+      <Card className="p-6 bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 shadow-sm">
+        <div className="flex items-center justify-between">
+          <span className="text-blue-700 font-medium">当前可分配总额度</span>
+          <span className="text-2xl font-semibold text-blue-800">
+            {managerQuota || 0} 元
+          </span>
+        </div>
+      </Card>
 
       <Button type="submit" className="w-full h-11">
         确认分配
