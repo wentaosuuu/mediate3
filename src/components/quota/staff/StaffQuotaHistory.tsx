@@ -2,6 +2,14 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDate, getServiceTypeName } from '@/utils/quotaUtils';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 export const StaffQuotaHistory = () => {
   const { data: quotas, isLoading, error } = useQuery({
@@ -18,11 +26,9 @@ export const StaffQuotaHistory = () => {
           .from('users')
           .select('tenant_id')
           .eq('id', userResponse.data.user.id)
-          .maybeSingle();
+          .single();
 
-        if (userDataResponse.error || !userDataResponse.data) {
-          throw new Error('获取租户信息失败');
-        }
+        if (userDataResponse.error) throw userDataResponse.error;
 
         // 获取作业员配额数据
         const { data: quotasData, error: quotasError } = await supabase
@@ -45,7 +51,7 @@ export const StaffQuotaHistory = () => {
             ),
             department_quotas:department_quotas!staff_quotas_department_quota_id_fkey (
               service_type,
-              departments:departments (
+              department:departments (
                 name
               )
             )
@@ -53,10 +59,7 @@ export const StaffQuotaHistory = () => {
           .eq('tenant_id', userDataResponse.data.tenant_id)
           .order('created_at', { ascending: false });
 
-        if (quotasError) {
-          console.error('获取配额数据失败:', quotasError);
-          throw quotasError;
-        }
+        if (quotasError) throw quotasError;
 
         return quotasData || [];
       } catch (error) {
@@ -66,42 +69,51 @@ export const StaffQuotaHistory = () => {
     },
   });
 
-  if (isLoading) {
-    return <div>加载中...</div>;
-  }
-
-  if (error) {
-    return <div>加载失败: {error instanceof Error ? error.message : '未知错误'}</div>;
-  }
-
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm text-left text-gray-500">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-          <tr>
-            <th className="px-6 py-3">作业员</th>
-            <th className="px-6 py-3">部门</th>
-            <th className="px-6 py-3">服务类型</th>
-            <th className="px-6 py-3">分配额度</th>
-            <th className="px-6 py-3">剩余额度</th>
-            <th className="px-6 py-3">分配者</th>
-            <th className="px-6 py-3">分配时间</th>
-          </tr>
-        </thead>
-        <tbody>
-          {quotas?.map((quota) => (
-            <tr key={quota.id} className="bg-white border-b hover:bg-gray-50">
-              <td className="px-6 py-4">{quota.staff?.username}</td>
-              <td className="px-6 py-4">{quota.department_quotas?.departments?.name}</td>
-              <td className="px-6 py-4">{getServiceTypeName(quota.department_quotas?.service_type)}</td>
-              <td className="px-6 py-4">{quota.quota_amount}</td>
-              <td className="px-6 py-4">{quota.remaining_amount}</td>
-              <td className="px-6 py-4">{quota.created_by_user?.username}</td>
-              <td className="px-6 py-4">{formatDate(quota.created_at)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="bg-white p-6 rounded-lg shadow">
+      <h3 className="text-lg font-medium mb-4">分配历史</h3>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>作业员</TableHead>
+            <TableHead>部门</TableHead>
+            <TableHead>服务类型</TableHead>
+            <TableHead>分配额度</TableHead>
+            <TableHead>剩余额度</TableHead>
+            <TableHead>分配者</TableHead>
+            <TableHead>分配时间</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {isLoading ? (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center py-4">加载中...</TableCell>
+            </TableRow>
+          ) : error ? (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center py-4 text-red-500">
+                加载失败，请刷新重试
+              </TableCell>
+            </TableRow>
+          ) : quotas && quotas.length > 0 ? (
+            quotas.map((quota) => (
+              <TableRow key={quota.id}>
+                <TableCell>{quota.staff?.username}</TableCell>
+                <TableCell>{quota.department_quotas?.department?.name}</TableCell>
+                <TableCell>{getServiceTypeName(quota.department_quotas?.service_type)}</TableCell>
+                <TableCell>{quota.quota_amount}</TableCell>
+                <TableCell>{quota.remaining_amount}</TableCell>
+                <TableCell>{quota.created_by_user?.username}</TableCell>
+                <TableCell>{formatDate(quota.created_at)}</TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center py-4">暂无数据</TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { QuotaAmountInput } from './QuotaAmountInput';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -57,15 +57,13 @@ export const QuotaFormRight = ({
     <div className="space-y-4 h-full flex flex-col justify-between">
       <div className="space-y-4">
         {/* 显示团队长可分配额度 */}
-        <Card className="bg-blue-50 border-blue-200">
-          <CardContent className="pt-4">
-            <div className="text-sm text-blue-800">
-              <div className="flex justify-between">
-                <span>当前可分配总额度：</span>
-                <span className="font-semibold text-green-600">{managerQuota || 0}</span>
-              </div>
-            </div>
-          </CardContent>
+        <Card className="p-6 bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-blue-700 font-medium">当前可分配总额度</span>
+            <span className="text-2xl font-semibold text-blue-800">
+              {managerQuota || 0} 元
+            </span>
+          </div>
         </Card>
 
         <QuotaAmountInput
