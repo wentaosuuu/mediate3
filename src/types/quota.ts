@@ -50,10 +50,10 @@ export interface StaffQuota {
   created_at: string;
   created_by: string | null;
   updated_at: string | null;
-  staff?: Staff;
-  created_by_user?: Staff;
+  staff?: Staff | null;
+  created_by_user?: Staff | null;
   department_quota?: {
     service_type: string | null;
-    department?: Department;
-  };
+    department?: Department | null;
+  } | null;
 }

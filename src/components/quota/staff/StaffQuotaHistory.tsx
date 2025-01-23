@@ -24,23 +24,20 @@ export const StaffQuotaHistory = () => {
           throw new Error('获取租户信息失败');
         }
 
-        console.log('当前用户tenant_id:', userDataResponse.data.tenant_id);
-
         // 获取作业员配额数据
         const { data: quotasData, error: quotasError } = await supabase
           .from('staff_quotas')
           .select(`
             *,
-            staff:users (
+            staff:staff_id (
               username
             ),
-            created_by_user:users (
+            created_by_user:created_by (
               username
             ),
             department_quota:department_quotas (
               service_type,
               department:departments (
-                id,
                 name
               )
             )

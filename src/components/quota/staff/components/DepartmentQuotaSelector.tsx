@@ -39,7 +39,6 @@ export const DepartmentQuotaSelector = ({ value, onValueChange, serviceType }: D
         .select(`
           *,
           department:departments (
-            id,
             name
           )
         `)
