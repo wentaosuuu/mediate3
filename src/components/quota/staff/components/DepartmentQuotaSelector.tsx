@@ -36,12 +36,10 @@ export const DepartmentQuotaSelector = ({ value, onValueChange }: DepartmentQuot
       const { data, error } = await supabase
         .from('department_quotas')
         .select(`
-          id,
-          departments!department_quotas_department_id_fkey (
+          *,
+          departments (
             name
-          ),
-          service_type,
-          remaining_amount
+          )
         `)
         .eq('tenant_id', userDataResponse.data.tenant_id)
         .gt('remaining_amount', 0); // 只获取还有剩余额度的配额

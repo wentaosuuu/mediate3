@@ -30,16 +30,13 @@ export const StaffQuotaHistory = () => {
         const { data: quotasData, error: quotasError } = await supabase
           .from('staff_quotas')
           .select(`
-            id,
-            quota_amount,
-            remaining_amount,
-            created_at,
+            *,
             users!staff_quotas_staff_id_fkey (
               username
             ),
             department_quotas!staff_quotas_department_quota_id_fkey (
               service_type,
-              departments!department_quotas_department_id_fkey (
+              departments (
                 name
               )
             )
