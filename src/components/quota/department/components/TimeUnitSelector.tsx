@@ -23,26 +23,29 @@ export const TimeUnitSelector = ({
   onDateRangeChange,
 }: TimeUnitSelectorProps) => {
   return (
-    <div className="space-y-2">
-      <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger className="bg-white h-10">
-          <SelectValue placeholder="选择时间维度" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="day">按天</SelectItem>
-          <SelectItem value="week">按周</SelectItem>
-          <SelectItem value="month">按月</SelectItem>
-          <SelectItem value="custom">自定义</SelectItem>
-        </SelectContent>
-      </Select>
+    <div>
+      <label className="text-sm font-medium mb-2 block">时间维度</label>
+      <div className="space-y-2">
+        <Select value={value} onValueChange={onValueChange}>
+          <SelectTrigger className="bg-white h-10">
+            <SelectValue placeholder="选择时间维度" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="day">按天</SelectItem>
+            <SelectItem value="week">按周</SelectItem>
+            <SelectItem value="month">按月</SelectItem>
+            <SelectItem value="custom">自定义</SelectItem>
+          </SelectContent>
+        </Select>
 
-      {value === 'custom' && (
-        <DateRangePicker
-          value={dateRange}
-          onChange={onDateRangeChange}
-          className="h-10"
-        />
-      )}
+        {value === 'custom' && (
+          <DateRangePicker
+            value={dateRange}
+            onChange={onDateRangeChange}
+            className="h-10"
+          />
+        )}
+      </div>
     </div>
   );
 };

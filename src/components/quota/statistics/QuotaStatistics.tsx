@@ -66,25 +66,34 @@ export const QuotaStatistics = () => {
   return (
     <div className="space-y-6">
       <Card className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <ServiceTypeSelector
-            value={serviceType}
-            onValueChange={setServiceType}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div>
+            <label className="text-sm font-medium mb-2 block">服务类型</label>
+            <ServiceTypeSelector
+              value={serviceType}
+              onValueChange={setServiceType}
+            />
+          </div>
           <TimeUnitSelector
             value={timeUnit}
             onValueChange={setTimeUnit}
             dateRange={dateRange}
             onDateRangeChange={setDateRange}
           />
-          <DepartmentSelector
-            value={department}
-            onValueChange={setDepartment}
-          />
-          <StaffSelector
-            value={staff}
-            onValueChange={setStaff}
-          />
+          <div>
+            <label className="text-sm font-medium mb-2 block">部门</label>
+            <DepartmentSelector
+              value={department}
+              onValueChange={setDepartment}
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium mb-2 block">作业员</label>
+            <StaffSelector
+              value={staff}
+              onValueChange={setStaff}
+            />
+          </div>
         </div>
       </Card>
 
