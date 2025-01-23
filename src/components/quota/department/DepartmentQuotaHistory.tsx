@@ -40,8 +40,7 @@ export const DepartmentQuotaHistory = () => {
           .from('department_quotas')
           .select(`
             *,
-            departments (
-              id,
+            department:departments!department_quotas_department_id_fkey (
               name
             )
           `)
@@ -56,9 +55,7 @@ export const DepartmentQuotaHistory = () => {
         // 转换数据结构以匹配 DepartmentQuota 类型
         const formattedQuotas: DepartmentQuota[] = (quotasData || []).map(quota => ({
           ...quota,
-          department: quota.departments ? {
-            name: quota.departments.name
-          } : null
+          department: quota.department || null
         }));
 
         console.log('格式化后的配额数据:', formattedQuotas);

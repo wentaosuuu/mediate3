@@ -31,12 +31,12 @@ export const StaffQuotaHistory = () => {
           .from('staff_quotas')
           .select(`
             *,
-            users!staff_quotas_staff_id_fkey (
+            staff:users!staff_quotas_staff_id_fkey (
               username
             ),
-            department_quotas!staff_quotas_department_quota_id_fkey (
+            department_quota:department_quotas!staff_quotas_department_quota_id_fkey (
               service_type,
-              departments (
+              department:departments!department_quotas_department_id_fkey (
                 name
               )
             )
@@ -81,9 +81,9 @@ export const StaffQuotaHistory = () => {
         <tbody>
           {quotas?.map((quota) => (
             <tr key={quota.id} className="bg-white border-b hover:bg-gray-50">
-              <td className="px-6 py-4">{quota.users?.username}</td>
-              <td className="px-6 py-4">{quota.department_quotas?.departments?.name}</td>
-              <td className="px-6 py-4">{getServiceTypeName(quota.department_quotas?.service_type)}</td>
+              <td className="px-6 py-4">{quota.staff?.username}</td>
+              <td className="px-6 py-4">{quota.department_quota?.department?.name}</td>
+              <td className="px-6 py-4">{getServiceTypeName(quota.department_quota?.service_type)}</td>
               <td className="px-6 py-4">{quota.quota_amount}</td>
               <td className="px-6 py-4">{quota.remaining_amount}</td>
               <td className="px-6 py-4">{formatDate(quota.created_at)}</td>
