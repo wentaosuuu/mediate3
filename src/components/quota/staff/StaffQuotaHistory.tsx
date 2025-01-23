@@ -34,6 +34,9 @@ export const StaffQuotaHistory = () => {
             staff:users (
               username
             ),
+            created_by_user:users (
+              username
+            ),
             department_quota:department_quotas (
               service_type,
               department:departments (
@@ -76,6 +79,7 @@ export const StaffQuotaHistory = () => {
             <th className="px-6 py-3">服务类型</th>
             <th className="px-6 py-3">分配额度</th>
             <th className="px-6 py-3">剩余额度</th>
+            <th className="px-6 py-3">分配者</th>
             <th className="px-6 py-3">分配时间</th>
           </tr>
         </thead>
@@ -87,6 +91,7 @@ export const StaffQuotaHistory = () => {
               <td className="px-6 py-4">{getServiceTypeName(quota.department_quota?.service_type)}</td>
               <td className="px-6 py-4">{quota.quota_amount}</td>
               <td className="px-6 py-4">{quota.remaining_amount}</td>
+              <td className="px-6 py-4">{quota.created_by_user?.username}</td>
               <td className="px-6 py-4">{formatDate(quota.created_at)}</td>
             </tr>
           ))}

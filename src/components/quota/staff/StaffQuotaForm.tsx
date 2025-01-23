@@ -11,6 +11,7 @@ export const StaffQuotaForm = () => {
     defaultValues: {
       departmentQuotaId: '',
       staffId: '',
+      serviceType: 'all',
       amount: undefined,
     },
   });
@@ -30,8 +31,10 @@ export const StaffQuotaForm = () => {
         <QuotaFormLeft
           departmentQuotaId={watch('departmentQuotaId')}
           staffId={watch('staffId')}
+          serviceType={watch('serviceType')}
           onDepartmentQuotaChange={(value) => setValue('departmentQuotaId', value)}
           onStaffChange={(value) => setValue('staffId', value)}
+          onServiceTypeChange={(value) => setValue('serviceType', value)}
         />
 
         <QuotaFormRight

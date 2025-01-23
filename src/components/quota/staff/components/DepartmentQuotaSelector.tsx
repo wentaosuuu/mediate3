@@ -12,11 +12,12 @@ import {
 interface DepartmentQuotaSelectorProps {
   value: string;
   onValueChange: (value: string) => void;
+  serviceType: string;
 }
 
-export const DepartmentQuotaSelector = ({ value, onValueChange }: DepartmentQuotaSelectorProps) => {
+export const DepartmentQuotaSelector = ({ value, onValueChange, serviceType }: DepartmentQuotaSelectorProps) => {
   const { data: quotas, isLoading } = useQuery({
-    queryKey: ['department-quotas'],
+    queryKey: ['department-quotas', serviceType],
     queryFn: async () => {
       // 获取当前用户信息
       const userResponse = await supabase.auth.getUser();
@@ -32,8 +33,8 @@ export const DepartmentQuotaSelector = ({ value, onValueChange }: DepartmentQuot
 
       if (userDataResponse.error) throw userDataResponse.error;
 
-      // 获取部门配额列表
-      const { data, error } = await supabase
+      // 构建查询条件
+      let query = supabase
         .from('department_quotas')
         .select(`
           *,
@@ -43,7 +44,14 @@ export const DepartmentQuotaSelector = ({ value, onValueChange }: DepartmentQuot
           )
         `)
         .eq('tenant_id', userDataResponse.data.tenant_id)
-        .gt('remaining_amount', 0); // 只获取还有剩余额度的配额
+        .gt('remaining_amount', 0);
+
+      // 如果选择了具体的服务类型，则添加筛选条件
+      if (serviceType !== 'all') {
+        query = query.eq('service_type', serviceType);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return data || [];
