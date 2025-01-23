@@ -37,11 +37,17 @@ export const StaffQuotaHistory = () => {
             created_at,
             created_by,
             updated_at,
-            staff:staff_id (username),
-            created_by_user:created_by (username),
-            department_quotas!inner (
+            staff:users!staff_quotas_staff_id_fkey (
+              username
+            ),
+            created_by_user:users!staff_quotas_created_by_fkey (
+              username
+            ),
+            department_quotas:department_quotas!staff_quotas_department_quota_id_fkey (
               service_type,
-              departments!inner (name)
+              departments:departments (
+                name
+              )
             )
           `)
           .eq('tenant_id', userDataResponse.data.tenant_id)

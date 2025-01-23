@@ -42,7 +42,7 @@ export const DepartmentQuotaSelector = ({ value, onValueChange, serviceType }: D
           quota_amount,
           remaining_amount,
           service_type,
-          departments!inner (
+          departments:departments (
             name
           )
         `)

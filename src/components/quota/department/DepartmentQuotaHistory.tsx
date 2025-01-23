@@ -49,7 +49,7 @@ export const DepartmentQuotaHistory = () => {
             created_at,
             created_by,
             updated_at,
-            departments (
+            departments:departments (
               id,
               name
             )
@@ -65,7 +65,7 @@ export const DepartmentQuotaHistory = () => {
         // 转换数据格式以匹配 DepartmentQuota 类型
         const formattedQuotas: DepartmentQuota[] = quotasData?.map(quota => ({
           ...quota,
-          department: quota.departments
+          department: quota.departments || null
         })) || [];
 
         return formattedQuotas;
