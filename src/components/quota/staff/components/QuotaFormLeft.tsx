@@ -1,41 +1,40 @@
 import React from 'react';
-import { DepartmentQuotaSelector } from './DepartmentQuotaSelector';
-import { StaffSelector } from './StaffSelector';
-import { ServiceTypeSelector } from '../../department/components/ServiceTypeSelector';
+import { DepartmentSelector } from '@/components/quota/department/components/DepartmentSelector';
+import { StaffSelector } from '../components/StaffSelector';
+import { DepartmentQuotaSelector } from '../components/DepartmentQuotaSelector';
 
 interface QuotaFormLeftProps {
-  departmentQuotaId: string;
-  staffId: string;
-  serviceType: string;
-  onDepartmentQuotaChange: (value: string) => void;
-  onStaffChange: (value: string) => void;
-  onServiceTypeChange: (value: string) => void;
+  department: string;
+  setDepartment: (value: string) => void;
+  staff: string;
+  setStaff: (value: string) => void;
+  departmentQuota: string;
+  setDepartmentQuota: (value: string) => void;
 }
 
 export const QuotaFormLeft = ({
-  departmentQuotaId,
-  staffId,
-  serviceType,
-  onDepartmentQuotaChange,
-  onStaffChange,
-  onServiceTypeChange,
+  department,
+  setDepartment,
+  staff,
+  setStaff,
+  departmentQuota,
+  setDepartmentQuota,
 }: QuotaFormLeftProps) => {
   return (
-    <div className="space-y-4 h-full">
-      <ServiceTypeSelector 
-        value={serviceType}
-        onValueChange={onServiceTypeChange}
+    <div className="space-y-4">
+      <DepartmentSelector
+        value={department}
+        onValueChange={setDepartment}
       />
-      
-      <DepartmentQuotaSelector
-        value={departmentQuotaId}
-        onValueChange={onDepartmentQuotaChange}
-        serviceType={serviceType}
-      />
-
       <StaffSelector
-        value={staffId}
-        onValueChange={onStaffChange}
+        value={staff}
+        onValueChange={setStaff}
+        departmentId={department}
+      />
+      <DepartmentQuotaSelector
+        value={departmentQuota}
+        onValueChange={setDepartmentQuota}
+        departmentId={department}
       />
     </div>
   );

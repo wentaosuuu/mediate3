@@ -20,7 +20,7 @@ export const DepartmentQuotaHistory = () => {
         .from('department_quotas')
         .select(`
           *,
-          department:departments!inner(
+          department:departments(
             id,
             name
           )
@@ -28,7 +28,7 @@ export const DepartmentQuotaHistory = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as DepartmentQuota[];
+      return data as unknown as DepartmentQuota[];
     },
   });
 

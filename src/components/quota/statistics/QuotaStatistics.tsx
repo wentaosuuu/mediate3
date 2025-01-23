@@ -17,7 +17,6 @@ export const QuotaStatistics = () => {
   const [staff, setStaff] = useState('');
   const [dateRange, setDateRange] = useState<DateRange>();
 
-  // 获取使用统计数据
   const { data: usageData, isLoading } = useQuery({
     queryKey: ['quota-usage', serviceType, timeUnit, department, staff, dateRange],
     queryFn: async () => {
@@ -31,7 +30,7 @@ export const QuotaStatistics = () => {
           staff:staff_id(username),
           staff_quota:staff_quota_id(
             department_quota:department_quota_id(
-              department:department_id(name)
+              department:departments(name)
             )
           )
         `);
@@ -59,7 +58,7 @@ export const QuotaStatistics = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data || [];
+      return data as unknown as UsageData[];
     },
   });
 
