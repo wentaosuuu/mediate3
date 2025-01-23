@@ -18,60 +18,65 @@ export const DepartmentQuotaHistory = () => {
     queryFn: async () => {
       try {
         // 获取当前用户信息
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        if (userError) throw userError;
-        if (!user) throw new Error('未登录');
+        const userResponse = await supabase.auth.getUser();
+        if (userResponse.error) throw userResponse.error;
+        if (!userResponse.data.user) throw new Error('未登录');
 
         // 获取用户的tenant_id
-        const { data: userData, error: tenantError } = await supabase
+        const userDataResponse = await supabase
           .from('users')
           .select('tenant_id')
-          .eq('id', user.id)
+          .eq('id', userResponse.data.user.id)
           .single();
 
-        if (tenantError) {
-          console.error('获取租户信息失败:', tenantError);
-          throw tenantError;
+        if (userDataResponse.error) {
+          console.error('获取租户信息失败:', userDataResponse.error);
+          throw userDataResponse.error;
         }
 
-        console.log('当前用户tenant_id:', userData.tenant_id);
+        const tenantId = userDataResponse.data.tenant_id;
+        console.log('当前用户tenant_id:', tenantId);
 
         // 获取部门配额数据
-        const { data: quotasData, error: quotasError } = await supabase
+        const quotasResponse = await supabase
           .from('department_quotas')
           .select('*')
-          .eq('tenant_id', userData.tenant_id)
+          .eq('tenant_id', tenantId)
           .order('created_at', { ascending: false });
 
-        if (quotasError) {
-          console.error('查询配额错误:', quotasError);
-          throw quotasError;
+        if (quotasResponse.error) {
+          console.error('查询配额错误:', quotasResponse.error);
+          throw quotasResponse.error;
         }
 
+        const quotasData = quotasResponse.data;
+        
         // 如果没有配额数据，返回空数组
         if (!quotasData || quotasData.length === 0) {
+          console.log('没有找到配额数据');
           return [];
         }
 
         // 获取所有相关部门的信息
         const departmentIds = quotasData.map(quota => quota.department_id);
-        const { data: departmentsData, error: departmentsError } = await supabase
+        const departmentsResponse = await supabase
           .from('departments')
           .select('id, name')
           .in('id', departmentIds);
 
-        if (departmentsError) {
-          console.error('查询部门错误:', departmentsError);
-          throw departmentsError;
+        if (departmentsResponse.error) {
+          console.error('查询部门错误:', departmentsResponse.error);
+          throw departmentsResponse.error;
         }
 
+        const departmentsData = departmentsResponse.data;
         console.log('获取到的配额数据:', quotasData);
         console.log('获取到的部门数据:', departmentsData);
 
         // 合并配额和部门数据
         const formattedQuotas = quotasData.map(quota => ({
           ...quota,
-          department: departmentsData?.find(dept => dept.id === quota.department_id) || {
+          department: departmentsData.find(dept => dept.id === quota.department_id) || {
             id: quota.department_id,
             name: '未知部门'
           }
