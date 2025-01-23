@@ -9,19 +9,6 @@ import { StaffSelector } from '@/components/quota/staff/components/StaffSelector
 import { DateRange } from 'react-day-picker';
 import { UsageChart } from './UsageChart';
 
-interface UsageData {
-  id: string;
-  amount: number;
-  service_type: string;
-  created_at: string;
-  staff: { username: string } | null;
-  staff_quota: {
-    department_quota: {
-      department: { name: string } | null;
-    } | null;
-  } | null;
-}
-
 export const QuotaStatistics = () => {
   // 状态管理
   const [serviceType, setServiceType] = useState('all');
@@ -30,6 +17,7 @@ export const QuotaStatistics = () => {
   const [staff, setStaff] = useState('');
   const [dateRange, setDateRange] = useState<DateRange>();
 
+  // 获取使用统计数据
   const { data: usageData, isLoading } = useQuery({
     queryKey: ['quota-usage', serviceType, timeUnit, department, staff, dateRange],
     queryFn: async () => {
@@ -43,7 +31,7 @@ export const QuotaStatistics = () => {
           staff:staff_id(username),
           staff_quota:staff_quota_id(
             department_quota:department_quota_id(
-              department:departments(name)
+              department:department_id(name)
             )
           )
         `);
@@ -71,7 +59,7 @@ export const QuotaStatistics = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as unknown as UsageData[];
+      return data;
     },
   });
 
@@ -103,13 +91,7 @@ export const QuotaStatistics = () => {
 
       <Card className="p-6">
         <h3 className="text-lg font-medium mb-4">额度使用趋势</h3>
-        {isLoading ? (
-          <div className="flex items-center justify-center h-[400px]">
-            <p>加载中...</p>
-          </div>
-        ) : (
-          <UsageChart data={usageData || []} />
-        )}
+        <UsageChart data={usageData || []} />
       </Card>
     </div>
   );

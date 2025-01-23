@@ -12,12 +12,11 @@ import {
 interface StaffSelectorProps {
   value: string;
   onValueChange: (value: string) => void;
-  departmentId?: string;
 }
 
-export const StaffSelector = ({ value, onValueChange, departmentId }: StaffSelectorProps) => {
+export const StaffSelector = ({ value, onValueChange }: StaffSelectorProps) => {
   const { data: staffList, isLoading } = useQuery({
-    queryKey: ['staff', departmentId],
+    queryKey: ['staff-list'],
     queryFn: async () => {
       // 获取当前用户信息
       const userResponse = await supabase.auth.getUser();
@@ -33,32 +32,15 @@ export const StaffSelector = ({ value, onValueChange, departmentId }: StaffSelec
 
       if (userDataResponse.error) throw userDataResponse.error;
 
-      // 获取员工列表
-      let query = supabase
+      // 获取作业员列表
+      const { data, error } = await supabase
         .from('users')
         .select('id, username')
         .eq('tenant_id', userDataResponse.data.tenant_id);
 
-      if (departmentId) {
-        // 如果指定了部门，则只获取该部门的员工
-        const staffQuotasResponse = await supabase
-          .from('staff_quotas')
-          .select('staff_id')
-          .eq('department_quota_id', departmentId);
-
-        if (staffQuotasResponse.error) throw staffQuotasResponse.error;
-        
-        const staffIds = staffQuotasResponse.data.map(sq => sq.staff_id);
-        if (staffIds.length > 0) {
-          query = query.in('id', staffIds);
-        }
-      }
-
-      const { data, error } = await query;
       if (error) throw error;
       return data || [];
     },
-    enabled: !departmentId || departmentId.length > 0,
   });
 
   if (isLoading) {

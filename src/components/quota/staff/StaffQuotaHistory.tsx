@@ -28,7 +28,7 @@ export const StaffQuotaHistory = () => {
           ),
           department_quota:department_quotas!inner(
             service_type,
-            department:departments(
+            department:departments!inner(
               name
             )
           )
@@ -36,7 +36,7 @@ export const StaffQuotaHistory = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as unknown as StaffQuota[];
+      return data as StaffQuota[];
     },
   });
 
