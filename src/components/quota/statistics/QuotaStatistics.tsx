@@ -59,7 +59,7 @@ export const QuotaStatistics = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
@@ -91,7 +91,13 @@ export const QuotaStatistics = () => {
 
       <Card className="p-6">
         <h3 className="text-lg font-medium mb-4">额度使用趋势</h3>
-        <UsageChart data={usageData || []} />
+        {isLoading ? (
+          <div className="flex items-center justify-center h-[400px]">
+            <p>加载中...</p>
+          </div>
+        ) : (
+          <UsageChart data={usageData || []} />
+        )}
       </Card>
     </div>
   );
