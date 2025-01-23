@@ -37,7 +37,8 @@ export const DepartmentQuotaSelector = ({ value, onValueChange }: DepartmentQuot
         .from('department_quotas')
         .select(`
           *,
-          department:departments!department_quotas_department_id_fkey (
+          department:departments (
+            id,
             name
           )
         `)

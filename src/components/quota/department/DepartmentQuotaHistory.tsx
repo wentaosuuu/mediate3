@@ -40,7 +40,8 @@ export const DepartmentQuotaHistory = () => {
           .from('department_quotas')
           .select(`
             *,
-            department:departments!department_quotas_department_id_fkey (
+            department:departments (
+              id,
               name
             )
           `)
@@ -52,14 +53,7 @@ export const DepartmentQuotaHistory = () => {
           throw quotasError;
         }
 
-        // 转换数据结构以匹配 DepartmentQuota 类型
-        const formattedQuotas: DepartmentQuota[] = (quotasData || []).map(quota => ({
-          ...quota,
-          department: quota.department || null
-        }));
-
-        console.log('格式化后的配额数据:', formattedQuotas);
-        return formattedQuotas;
+        return quotasData || [];
       } catch (error) {
         console.error('获取配额历史记录失败:', error);
         throw error;

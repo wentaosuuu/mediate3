@@ -31,12 +31,13 @@ export const StaffQuotaHistory = () => {
           .from('staff_quotas')
           .select(`
             *,
-            staff:users!staff_quotas_staff_id_fkey (
+            staff:users (
               username
             ),
-            department_quota:department_quotas!staff_quotas_department_quota_id_fkey (
+            department_quota:department_quotas (
               service_type,
-              department:departments!department_quotas_department_id_fkey (
+              department:departments (
+                id,
                 name
               )
             )
