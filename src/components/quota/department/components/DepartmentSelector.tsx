@@ -15,26 +15,31 @@ interface DepartmentSelectorProps {
 }
 
 export const DepartmentSelector = ({ value, onValueChange }: DepartmentSelectorProps) => {
-  // 模拟测试数据
-  const testDepartments = [
-    { id: '1', name: '调解一部' },
-    { id: '2', name: '调解二部' },
-    { id: '3', name: '调解三部' },
-  ];
-
   const { data: departments, isLoading } = useQuery({
     queryKey: ['departments'],
     queryFn: async () => {
-      // 在实际环境中使用这段代码
-      // const { data, error } = await supabase
-      //   .from('departments')
-      //   .select('id, name');
-      
-      // if (error) throw error;
-      // return data;
-      
-      // 使用测试数据
-      return testDepartments;
+      // 获取当前用户信息
+      const userResponse = await supabase.auth.getUser();
+      if (userResponse.error) throw userResponse.error;
+      if (!userResponse.data.user) throw new Error('未登录');
+
+      // 获取用户的tenant_id
+      const userDataResponse = await supabase
+        .from('users')
+        .select('tenant_id')
+        .eq('id', userResponse.data.user.id)
+        .single();
+
+      if (userDataResponse.error) throw userDataResponse.error;
+
+      // 获取部门列表
+      const { data, error } = await supabase
+        .from('departments')
+        .select('id, name')
+        .eq('tenant_id', userDataResponse.data.tenant_id);
+
+      if (error) throw error;
+      return data || [];
     },
   });
 
