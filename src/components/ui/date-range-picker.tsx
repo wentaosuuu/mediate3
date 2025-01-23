@@ -18,7 +18,6 @@ interface DateRangePickerProps {
 }
 
 export function DateRangePicker({ value, onChange, className }: DateRangePickerProps) {
-  // 添加重置功能
   const handleReset = () => {
     onChange?.(undefined);
   };
@@ -31,7 +30,7 @@ export function DateRangePicker({ value, onChange, className }: DateRangePickerP
             id="date"
             variant={"outline"}
             className={cn(
-              "w-full justify-start text-left font-normal bg-white",
+              "w-full h-10 justify-start text-left font-normal bg-white",
               !value && "text-muted-foreground"
             )}
           >
@@ -41,7 +40,6 @@ export function DateRangePicker({ value, onChange, className }: DateRangePickerP
                 <>
                   {format(value.from, "yyyy-MM-dd")} -{" "}
                   {format(value.to, "yyyy-MM-dd")}
-                  {/* 添加重置按钮 */}
                   <X 
                     className="ml-auto h-4 w-4 hover:text-destructive"
                     onClick={(e) => {

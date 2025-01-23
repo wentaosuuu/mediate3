@@ -1,5 +1,4 @@
 import React from 'react';
-import { Calendar } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -14,40 +13,35 @@ interface TimeUnitSelectorProps {
   value: string;
   onValueChange: (value: string) => void;
   dateRange?: DateRange;
-  onDateRangeChange?: (range: DateRange | undefined) => void;
+  onDateRangeChange?: (dateRange: DateRange | undefined) => void;
 }
 
-export const TimeUnitSelector = ({ 
-  value, 
+export const TimeUnitSelector = ({
+  value,
   onValueChange,
   dateRange,
-  onDateRangeChange 
+  onDateRangeChange,
 }: TimeUnitSelectorProps) => {
   return (
-    <div className="flex items-start gap-4">
-      <div className="flex items-center gap-2">
-        <Calendar className="h-5 w-5 text-gray-500" />
-        <Select value={value} onValueChange={onValueChange}>
-          <SelectTrigger className="w-[180px] bg-white">
-            <SelectValue placeholder="选择时间维度" />
-          </SelectTrigger>
-          <SelectContent className="bg-white">
-            <SelectItem value="day">按天</SelectItem>
-            <SelectItem value="week">按周</SelectItem>
-            <SelectItem value="month">按月</SelectItem>
-            <SelectItem value="custom">自定义</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      
+    <div className="space-y-2">
+      <Select value={value} onValueChange={onValueChange}>
+        <SelectTrigger className="bg-white h-10">
+          <SelectValue placeholder="选择时间维度" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="day">按天</SelectItem>
+          <SelectItem value="week">按周</SelectItem>
+          <SelectItem value="month">按月</SelectItem>
+          <SelectItem value="custom">自定义</SelectItem>
+        </SelectContent>
+      </Select>
+
       {value === 'custom' && (
-        <div className="w-full">
-          <DateRangePicker
-            value={dateRange}
-            onChange={onDateRangeChange}
-            className="w-full"
-          />
-        </div>
+        <DateRangePicker
+          value={dateRange}
+          onChange={onDateRangeChange}
+          className="h-10"
+        />
       )}
     </div>
   );
