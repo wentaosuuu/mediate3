@@ -37,8 +37,19 @@ export const DepartmentQuotaHistory = () => {
         const { data: quotasData, error: quotasError } = await supabase
           .from('department_quotas')
           .select(`
-            *,
-            departments!department_quotas_department_id_fkey (
+            id,
+            tenant_id,
+            department_id,
+            service_type,
+            time_unit,
+            quota_amount,
+            remaining_amount,
+            start_date,
+            end_date,
+            created_at,
+            created_by,
+            updated_at,
+            departments (
               id,
               name
             )
@@ -52,12 +63,12 @@ export const DepartmentQuotaHistory = () => {
         }
 
         // 转换数据格式以匹配 DepartmentQuota 类型
-        const formattedQuotas = quotasData?.map(quota => ({
+        const formattedQuotas: DepartmentQuota[] = quotasData?.map(quota => ({
           ...quota,
           department: quota.departments
-        }));
+        })) || [];
 
-        return formattedQuotas || [];
+        return formattedQuotas;
       } catch (error) {
         console.error('获取配额历史记录失败:', error);
         throw error;

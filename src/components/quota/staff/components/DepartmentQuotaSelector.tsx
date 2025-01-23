@@ -38,8 +38,11 @@ export const DepartmentQuotaSelector = ({ value, onValueChange, serviceType }: D
       let query = supabase
         .from('department_quotas')
         .select(`
-          *,
-          departments!department_quotas_department_id_fkey (
+          id,
+          quota_amount,
+          remaining_amount,
+          service_type,
+          departments!inner (
             name
           )
         `)

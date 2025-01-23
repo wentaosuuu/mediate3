@@ -28,12 +28,20 @@ export const StaffQuotaHistory = () => {
         const { data: quotasData, error: quotasError } = await supabase
           .from('staff_quotas')
           .select(`
-            *,
-            users!staff_quotas_staff_id_fkey (username) as staff,
-            users!staff_quotas_created_by_fkey (username) as created_by_user,
-            department_quotas!staff_quotas_department_quota_id_fkey (
+            id,
+            tenant_id,
+            department_quota_id,
+            staff_id,
+            quota_amount,
+            remaining_amount,
+            created_at,
+            created_by,
+            updated_at,
+            staff:staff_id (username),
+            created_by_user:created_by (username),
+            department_quotas!inner (
               service_type,
-              departments!department_quotas_department_id_fkey (name) as department
+              departments!inner (name)
             )
           `)
           .eq('tenant_id', userDataResponse.data.tenant_id)
@@ -78,7 +86,7 @@ export const StaffQuotaHistory = () => {
           {quotas?.map((quota) => (
             <tr key={quota.id} className="bg-white border-b hover:bg-gray-50">
               <td className="px-6 py-4">{quota.staff?.username}</td>
-              <td className="px-6 py-4">{quota.department_quotas?.department?.name}</td>
+              <td className="px-6 py-4">{quota.department_quotas?.departments?.name}</td>
               <td className="px-6 py-4">{getServiceTypeName(quota.department_quotas?.service_type)}</td>
               <td className="px-6 py-4">{quota.quota_amount}</td>
               <td className="px-6 py-4">{quota.remaining_amount}</td>
