@@ -24,7 +24,7 @@ export const TimeUnitSelector = ({
 }: TimeUnitSelectorProps) => {
   return (
     <div>
-      <label className="text-sm font-medium mb-2 block">时间维度</label>
+      <label className="text-sm font-medium mb-2 block">选择时间</label>
       <div className="space-y-2">
         <Select value={value} onValueChange={onValueChange}>
           <SelectTrigger className="bg-white h-10">
