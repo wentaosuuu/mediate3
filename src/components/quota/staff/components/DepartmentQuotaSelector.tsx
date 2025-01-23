@@ -39,7 +39,7 @@ export const DepartmentQuotaSelector = ({ value, onValueChange, serviceType }: D
         .from('department_quotas')
         .select(`
           *,
-          department:departments (
+          departments!department_quotas_department_id_fkey (
             name
           )
         `)
@@ -76,7 +76,7 @@ export const DepartmentQuotaSelector = ({ value, onValueChange, serviceType }: D
           <SelectContent className="bg-white">
             {quotas?.map((quota) => (
               <SelectItem key={quota.id} value={quota.id} className="hover:bg-gray-100">
-                {quota.department?.name} - {quota.service_type}
+                {quota.departments?.name} - {quota.service_type}
               </SelectItem>
             ))}
           </SelectContent>

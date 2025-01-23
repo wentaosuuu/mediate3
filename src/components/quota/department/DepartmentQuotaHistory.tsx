@@ -33,14 +33,12 @@ export const DepartmentQuotaHistory = () => {
           throw new Error('获取租户信息失败');
         }
 
-        console.log('当前用户tenant_id:', userData.tenant_id);
-
         // 获取部门配额数据
         const { data: quotasData, error: quotasError } = await supabase
           .from('department_quotas')
           .select(`
             *,
-            department:departments (
+            departments!department_quotas_department_id_fkey (
               id,
               name
             )
@@ -53,7 +51,13 @@ export const DepartmentQuotaHistory = () => {
           throw quotasError;
         }
 
-        return quotasData || [];
+        // 转换数据格式以匹配 DepartmentQuota 类型
+        const formattedQuotas = quotasData?.map(quota => ({
+          ...quota,
+          department: quota.departments
+        }));
+
+        return formattedQuotas || [];
       } catch (error) {
         console.error('获取配额历史记录失败:', error);
         throw error;
