@@ -8,6 +8,7 @@ import SmsService from './pages/mediation/SmsService';
 import SmsRecords from './pages/mediation/SmsRecords';
 import DepartmentQuota from './pages/quota/DepartmentQuota';
 import StaffQuota from './pages/quota/StaffQuota';
+import Statistics from './pages/quota/Statistics';
 import Balance from './pages/wallet/Balance';
 import Orders from './pages/wallet/Orders';
 import Purchase from './pages/wallet/Purchase';
@@ -25,6 +26,7 @@ function App() {
         <Route path="/mediation/sms-records" element={<SmsRecords />} />
         <Route path="/quota/department" element={<DepartmentQuota />} />
         <Route path="/quota/staff" element={<StaffQuota />} />
+        <Route path="/quota/statistics" element={<Statistics />} />
         <Route path="/wallet/balance" element={<Balance />} />
         <Route path="/wallet/orders" element={<Orders />} />
         <Route path="/wallet/purchase" element={<Purchase />} />

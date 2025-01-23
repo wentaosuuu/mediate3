@@ -84,7 +84,6 @@ export const QuotaStatistics = () => {
           <StaffSelector
             value={staff}
             onValueChange={setStaff}
-            departmentId={department}
           />
         </div>
       </Card>
