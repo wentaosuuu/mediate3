@@ -9,6 +9,19 @@ import { StaffSelector } from '@/components/quota/staff/components/StaffSelector
 import { DateRange } from 'react-day-picker';
 import { UsageChart } from './UsageChart';
 
+interface UsageData {
+  id: string;
+  amount: number;
+  service_type: string;
+  created_at: string;
+  staff: { username: string } | null;
+  staff_quota: {
+    department_quota: {
+      department: { name: string } | null;
+    } | null;
+  } | null;
+}
+
 export const QuotaStatistics = () => {
   // 状态管理
   const [serviceType, setServiceType] = useState('all');
@@ -58,14 +71,14 @@ export const QuotaStatistics = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as unknown as UsageData[];
+      return data as UsageData[];
     },
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-[1200px] mx-auto px-4">
       <Card className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
           <ServiceTypeSelector
             value={serviceType}
             onValueChange={setServiceType}

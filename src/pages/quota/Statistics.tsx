@@ -20,15 +20,13 @@ const Statistics = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="fixed left-0 top-0 h-full w-64 z-30">
-        <Navigation
-          currentPath="/quota/statistics"
-          onMenuClick={(path) => navigate(path)}
-        />
-      </div>
-
-      <div className="pl-64 min-h-screen">
+    <div className="flex h-screen bg-gray-100">
+      <Navigation
+        currentPath="/quota/statistics"
+        onMenuClick={(path) => navigate(path)}
+      />
+      
+      <div className="flex-1 flex flex-col overflow-hidden">
         <TopBar
           username={mockUser.username}
           department={mockUser.department}

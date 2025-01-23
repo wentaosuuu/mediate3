@@ -16,9 +16,9 @@ export const MainContent = ({ username, currentPath, children }: MainContentProp
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-50">
+    <div className="flex-1 flex flex-col bg-gray-50 overflow-hidden">
       <TabManager currentPath={currentPath} />
-      <div className="flex-1 p-6 overflow-auto">
+      <div className="flex-1 overflow-auto">
         {renderContent()}
       </div>
     </div>
