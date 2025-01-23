@@ -29,17 +29,11 @@ export const StaffQuotaHistory = () => {
           .from('staff_quotas')
           .select(`
             *,
-            staff:staff_id (
-              username
-            ),
-            created_by_user:created_by (
-              username
-            ),
-            department_quota:department_quotas (
+            staff:staff_id(username),
+            created_by_user:created_by(username),
+            department_quota:department_quotas(
               service_type,
-              department:departments (
-                name
-              )
+              department:departments(name)
             )
           `)
           .eq('tenant_id', userDataResponse.data.tenant_id)

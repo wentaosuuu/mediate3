@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface DepartmentQuotaSelectorProps {
   value: string;
@@ -61,21 +62,44 @@ export const DepartmentQuotaSelector = ({ value, onValueChange, serviceType }: D
     return <div>加载中...</div>;
   }
 
+  // 获取当前选中的配额信息
+  const selectedQuota = quotas?.find(quota => quota.id === value);
+
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">选择部门配额</label>
-      <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger className="w-full bg-white border-gray-300">
-          <SelectValue placeholder="请选择部门配额" />
-        </SelectTrigger>
-        <SelectContent className="bg-white">
-          {quotas?.map((quota) => (
-            <SelectItem key={quota.id} value={quota.id} className="hover:bg-gray-100">
-              {quota.department?.name} - {quota.service_type} (剩余: {quota.remaining_amount})
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">选择部门配额</label>
+        <Select value={value} onValueChange={onValueChange}>
+          <SelectTrigger className="w-full bg-white border-gray-300">
+            <SelectValue placeholder="请选择部门配额" />
+          </SelectTrigger>
+          <SelectContent className="bg-white">
+            {quotas?.map((quota) => (
+              <SelectItem key={quota.id} value={quota.id} className="hover:bg-gray-100">
+                {quota.department?.name} - {quota.service_type}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* 显示选中部门的可分配额度信息 */}
+      {selectedQuota && (
+        <Card className="bg-blue-50 border-blue-200">
+          <CardContent className="pt-4">
+            <div className="text-sm text-blue-800">
+              <div className="flex justify-between mb-2">
+                <span>部门总额度：</span>
+                <span className="font-semibold">{selectedQuota.quota_amount}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>可分配额度：</span>
+                <span className="font-semibold text-green-600">{selectedQuota.remaining_amount}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
