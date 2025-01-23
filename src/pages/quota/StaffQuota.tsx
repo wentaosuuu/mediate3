@@ -3,11 +3,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { TabManager } from '@/components/dashboard/TabManager';
-import { DepartmentQuotaForm } from '@/components/quota/department/DepartmentQuotaForm';
-import { DepartmentQuotaHistory } from '@/components/quota/department/DepartmentQuotaHistory';
+import { StaffQuotaForm } from '@/components/quota/staff/StaffQuotaForm';
+import { StaffQuotaHistory } from '@/components/quota/staff/StaffQuotaHistory';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-const DepartmentQuota = () => {
+const StaffQuota = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -45,7 +45,7 @@ const DepartmentQuota = () => {
         <div className="mt-32 p-6">
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-semibold text-gray-800">部门额度分配</h2>
+              <h2 className="text-2xl font-semibold text-gray-800">作业员额度分配</h2>
             </div>
             
             {/* 额度分配表单 */}
@@ -54,7 +54,7 @@ const DepartmentQuota = () => {
                 <CardTitle className="text-lg font-medium text-gray-700">配额设置</CardTitle>
               </CardHeader>
               <CardContent>
-                <DepartmentQuotaForm />
+                <StaffQuotaForm />
               </CardContent>
             </Card>
 
@@ -64,7 +64,7 @@ const DepartmentQuota = () => {
                 <CardTitle className="text-lg font-medium text-gray-700">历史记录</CardTitle>
               </CardHeader>
               <CardContent>
-                <DepartmentQuotaHistory />
+                <StaffQuotaHistory />
               </CardContent>
             </Card>
           </div>
@@ -74,4 +74,4 @@ const DepartmentQuota = () => {
   );
 };
 
-export default DepartmentQuota;
+export default StaffQuota;

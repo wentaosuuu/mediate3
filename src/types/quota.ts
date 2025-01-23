@@ -27,3 +27,9 @@ export interface DepartmentQuotaFormData {
   amount: number;
   dateRange?: DateRange;
 }
+
+export interface StaffQuotaFormData {
+  departmentQuotaId: string;
+  staffId: string;
+  amount: number;
+}
