@@ -34,15 +34,12 @@ export const DepartmentQuotaHistory = () => {
           throw tenantError;
         }
 
-        console.log('当前用户tenant_id:', userData.tenant_id); // 添加日志
+        console.log('当前用户tenant_id:', userData.tenant_id);
 
-        // 获取部门配额数据，使用join查询同时获取部门信息
+        // 获取部门配额数据
         const { data: quotasData, error: quotasError } = await supabase
           .from('department_quotas')
-          .select(`
-            *,
-            departments:departments(id, name)
-          `)
+          .select('*')
           .eq('tenant_id', userData.tenant_id)
           .order('created_at', { ascending: false });
 
@@ -51,15 +48,30 @@ export const DepartmentQuotaHistory = () => {
           throw quotasError;
         }
 
-        console.log('获取到的配额数据:', quotasData); // 添加日志
+        // 如果没有配额数据，返回空数组
+        if (!quotasData || quotasData.length === 0) {
+          return [];
+        }
 
-        // 处理数据格式
-        const formattedQuotas = quotasData?.map(quota => ({
+        // 获取所有相关部门的信息
+        const departmentIds = quotasData.map(quota => quota.department_id);
+        const { data: departmentsData, error: departmentsError } = await supabase
+          .from('departments')
+          .select('id, name')
+          .in('id', departmentIds);
+
+        if (departmentsError) {
+          console.error('查询部门错误:', departmentsError);
+          throw departmentsError;
+        }
+
+        console.log('获取到的配额数据:', quotasData);
+        console.log('获取到的部门数据:', departmentsData);
+
+        // 合并配额和部门数据
+        const formattedQuotas = quotasData.map(quota => ({
           ...quota,
-          department: quota.departments ? {
-            id: quota.departments.id,
-            name: quota.departments.name
-          } : {
+          department: departmentsData?.find(dept => dept.id === quota.department_id) || {
             id: quota.department_id,
             name: '未知部门'
           }
