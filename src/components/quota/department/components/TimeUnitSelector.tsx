@@ -30,7 +30,7 @@ export const TimeUnitSelector = ({
           <SelectTrigger className="bg-white h-10">
             <SelectValue placeholder="选择时间维度" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white">
             <SelectItem value="day">按天</SelectItem>
             <SelectItem value="week">按周</SelectItem>
             <SelectItem value="month">按月</SelectItem>
