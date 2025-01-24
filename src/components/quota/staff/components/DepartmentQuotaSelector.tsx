@@ -28,6 +28,7 @@ export const DepartmentQuotaSelector = ({
         .select(`
           *,
           department:departments(
+            id,
             name
           )
         `)
@@ -64,7 +65,7 @@ export const DepartmentQuotaSelector = ({
               value={quota.id}
               className="hover:bg-gray-100"
             >
-              {`${quota.department?.name} (剩余: ${quota.remaining_amount})`}
+              {`${quota.department?.name || '-'} (剩余: ${quota.remaining_amount})`}
             </SelectItem>
           ))}
         </SelectContent>

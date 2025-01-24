@@ -53,3 +53,17 @@ export interface StaffQuota {
     department?: Department | null;
   } | null;
 }
+
+export interface UsageData {
+  id: string;
+  amount: number;
+  created_at: string;
+  staff?: {
+    username: string;
+  };
+  staff_quota?: {
+    department_quota?: {
+      department?: Department;
+    };
+  };
+}

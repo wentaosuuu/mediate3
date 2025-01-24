@@ -7,6 +7,7 @@ import { DepartmentSelector } from '@/components/quota/department/components/Dep
 import { StaffSelector } from '@/components/quota/staff/components/StaffSelector';
 import { DateRange } from 'react-day-picker';
 import { UsageChart } from './UsageChart';
+import type { UsageData } from '@/types/quota';
 
 export const QuotaStatistics = () => {
   // 状态管理
@@ -28,7 +29,7 @@ export const QuotaStatistics = () => {
           staff:staff_id(username),
           staff_quota:staff_quota_id(
             department_quota:department_quota_id(
-              department:departments!inner(name)
+              department:departments(name)
             )
           )
         `);
@@ -51,7 +52,7 @@ export const QuotaStatistics = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      return data as UsageData[];
     },
   });
 
