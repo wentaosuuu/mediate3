@@ -27,7 +27,7 @@ export const DepartmentQuotaSelector = ({
         .from('department_quotas')
         .select(`
           *,
-          department:departments!department_id(
+          departments!inner(
             id,
             name
           )
@@ -65,7 +65,7 @@ export const DepartmentQuotaSelector = ({
               value={quota.id}
               className="hover:bg-gray-100"
             >
-              {`${quota.department?.name || '-'} (剩余: ${quota.remaining_amount})`}
+              {`${quota.departments?.name || '-'} (剩余: ${quota.remaining_amount})`}
             </SelectItem>
           ))}
         </SelectContent>
