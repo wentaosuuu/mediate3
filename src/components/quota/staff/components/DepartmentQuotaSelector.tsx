@@ -52,7 +52,7 @@ export const DepartmentQuotaSelector = ({
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">
-        选择部门额度
+        选择部门
       </label>
       <Select value={value} onValueChange={onValueChange}>
         <SelectTrigger className="w-full bg-white border-gray-300">
