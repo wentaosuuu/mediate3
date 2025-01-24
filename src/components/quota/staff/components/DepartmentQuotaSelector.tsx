@@ -56,7 +56,7 @@ export const DepartmentQuotaSelector = ({
       </label>
       <Select value={value} onValueChange={onValueChange}>
         <SelectTrigger className="w-full bg-white border-gray-300">
-          <SelectValue placeholder="请选择部门额度" />
+          <SelectValue placeholder="请选择部门" />
         </SelectTrigger>
         <SelectContent className="bg-white">
           {departmentQuotas?.map((quota) => (
