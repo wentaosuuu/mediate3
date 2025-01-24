@@ -20,7 +20,7 @@ export const DepartmentQuotaHistory = () => {
         .from('department_quotas')
         .select(`
           *,
-          department:departments(
+          department:departments!department_id(
             id,
             name
           )

@@ -26,8 +26,9 @@ export const StaffQuotaHistory = () => {
           created_by_user:users!created_by(
             username
           ),
-          department_quota:department_quotas!inner(
-            department:departments!inner(
+          department_quota:department_quotas!department_quota_id(
+            department:departments!department_id(
+              id,
               name
             )
           )

@@ -27,7 +27,7 @@ export const DepartmentQuotaSelector = ({
         .from('department_quotas')
         .select(`
           *,
-          department:departments(
+          department:departments!department_id(
             id,
             name
           )

@@ -1,8 +1,8 @@
 import { DateRange } from 'react-day-picker';
 
 export interface Department {
-  id?: string;
-  name: string | null;
+  id: string;
+  name: string;
 }
 
 export interface DepartmentQuota {
@@ -63,7 +63,7 @@ export interface UsageData {
   };
   staff_quota?: {
     department_quota?: {
-      department?: Department;
+      department?: Department | null;
     };
   };
 }

@@ -29,7 +29,10 @@ export const QuotaStatistics = () => {
           staff:staff_id(username),
           staff_quota:staff_quota_id(
             department_quota:department_quota_id(
-              department:departments(name)
+              department:departments!department_id(
+                id,
+                name
+              )
             )
           )
         `);
