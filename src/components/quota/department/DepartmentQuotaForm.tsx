@@ -12,7 +12,6 @@ export const DepartmentQuotaForm = () => {
     defaultValues: {
       timeUnit: 'day',
       departmentId: '',
-      serviceType: '',
       amount: undefined,
       dateRange: undefined,
     },
@@ -38,11 +37,9 @@ export const DepartmentQuotaForm = () => {
           timeUnit={watch('timeUnit')}
           dateRange={watch('dateRange')}
           departmentId={watch('departmentId')}
-          serviceType={watch('serviceType')}
           onTimeUnitChange={(value) => setValue('timeUnit', value)}
           onDateRangeChange={(range) => setValue('dateRange', range)}
           onDepartmentChange={(value) => setValue('departmentId', value)}
-          onServiceTypeChange={(value) => setValue('serviceType', value)}
         />
 
         <QuotaFormRight

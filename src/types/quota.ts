@@ -9,7 +9,6 @@ export interface DepartmentQuota {
   id: string;
   tenant_id: string;
   department_id: string;
-  service_type?: string | null;
   time_unit: string;
   quota_amount: number;
   remaining_amount: number;
@@ -24,7 +23,6 @@ export interface DepartmentQuota {
 export interface DepartmentQuotaFormData {
   timeUnit: string;
   departmentId: string;
-  serviceType: string;
   amount: number;
   dateRange?: DateRange;
 }

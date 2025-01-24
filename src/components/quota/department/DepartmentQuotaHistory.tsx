@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getTimeUnitName, formatDate, getServiceTypeName } from '@/utils/quotaUtils';
+import { getTimeUnitName, formatDate } from '@/utils/quotaUtils';
 import type { DepartmentQuota } from '@/types/quota';
 
 export const DepartmentQuotaHistory = () => {
@@ -42,7 +42,6 @@ export const DepartmentQuotaHistory = () => {
         <TableHeader>
           <TableRow>
             <TableHead>部门</TableHead>
-            <TableHead>服务类型</TableHead>
             <TableHead>时间维度</TableHead>
             <TableHead>额度金额</TableHead>
             <TableHead>剩余金额</TableHead>
@@ -55,7 +54,6 @@ export const DepartmentQuotaHistory = () => {
           {quotaHistory?.map((quota) => (
             <TableRow key={quota.id}>
               <TableCell>{quota.department?.name}</TableCell>
-              <TableCell>{getServiceTypeName(quota.service_type)}</TableCell>
               <TableCell>{getTimeUnitName(quota.time_unit)}</TableCell>
               <TableCell>{quota.quota_amount}</TableCell>
               <TableCell>{quota.remaining_amount}</TableCell>
