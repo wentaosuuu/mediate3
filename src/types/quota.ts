@@ -30,7 +30,6 @@ export interface DepartmentQuotaFormData {
 export interface StaffQuotaFormData {
   departmentQuotaId: string;
   staffId: string;
-  serviceType: string;
   amount: number;
 }
 
@@ -51,7 +50,6 @@ export interface StaffQuota {
   staff?: Staff | null;
   created_by_user?: Staff | null;
   department_quota?: {
-    service_type: string | null;
     department?: Department | null;
   } | null;
 }

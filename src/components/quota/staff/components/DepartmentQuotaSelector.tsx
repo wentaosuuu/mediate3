@@ -8,7 +8,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { getServiceTypeName } from '@/utils/quotaUtils';
 
 interface DepartmentQuotaSelectorProps {
   value: string;
@@ -28,7 +27,7 @@ export const DepartmentQuotaSelector = ({
         .from('department_quotas')
         .select(`
           *,
-          department:departments!inner(
+          department:departments(
             name
           )
         `)
@@ -65,7 +64,7 @@ export const DepartmentQuotaSelector = ({
               value={quota.id}
               className="hover:bg-gray-100"
             >
-              {`${quota.department?.name} - ${getServiceTypeName(quota.service_type)} (剩余: ${quota.remaining_amount})`}
+              {`${quota.department?.name} (剩余: ${quota.remaining_amount})`}
             </SelectItem>
           ))}
         </SelectContent>

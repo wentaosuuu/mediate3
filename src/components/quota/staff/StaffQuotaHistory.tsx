@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate, getServiceTypeName } from '@/utils/quotaUtils';
+import { formatDate } from '@/utils/quotaUtils';
 import type { StaffQuota } from '@/types/quota';
 
 export const StaffQuotaHistory = () => {
@@ -27,7 +27,6 @@ export const StaffQuotaHistory = () => {
             username
           ),
           department_quota:department_quotas!inner(
-            service_type,
             department:departments!inner(
               name
             )
@@ -51,7 +50,6 @@ export const StaffQuotaHistory = () => {
           <TableRow>
             <TableHead>作业员</TableHead>
             <TableHead>所属部门</TableHead>
-            <TableHead>服务类型</TableHead>
             <TableHead>额度金额</TableHead>
             <TableHead>剩余金额</TableHead>
             <TableHead>分配人</TableHead>
@@ -63,9 +61,6 @@ export const StaffQuotaHistory = () => {
             <TableRow key={quota.id}>
               <TableCell>{quota.staff?.username}</TableCell>
               <TableCell>{quota.department_quota?.department?.name}</TableCell>
-              <TableCell>
-                {getServiceTypeName(quota.department_quota?.service_type)}
-              </TableCell>
               <TableCell>{quota.quota_amount}</TableCell>
               <TableCell>{quota.remaining_amount}</TableCell>
               <TableCell>{quota.created_by_user?.username}</TableCell>
