@@ -27,8 +27,7 @@ export const CustomerServiceWidget = () => {
   const loadScript = useCallback(() => {
     setIsLoading(true);
     const script = document.createElement('script');
-    // 使用 HTTPS 协议和公网可访问的地址
-    script.src = 'https://chat-box-api.example.com/embed.js'; // 这里需要替换为实际的客服脚本地址
+    script.src = 'http://172.16.20.82:8080/api/application/embed?protocol=http&host=172.16.20.82:8080&token=62bacb3e3b761714';
     script.async = true;
     script.defer = true;
 
