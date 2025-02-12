@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { MessageCircle, X } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 
 export const CustomerServiceWidget = () => {
@@ -14,10 +14,23 @@ export const CustomerServiceWidget = () => {
     script.src = 'http://172.16.20.40:8080/api/application/embed?protocol=http&host=172.16.20.40:8080&token=62bacb3e3b761714';
     script.async = true;
     script.defer = true;
-    script.onload = () => {
-      setScriptLoaded(true);
-      console.log('客服脚本加载成功');
+    
+    // 监听脚本加载和初始化状态
+    const checkMaxKBInitialized = () => {
+      if ((window as any).MaxKB) {
+        setScriptLoaded(true);
+        console.log('客服脚本初始化成功');
+      } else {
+        // 如果还没初始化完成，继续等待
+        setTimeout(checkMaxKBInitialized, 100);
+      }
     };
+
+    script.onload = () => {
+      console.log('客服脚本加载成功，等待初始化...');
+      checkMaxKBInitialized();
+    };
+
     script.onerror = () => {
       toast({
         variant: "destructive",
@@ -25,6 +38,7 @@ export const CustomerServiceWidget = () => {
         description: "请检查网络连接后重试"
       });
     };
+
     document.body.appendChild(script);
 
     // 清理函数
@@ -35,13 +49,26 @@ export const CustomerServiceWidget = () => {
 
   // 切换客服窗口显示状态
   const toggleCustomerService = () => {
-    setIsOpen(!isOpen);
-    // 如果脚本已加载，通过全局方法控制显示/隐藏
-    if (scriptLoaded && (window as any).MaxKB) {
-      if (!isOpen) {
+    if (!scriptLoaded) {
+      toast({
+        title: "客服系统正在加载",
+        description: "请稍候再试"
+      });
+      return;
+    }
+
+    if ((window as any).MaxKB) {
+      try {
+        console.log('切换客服窗口状态，当前状态:', !isOpen);
         (window as any).MaxKB.toggle();
-      } else {
-        (window as any).MaxKB.hide();
+        setIsOpen(!isOpen);
+      } catch (error) {
+        console.error('切换客服窗口失败:', error);
+        toast({
+          variant: "destructive",
+          title: "操作失败",
+          description: "客服系统出现异常"
+        });
       }
     }
   };
