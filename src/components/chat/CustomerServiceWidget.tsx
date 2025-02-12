@@ -42,7 +42,7 @@ export const CustomerServiceWidget = () => {
           
           {/* 客服iframe */}
           <iframe
-            src="http://172.16.20.40:8080/api/application/embed?protocol=http&host=172.16.20.40:8080&token=62bacb3e3b761714"
+            src="https://172.16.20.40:8080/api/application/embed?protocol=https&host=172.16.20.40:8080&token=62bacb3e3b761714"
             className="w-full h-[calc(100%-48px)]"
             style={{ border: 'none' }}
             title="客服系统"
