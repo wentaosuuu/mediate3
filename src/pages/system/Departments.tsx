@@ -1,5 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Navigation } from '@/components/dashboard/Navigation';
+import { TopBar } from '@/components/dashboard/TopBar';
+import { MainContent } from '@/components/dashboard/MainContent';
 import { Plus, Search, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -326,4 +330,44 @@ const DepartmentsManagement = () => {
   );
 };
 
-export default DepartmentsManagement;
+const Departments = () => {
+  const navigate = useNavigate();
+
+  // Mock user data - 实际项目中应该从认证系统获取
+  const mockUser = {
+    username: '张三',
+    department: '技术部',
+    role: '管理员'
+  };
+
+  const handleLogout = () => {
+    navigate('/');
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <div className="fixed left-0 top-0 h-full w-64 z-30">
+        <Navigation
+          currentPath="/system/departments"
+          onMenuClick={(path) => navigate(path)}
+        />
+      </div>
+
+      <div className="pl-64 min-h-screen">
+        <TopBar
+          username={mockUser.username}
+          department={mockUser.department}
+          role={mockUser.role}
+          onLogout={handleLogout}
+          onSearch={() => {}}
+          searchQuery=""
+        />
+        <MainContent username={mockUser.username} currentPath="/system/departments">
+          <DepartmentsManagement />
+        </MainContent>
+      </div>
+    </div>
+  );
+};
+
+export default Departments;
