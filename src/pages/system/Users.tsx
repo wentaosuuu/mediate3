@@ -9,9 +9,9 @@ import UsersManagement from './users/UsersManagement';
 const Users = () => {
   const navigate = useNavigate();
 
-  // Mock user data - 实际项目中应该从认证系统获取
+  // 使用正确的用户信息，姓名作为显示名称
   const mockUser = {
-    username: '张三',
+    username: '张三', // 姓名
     department: '技术部',
     role: '管理员'
   };

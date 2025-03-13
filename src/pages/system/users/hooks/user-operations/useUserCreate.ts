@@ -4,103 +4,98 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { UserFormValues } from '../../components/user-form/UserFormSchema';
 
-// 处理用户创建的钩子
-export const useUserCreate = (fetchUsers: () => Promise<void>) => {
+// 用户创建钩子
+export const useUserCreate = (refreshUsers: () => Promise<void>) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // 创建用户
-  const createUser = async (values: UserFormValues) => {
+  // 创建新用户
+  const createUser = async (values: UserFormValues): Promise<boolean> => {
     setIsLoading(true);
-    
     try {
-      console.log("创建用户，数据:", values);
+      console.log("开始创建用户，用户数据:", values);
       
-      // 创建用户基本信息，让Supabase自动生成ID
+      // 1. 创建用户基本信息
       const { data: userData, error: userError } = await supabase
         .from('users')
         .insert({
           username: values.username,
           name: values.name,
           email: values.email,
-          phone: values.phone,
-          tenant_id: values.tenant_id,
+          phone: values.phone || null,
+          tenant_id: values.tenant_id
         })
-        .select();
-
+        .select('id, username, name, email')
+        .single();
+      
       if (userError) {
-        console.error('创建用户基本信息失败:', userError);
-        throw userError;
+        console.error("创建用户基本信息失败:", userError);
+        throw new Error(`创建用户失败: ${userError.message}`);
       }
       
-      console.log("用户创建成功，返回数据:", userData);
-      
-      // 确保我们有创建的用户ID
-      if (!userData || userData.length === 0) {
-        throw new Error("用户创建成功但未返回用户ID");
+      if (!userData) {
+        throw new Error("创建用户后未返回用户数据");
       }
       
-      const userId = userData[0].id;
+      const userId = userData.id;
+      console.log("用户基本信息创建成功，用户ID:", userId);
       
-      // 处理部门关联
+      // 2. 如果提供了部门ID，创建用户-部门关联
       if (values.department_id) {
-        try {
-          console.log("开始创建用户部门关联，用户ID:", userId, "部门ID:", values.department_id);
-          
-          // 创建用户部门关联
-          const { error: deptError } = await supabase
-            .from('user_departments')
-            .insert({
-              user_id: userId,
-              department_id: values.department_id
-            });
-          
-          if (deptError) {
-            console.error('创建部门关联失败:', deptError);
-            // 记录错误但不中断流程
-          } else {
-            console.log("用户部门关联创建成功");
+        console.log("为用户设置部门:", values.department_id);
+        const { error: deptError } = await supabase.rpc(
+          'upsert_user_department',
+          { 
+            p_user_id: userId, 
+            p_department_id: values.department_id 
           }
-        } catch (deptError) {
-          console.error('处理部门关联时出错:', deptError);
-          // 记录错误但不中断流程
+        );
+        
+        if (deptError) {
+          console.error("创建用户-部门关联失败:", deptError);
+          // 不中断流程，但记录错误
+          toast({
+            title: "设置用户部门失败",
+            description: deptError.message,
+            variant: "destructive",
+          });
         }
       }
       
-      // 处理角色关联
+      // 3. 如果提供了角色ID，创建用户-角色关联
       if (values.role_id) {
-        try {
-          console.log("开始创建用户角色关联，用户ID:", userId, "角色ID:", values.role_id);
-          
-          const { error: roleError } = await supabase
-            .from('user_roles')
-            .insert({
-              user_id: userId,
-              role_id: values.role_id
-            });
-            
-          if (roleError) {
-            console.error('分配角色失败:', roleError);
-            // 记录错误但不中断流程
-          } else {
-            console.log("用户角色关联创建成功");
-          }
-        } catch (roleError) {
-          console.error('处理角色关联时出错:', roleError);
-          // 记录错误但不中断流程
+        console.log("为用户设置角色:", values.role_id);
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: userId,
+            role_id: values.role_id
+          });
+        
+        if (roleError) {
+          console.error("创建用户-角色关联失败:", roleError);
+          // 不中断流程，但记录错误
+          toast({
+            title: "设置用户角色失败",
+            description: roleError.message,
+            variant: "destructive",
+          });
         }
       }
-
-      toast({
-        title: "用户创建成功",
-        description: `用户 ${values.name} 已创建`,
-      });
+      
+      console.log("用户创建成功，用户ID:", userId);
       
       // 刷新用户列表
-      await fetchUsers();
+      await refreshUsers();
+      
+      toast({
+        title: "用户创建成功",
+        description: `已成功创建用户: ${values.username}`,
+      });
+      
       return true;
     } catch (error) {
-      console.error('创建用户失败:', error);
+      console.error("创建用户过程中出错:", error);
       toast({
         title: "创建用户失败",
         description: (error as Error).message,

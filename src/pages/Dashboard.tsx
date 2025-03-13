@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Navigation } from '@/components/dashboard/Navigation';
@@ -9,9 +10,9 @@ const Dashboard = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Mock user data - replace with actual user data later
+  // 从localStorage或者状态管理获取用户信息，这里使用模拟数据
   const mockUser = {
-    username: '张三',
+    username: '张三', // 姓名
     department: '技术部',
     role: '管理员'
   };
