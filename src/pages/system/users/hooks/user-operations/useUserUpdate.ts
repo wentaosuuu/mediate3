@@ -30,65 +30,79 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       
       // 处理部门关联 - 如果选择了部门，则创建或更新用户-部门关联
       if (values.department_id) {
-        // 首先检查是否有现有的 user_departments 表，如果没有则创建
-        const { error: createTableError } = await supabase.rpc(
-          'create_user_departments_if_not_exists', 
-          {} as Record<string, never>
-        );
-        
-        if (createTableError) {
-          console.error('创建用户部门表失败:', createTableError);
-        }
-        
-        // 即使表创建失败（可能是因为已经存在），也继续尝试更新部门关联
-        // 尝试更新用户的部门关联
-        const { error: userDeptError } = await supabase.rpc(
-          'upsert_user_department', 
-          { 
-            p_user_id: currentUser.id, 
-            p_department_id: values.department_id 
-          } as { 
-            p_user_id: string, 
-            p_department_id: string 
+        try {
+          // 首先检查用户部门表是否存在，如果不存在则创建
+          const { error: createTableError } = await supabase.rpc(
+            'create_user_departments_if_not_exists', 
+            {} as Record<string, never>
+          );
+          
+          if (createTableError) {
+            console.error('创建用户部门表失败:', createTableError);
           }
-        );
-        
-        if (userDeptError) {
-          console.error('更新部门关联失败:', userDeptError);
-          // 不中断流程，继续处理角色
+          
+          // 更新用户的部门关联
+          const { error: userDeptError } = await supabase.rpc(
+            'upsert_user_department', 
+            { 
+              p_user_id: currentUser.id, 
+              p_department_id: values.department_id 
+            } as { 
+              p_user_id: string, 
+              p_department_id: string 
+            }
+          );
+          
+          if (userDeptError) {
+            console.error('更新部门关联失败:', userDeptError);
+            // 记录错误但不中断流程
+          }
+        } catch (deptError) {
+          console.error('处理部门关联时出错:', deptError);
+          // 记录错误但不中断流程
         }
       }
       
       // 处理角色关联 - 如果选择了角色
       if (values.role_id) {
-        // 首先检查是否已有角色关联
-        const { data: existingRoles } = await supabase
-          .from('user_roles')
-          .select('*')
-          .eq('user_id', currentUser.id);
-          
-        if (existingRoles && existingRoles.length > 0) {
-          // 已有角色关联，更新它
-          const { error: roleUpdateError } = await supabase
+        try {
+          // 首先检查是否已有角色关联
+          const { data: existingRoles, error: fetchError } = await supabase
             .from('user_roles')
-            .update({ role_id: values.role_id })
+            .select('*')
             .eq('user_id', currentUser.id);
             
-          if (roleUpdateError) {
-            console.error('更新角色失败:', roleUpdateError);
+          if (fetchError) {
+            console.error('获取角色关联失败:', fetchError);
+            // 但继续处理
           }
-        } else {
-          // 没有角色关联，创建新的
-          const { error: roleInsertError } = await supabase
-            .from('user_roles')
-            .insert({
-              user_id: currentUser.id,
-              role_id: values.role_id
-            });
-            
-          if (roleInsertError) {
-            console.error('分配角色失败:', roleInsertError);
+          
+          if (existingRoles && existingRoles.length > 0) {
+            // 已有角色关联，更新它
+            const { error: roleUpdateError } = await supabase
+              .from('user_roles')
+              .update({ role_id: values.role_id })
+              .eq('user_id', currentUser.id);
+              
+            if (roleUpdateError) {
+              console.error('更新角色失败:', roleUpdateError);
+            }
+          } else {
+            // 没有角色关联，创建新的
+            const { error: roleInsertError } = await supabase
+              .from('user_roles')
+              .insert({
+                user_id: currentUser.id,
+                role_id: values.role_id
+              });
+              
+            if (roleInsertError) {
+              console.error('分配角色失败:', roleInsertError);
+            }
           }
+        } catch (roleError) {
+          console.error('处理角色关联时出错:', roleError);
+          // 记录错误但不中断流程
         }
       }
       

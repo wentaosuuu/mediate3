@@ -3,6 +3,13 @@ import { useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+// 定义部门信息接口
+interface DepartmentInfo {
+  user_id: string;
+  department_id: string;
+  department_name: string;
+}
+
 // 获取用户列表的钩子
 export const useFetchUsers = () => {
   const [users, setUsers] = useState<any[]>([]);
@@ -30,19 +37,39 @@ export const useFetchUsers = () => {
       
       // 获取用户关联的部门信息
       const formattedUsers = await Promise.all((data || []).map(async (user) => {
-        // 尝试获取部门信息
-        const { data: deptData } = await supabase.rpc(
-          'get_user_department', 
-          { p_user_id: user.id } as { p_user_id: string }
-        );
-        
-        const departmentInfo = deptData && deptData.length > 0 ? deptData[0] : null;
-        
-        return {
-          ...user,
-          department_id: departmentInfo?.department_id || "",
-          department_name: departmentInfo?.department_name || "-"
-        };
+        try {
+          // 尝试获取部门信息
+          const { data: deptData, error: deptError } = await supabase.rpc(
+            'get_user_department', 
+            { p_user_id: user.id } as { p_user_id: string }
+          );
+          
+          if (deptError) {
+            console.error(`获取用户 ${user.id} 的部门信息失败:`, deptError);
+            return {
+              ...user,
+              department_id: "",
+              department_name: "-"
+            };
+          }
+          
+          const departmentInfo = deptData && Array.isArray(deptData) && deptData.length > 0 
+            ? deptData[0] as DepartmentInfo 
+            : null;
+          
+          return {
+            ...user,
+            department_id: departmentInfo?.department_id || "",
+            department_name: departmentInfo?.department_name || "-"
+          };
+        } catch (err) {
+          console.error(`处理用户 ${user.id} 的部门信息时出错:`, err);
+          return {
+            ...user,
+            department_id: "",
+            department_name: "-"
+          };
+        }
       }));
       
       console.log("格式化后的用户列表:", formattedUsers);
