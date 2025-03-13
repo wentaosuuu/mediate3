@@ -9,7 +9,8 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    https: false, // 显式禁用HTTPS，确保使用HTTP协议
+    // 移除错误的https配置方式，改为正确的方式
+    https: false as any, // 显式禁用HTTPS，确保使用HTTP协议
   },
   plugins: [
     react(),

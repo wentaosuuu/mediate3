@@ -1,0 +1,171 @@
+
+import React, { useState, useEffect, useRef } from 'react';
+import { X } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import {
+  DialogContent,
+  DialogPortal,
+  DialogClose,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Loading } from './Loading';
+import { ErrorDisplay } from './ErrorDisplay';
+import { MaxKbContainer } from './MaxKbContainer';
+import { FallbackContent } from './FallbackContent';
+
+/**
+ * 客服对话框组件
+ * 
+ * 包含MaxKB客服窗口的对话框，处理加载、错误和内容展示
+ */
+interface CustomerServiceDialogProps {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceDialogProps) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [showFallback, setShowFallback] = useState(false);
+  const scriptLoaded = useRef(false);
+  const maxKbContainerId = "maxkb-container";
+  
+  // 加载MaxKB客服脚本
+  useEffect(() => {
+    if (isOpen && !scriptLoaded.current) {
+      setIsLoading(true);
+      setLoadError(false);
+      setShowFallback(false);
+      
+      const script = document.createElement('script');
+      // 确保使用HTTP协议而非相对协议，因为我们已经配置了开发服务器使用HTTP
+      script.src = "http://127.0.0.1:8080/api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714";
+      script.async = true;
+      script.defer = true;
+      
+      // 脚本加载成功处理
+      script.onload = () => {
+        console.log("MaxKB脚本加载成功");
+        scriptLoaded.current = true;
+        setIsLoading(false);
+        
+        // 检查MaxKB是否在容器中成功初始化
+        setTimeout(() => {
+          const container = document.getElementById(maxKbContainerId);
+          if (container && container.childElementCount === 0) {
+            console.log("MaxKB未能成功初始化，可能是连接问题");
+            setLoadError(true);
+          }
+        }, 3000); // 给MaxKB 3秒钟时间来初始化
+      };
+      
+      // 脚本加载失败处理
+      script.onerror = () => {
+        console.error("MaxKB脚本加载失败");
+        setIsLoading(false);
+        setLoadError(true);
+        scriptLoaded.current = false;
+        
+        // 显示更详细的错误信息
+        console.error("可能的原因: 跨域问题、MaxKB服务未运行或网络连接问题");
+      };
+      
+      document.body.appendChild(script);
+      
+      // 清理函数
+      return () => {
+        if (document.body.contains(script)) {
+          document.body.removeChild(script);
+        }
+      };
+    }
+  }, [isOpen]);
+  
+  // 添加开发环境调试信息
+  useEffect(() => {
+    if (isOpen) {
+      console.log("客服窗口状态:", { 
+        isOpen, 
+        isLoading, 
+        loadError, 
+        scriptLoaded: scriptLoaded.current,
+        currentProtocol: window.location.protocol,
+        iframeContainer: document.getElementById(maxKbContainerId)
+      });
+    }
+  }, [isOpen, isLoading, loadError]);
+  
+  // 重试连接
+  const handleRetry = () => {
+    scriptLoaded.current = false;
+    setLoadError(false);
+    setIsLoading(true);
+    setShowFallback(false);
+    
+    // 重新加载脚本
+    const script = document.createElement('script');
+    script.src = "http://127.0.0.1:8080/api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714";
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+  };
+  
+  // 使用备用系统
+  const handleUseFallback = () => {
+    setShowFallback(true);
+  };
+  
+  const isHttps = window.location.protocol === 'https:';
+  
+  return (
+    <>
+      {isOpen && (
+        <DialogPortal>
+          <DialogContent className="fixed bottom-20 right-6 sm:max-w-[425px] w-96 h-[70vh] max-h-[600px] p-0">
+            {/* 浮窗标题栏 */}
+            <div className="flex items-center justify-between px-4 py-2 bg-primary text-white">
+              <DialogTitle className="font-medium text-white">在线客服</DialogTitle>
+              <DialogClose asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-white hover:bg-primary/90 hover:text-white"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </DialogClose>
+            </div>
+            
+            {/* 客服内容区 */}
+            <div className="flex-1 flex flex-col h-full overflow-hidden">
+              {/* 加载中显示 */}
+              {isLoading && <Loading />}
+              
+              {/* 加载错误显示 */}
+              {loadError && !showFallback && (
+                <ErrorDisplay 
+                  onRetry={handleRetry}
+                  onUseFallback={handleUseFallback}
+                  isHttps={isHttps}
+                />
+              )}
+              
+              {/* MaxKB容器 */}
+              <MaxKbContainer 
+                containerId={maxKbContainerId}
+                isHidden={isLoading || loadError}
+              />
+              
+              {/* 如果加载失败并且用户选择了备用系统，显示备用内容 */}
+              {loadError && showFallback && (
+                <div className="absolute inset-0 pt-12">
+                  <FallbackContent />
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </DialogPortal>
+      )}
+    </>
+  );
+};
