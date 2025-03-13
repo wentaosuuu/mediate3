@@ -24,7 +24,9 @@ export const userFormSchema = z.object({
       const formData = ctx.path.length > 0 ? ctx : undefined;
       
       // 通过外部传入的context获取currentUser状态
-      const hasCurrentUser = formData && formData.addIssue && ctx.parent._contextual?.currentUser;
+      // 修复：使用Zod正确的上下文API访问方式
+      const contextData = ctx.contextualErrorMap?.formData;
+      const hasCurrentUser = contextData?.currentUser;
       
       if (!val && !hasCurrentUser) {
         ctx.addIssue({
