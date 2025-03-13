@@ -30,7 +30,8 @@ export const CustomerServiceWidget = () => {
       setLoadError(false);
       
       const script = document.createElement('script');
-      script.src = "http://127.0.0.1:8080/api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714";
+      // 使用相对协议（省略http:），让浏览器自动匹配当前页面的协议
+      script.src = "//127.0.0.1:8080/api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714";
       script.async = true;
       script.defer = true;
       
@@ -56,6 +57,9 @@ export const CustomerServiceWidget = () => {
         setIsLoading(false);
         setLoadError(true);
         scriptLoaded.current = false;
+        
+        // 显示更详细的错误信息
+        console.error("可能的原因: 跨域问题、MaxKB服务未运行或网络连接问题");
       };
       
       document.body.appendChild(script);
@@ -68,6 +72,20 @@ export const CustomerServiceWidget = () => {
       };
     }
   }, [isOpen]);
+
+  // 添加开发环境调试信息
+  useEffect(() => {
+    if (isOpen) {
+      console.log("客服窗口状态:", { 
+        isOpen, 
+        isLoading, 
+        loadError, 
+        scriptLoaded: scriptLoaded.current,
+        currentProtocol: window.location.protocol,
+        iframeContainer: document.getElementById(maxKbContainerId)
+      });
+    }
+  }, [isOpen, isLoading, loadError]);
 
   // 切换客服窗口显示状态
   const toggleCustomerService = () => {
@@ -135,7 +153,14 @@ export const CustomerServiceWidget = () => {
                   <div className="flex-1 flex flex-col items-center justify-center p-6">
                     <div className="text-center">
                       <p className="text-red-500 mb-4">客服系统连接失败</p>
-                      <p className="mb-4 text-sm text-gray-500">可能是由于MaxKB服务未启动或网络问题</p>
+                      <p className="mb-4 text-sm text-gray-500">
+                        可能是由于MaxKB服务未启动、网络问题或跨域限制导致
+                        {window.location.protocol === 'https:' && 
+                          <span className="block mt-1 text-amber-600">
+                            检测到您正在使用HTTPS，而MaxKB使用HTTP，这可能导致浏览器阻止加载
+                          </span>
+                        }
+                      </p>
                       <Button 
                         onClick={() => {
                           scriptLoaded.current = false;
@@ -144,7 +169,7 @@ export const CustomerServiceWidget = () => {
                           
                           // 重新加载脚本
                           const script = document.createElement('script');
-                          script.src = "http://127.0.0.1:8080/api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714";
+                          script.src = "//127.0.0.1:8080/api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714";
                           script.async = true;
                           script.defer = true;
                           document.body.appendChild(script);
