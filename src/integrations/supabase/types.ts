@@ -769,7 +769,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_user_departments_if_not_exists: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      get_user_department: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: {
+          user_id: string
+          department_id: string
+          department_name: string
+        }[]
+      }
+      upsert_user_department: {
+        Args: {
+          p_user_id: string
+          p_department_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

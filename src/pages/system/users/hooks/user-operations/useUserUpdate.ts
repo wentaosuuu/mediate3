@@ -33,6 +33,10 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
         // 首先检查是否有现有的 user_departments 表，如果没有则创建
         const { error: createTableError } = await supabase.rpc('create_user_departments_if_not_exists');
         
+        if (createTableError) {
+          console.error('创建用户部门表失败:', createTableError);
+        }
+        
         // 即使表创建失败（可能是因为已经存在），也继续尝试更新部门关联
         // 尝试更新用户的部门关联
         const { error: userDeptError } = await supabase.rpc('upsert_user_department', {
