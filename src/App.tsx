@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import Index from './pages/Index';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -19,6 +19,9 @@ import RolesManagement from './pages/system/Roles';
 import DepartmentsManagement from './pages/system/Departments';
 import { CustomerServiceWidget } from './components/chat/CustomerServiceWidget';
 import NotFound from './components/NotFound';
+import { Navigation } from '@/components/dashboard/Navigation';
+import { TopBar } from '@/components/dashboard/TopBar';
+import { MainContent } from '@/components/dashboard/MainContent';
 
 function App() {
   return (
@@ -101,8 +104,10 @@ const UnderDevelopmentPage = ({ title }: { title: string }) => {
     role: '管理员'
   };
   
-  const navigate = useNavigate();
-  
+  const navigate = (path: string) => {
+    window.location.href = path;
+  };
+
   const handleLogout = () => {
     navigate('/');
   };
