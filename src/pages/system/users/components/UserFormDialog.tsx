@@ -1,40 +1,19 @@
 
 import React from 'react';
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { 
   Dialog, 
   DialogContent, 
   DialogDescription, 
-  DialogFooter, 
   DialogHeader, 
   DialogTitle
 } from "@/components/ui/dialog";
-import { 
-  Form, 
-  FormControl, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage 
-} from "@/components/ui/form";
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-// 用户表单验证模式
-const userFormSchema = z.object({
-  username: z.string().min(2, { message: "用户名至少需要2个字符" }),
-  email: z.string().email({ message: "请输入有效的邮箱地址" }),
-  phone: z.string().optional(),
-  department_id: z.string().optional(),
-  role_id: z.string().optional(),
-  password: z.string().min(6, { message: "密码至少需要6个字符" }).optional(),
-  tenant_id: z.string()
-});
-
-type UserFormValues = z.infer<typeof userFormSchema>;
+import { Form } from "@/components/ui/form";
+import { userFormSchema, UserFormValues } from './user-form/UserFormSchema';
+import UserBasicInfo from './user-form/UserBasicInfo';
+import UserAssociation from './user-form/UserAssociation';
+import UserFormActions from './user-form/UserFormActions';
 
 interface Department {
   id: string;
@@ -114,143 +93,28 @@ const UserFormDialog = ({
           </DialogDescription>
         </DialogHeader>
         
-        <Form {...form}>
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>用户名</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="请输入用户名" disabled={isLoading} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>邮箱</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="email" placeholder="请输入邮箱" disabled={isLoading} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>电话</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="请输入电话" disabled={isLoading} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            {!currentUser && (
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>密码</FormLabel>
-                    <FormControl>
-                      <Input 
-                        {...field} 
-                        type="password" 
-                        placeholder="请输入密码" 
-                        disabled={isLoading} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-            
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="department_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>部门</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value} 
-                      disabled={isLoading}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="请选择部门" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="">请选择部门</SelectItem>
-                        {departments.map(dept => (
-                          <SelectItem key={dept.id} value={dept.id}>
-                            {dept.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
+        <FormProvider {...form}>
+          <Form>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* 基本信息组件 */}
+              <UserBasicInfo isLoading={isLoading} currentUser={currentUser} />
+              
+              {/* 部门和角色关联组件 */}
+              <UserAssociation 
+                isLoading={isLoading} 
+                departments={departments} 
+                roles={roles} 
               />
               
-              <FormField
-                control={form.control}
-                name="role_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>角色</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value} 
-                      disabled={isLoading}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="请选择角色" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="">请选择角色</SelectItem>
-                        {roles.map(role => (
-                          <SelectItem key={role.id} value={role.id}>
-                            {role.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
+              {/* 表单操作按钮组件 */}
+              <UserFormActions 
+                isLoading={isLoading} 
+                currentUser={currentUser} 
+                onCancel={() => onOpenChange(false)} 
               />
-            </div>
-            
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                取消
-              </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "处理中..." : currentUser ? "保存" : "创建"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+            </form>
+          </Form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );
