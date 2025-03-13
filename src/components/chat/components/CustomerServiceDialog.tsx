@@ -49,7 +49,7 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
       script.id = 'maxkb-script';
       
       // 使用代理路径，确保协议匹配当前页面协议
-      // 使用用户提供的确切嵌入代码参数
+      // 使用用户提供的确切嵌入代码参数，但修正路径为/ui
       script.src = `/maxkb-api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714`;
       script.async = true;
       script.defer = true;
