@@ -21,11 +21,11 @@ export const ErrorDisplay = ({ onRetry, onUseFallback, isHttps = false }: ErrorD
         <AlertTriangle className="h-10 w-10 text-amber-500 mx-auto mb-2" />
         <p className="text-red-500 mb-4">客服系统连接失败</p>
         <p className="mb-4 text-sm text-gray-500">
-          可能是由于MaxKB服务未启动、网络问题或跨域限制导致
+          可能是由于MaxKB服务未启动或网络连接问题导致
           {isHttps && 
             <span className="block mt-1 text-amber-600">
-              检测到您正在使用HTTPS，系统将尝试通过HTTPS连接MaxKB。
-              如果您的MaxKB服务仅支持HTTP，请确保您的浏览器允许混合内容或切换到HTTP访问本站。
+              系统已通过代理尝试解决HTTP/HTTPS混合内容问题。
+              如果问题仍然存在，请确认MaxKB服务是否正在运行在127.0.0.1:8080地址上。
             </span>
           }
         </p>

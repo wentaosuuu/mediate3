@@ -31,21 +31,20 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
       
       const script = document.createElement('script');
       
-      // 使用动态协议
-      const currentProtocol = window.location.protocol;
-      // 基本URL，去掉协议部分
-      const baseUrl = "127.0.0.1:8080";
-      // 如果当前是HTTPS，尝试也使用HTTPS访问MaxKB；否则使用HTTP
-      const protocol = currentProtocol === 'https:' ? 'https' : 'http';
+      // 使用代理解决混合内容问题
+      // 无论当前协议是什么，都使用相对路径，这样会自动匹配当前协议
+      const baseUrl = window.location.hostname === 'localhost' ? 
+        `${window.location.hostname}:${window.location.port}` : 
+        window.location.host;
       
-      // 构建脚本URL
-      script.src = `${protocol}://${baseUrl}/api/application/embed?protocol=${protocol}&host=${baseUrl}&token=62bacb3e3b761714`;
+      // 使用代理路径
+      script.src = `/maxkb-api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714`;
       script.async = true;
       script.defer = true;
       
       // 脚本加载成功处理
       script.onload = () => {
-        console.log(`MaxKB脚本加载成功 (使用${protocol}协议)`);
+        console.log(`MaxKB脚本通过代理加载成功`);
         scriptLoaded.current = true;
         setIsLoading(false);
         
@@ -61,7 +60,7 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
       
       // 脚本加载失败处理
       script.onerror = () => {
-        console.error(`MaxKB脚本加载失败 (尝试使用${protocol}协议)`);
+        console.error(`MaxKB脚本加载失败`);
         setIsLoading(false);
         setLoadError(true);
         scriptLoaded.current = false;
