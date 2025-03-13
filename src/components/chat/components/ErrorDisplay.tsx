@@ -31,11 +31,19 @@ export const ErrorDisplay = ({ onRetry, onUseFallback, isHttps = false }: ErrorD
             <span className="block mt-2 text-amber-600">
               检测到您正在使用HTTPS协议访问，但客服系统使用的是HTTP协议。
               浏览器安全策略可能会阻止HTTPS页面加载HTTP资源，这称为"混合内容"问题。
-              请尝试以下解决方案：
               <br/>
-              1. 在浏览器地址栏点击"盾牌"图标，允许加载不安全内容
-              <br/>
-              2. 或者使用HTTP协议访问本站
+              <strong>解决方法：</strong>
+              <ol className="list-decimal text-left pl-5 mt-1">
+                <li>
+                  在浏览器地址栏右侧或左侧查找安全提示图标（不同浏览器可能是盾牌、锁、感叹号等）
+                </li>
+                <li>
+                  点击该图标，寻找"允许不安全内容"、"加载不安全脚本"或类似选项
+                </li>
+                <li>
+                  或者尝试更改您的URL，从https://改为http://（去掉s）来访问本站
+                </li>
+              </ol>
             </span>
           }
         </p>
