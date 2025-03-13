@@ -92,7 +92,14 @@ const UserFormDialog = ({
   // 处理表单提交
   const handleSubmit = form.handleSubmit(async (values) => {
     console.log("提交表单数据:", values);
-    await onSubmit(values);
+    try {
+      await onSubmit(values);
+      // 成功后主动关闭对话框
+      onOpenChange(false);
+    } catch (error) {
+      console.error("表单提交失败:", error);
+      // 错误已在onSubmit中处理，这里不需要额外处理
+    }
   });
 
   // 当对话框关闭时记录日志

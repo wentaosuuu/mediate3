@@ -40,7 +40,7 @@ export const useFetchUsers = () => {
         try {
           // 尝试获取部门信息
           const { data: deptData, error: deptError } = await supabase.rpc(
-            'get_user_department', 
+            'get_user_department',
             { p_user_id: user.id } as { p_user_id: string }
           );
           
@@ -57,17 +57,26 @@ export const useFetchUsers = () => {
             ? deptData[0] as DepartmentInfo 
             : null;
           
+          // 获取用户角色信息
+          const { data: roleData, error: roleError } = await supabase
+            .from('user_roles')
+            .select('role_id')
+            .eq('user_id', user.id)
+            .single();
+            
           return {
             ...user,
             department_id: departmentInfo?.department_id || "",
-            department_name: departmentInfo?.department_name || "-"
+            department_name: departmentInfo?.department_name || "-",
+            role_id: roleError ? "" : roleData?.role_id || ""
           };
         } catch (err) {
-          console.error(`处理用户 ${user.id} 的部门信息时出错:`, err);
+          console.error(`处理用户 ${user.id} 的信息时出错:`, err);
           return {
             ...user,
             department_id: "",
-            department_name: "-"
+            department_name: "-",
+            role_id: ""
           };
         }
       }));

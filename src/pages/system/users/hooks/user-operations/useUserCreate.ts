@@ -13,6 +13,8 @@ export const useUserCreate = (fetchUsers: () => Promise<void>) => {
   const createUser = async (values: UserFormValues) => {
     setIsLoading(true);
     try {
+      console.log("创建用户，数据:", values);
+      
       // 生成一个随机ID
       const userId = crypto.randomUUID();
       
@@ -29,17 +31,59 @@ export const useUserCreate = (fetchUsers: () => Promise<void>) => {
 
       if (error) throw error;
       
+      // 如果选择了部门，则创建或更新用户-部门关联
+      if (values.department_id) {
+        try {
+          // 首先检查用户部门表是否存在，如果不存在则创建
+          const { error: createTableError } = await supabase.rpc(
+            'create_user_departments_if_not_exists', 
+            {} as Record<string, never>
+          );
+          
+          if (createTableError) {
+            console.error('创建用户部门表失败:', createTableError);
+            // 记录错误但不中断流程
+          }
+          
+          // 更新用户的部门关联
+          const { error: userDeptError } = await supabase.rpc(
+            'upsert_user_department', 
+            { 
+              p_user_id: userId, 
+              p_department_id: values.department_id 
+            } as { 
+              p_user_id: string, 
+              p_department_id: string 
+            }
+          );
+          
+          if (userDeptError) {
+            console.error('创建部门关联失败:', userDeptError);
+            // 记录错误但不中断流程
+          }
+        } catch (deptError) {
+          console.error('处理部门关联时出错:', deptError);
+          // 记录错误但不中断流程
+        }
+      }
+      
       // 如果选择了角色，则添加用户-角色关联
       if (values.role_id) {
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .insert({
-            user_id: userId,
-            role_id: values.role_id
-          });
-          
-        if (roleError) {
-          console.error('分配角色失败:', roleError);
+        try {
+          const { error: roleError } = await supabase
+            .from('user_roles')
+            .insert({
+              user_id: userId,
+              role_id: values.role_id
+            });
+            
+          if (roleError) {
+            console.error('分配角色失败:', roleError);
+            // 记录错误但不中断流程
+          }
+        } catch (roleError) {
+          console.error('处理角色关联时出错:', roleError);
+          // 记录错误但不中断流程
         }
       }
 
@@ -49,7 +93,7 @@ export const useUserCreate = (fetchUsers: () => Promise<void>) => {
       });
       
       // 刷新用户列表
-      fetchUsers();
+      await fetchUsers();
       return true;
     } catch (error) {
       console.error('创建用户失败:', error);

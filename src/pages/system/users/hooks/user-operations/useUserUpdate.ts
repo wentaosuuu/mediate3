@@ -39,23 +39,24 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
           
           if (createTableError) {
             console.error('创建用户部门表失败:', createTableError);
-          }
-          
-          // 更新用户的部门关联
-          const { error: userDeptError } = await supabase.rpc(
-            'upsert_user_department', 
-            { 
-              p_user_id: currentUser.id, 
-              p_department_id: values.department_id 
-            } as { 
-              p_user_id: string, 
-              p_department_id: string 
+            // 继续尝试其他操作
+          } else {
+            // 如果表创建成功或已存在，则更新用户的部门关联
+            const { error: userDeptError } = await supabase.rpc(
+              'upsert_user_department', 
+              { 
+                p_user_id: currentUser.id, 
+                p_department_id: values.department_id 
+              } as { 
+                p_user_id: string, 
+                p_department_id: string 
+              }
+            );
+            
+            if (userDeptError) {
+              console.error('更新部门关联失败:', userDeptError);
+              // 记录错误但不中断流程
             }
-          );
-          
-          if (userDeptError) {
-            console.error('更新部门关联失败:', userDeptError);
-            // 记录错误但不中断流程
           }
         } catch (deptError) {
           console.error('处理部门关联时出错:', deptError);
@@ -86,6 +87,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
               
             if (roleUpdateError) {
               console.error('更新角色失败:', roleUpdateError);
+              // 记录错误但不中断流程
             }
           } else {
             // 没有角色关联，创建新的
@@ -98,6 +100,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
               
             if (roleInsertError) {
               console.error('分配角色失败:', roleInsertError);
+              // 记录错误但不中断流程
             }
           }
         } catch (roleError) {
