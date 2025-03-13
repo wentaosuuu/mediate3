@@ -19,15 +19,19 @@ export const useUserOperations = (fetchUsers: () => Promise<void>) => {
   const { deleteUser } = useUserDelete(fetchUsers);
 
   // 处理用户创建或更新的统一入口
-  const handleSubmit = async (values: UserFormValues) => {
+  const handleSubmit = async (values: UserFormValues): Promise<boolean> => {
+    let success = false;
     if (currentUser) {
       // 更新现有用户
-      await updateUser(values, currentUser);
+      success = await updateUser(values, currentUser);
     } else {
       // 创建新用户
-      await createUser(values);
+      success = await createUser(values);
     }
-    setIsDialogOpen(false);
+    if (success) {
+      setIsDialogOpen(false);
+    }
+    return success;
   };
 
   return {
