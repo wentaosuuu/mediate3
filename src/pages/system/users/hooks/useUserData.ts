@@ -15,7 +15,7 @@ export const useUserData = () => {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      // 简化查询，不再尝试关联departments表
+      // 不尝试获取 department_id，因为该字段在 users 表中不存在
       const { data, error } = await supabase
         .from('users')
         .select(`
@@ -23,7 +23,6 @@ export const useUserData = () => {
           username, 
           email, 
           phone, 
-          department_id,
           tenant_id, 
           created_at, 
           updated_at
@@ -31,16 +30,18 @@ export const useUserData = () => {
 
       if (error) throw error;
       
-      // 手动关联部门名称
+      // 用户数据获取成功后，加载部门信息
+      console.log("获取到的用户列表原始数据:", data);
+      
+      // 将用户数据映射为前端需要的格式
       const formattedUsers = (data || []).map(user => {
-        const userDepartment = departments.find(dept => dept.id === user.department_id);
         return {
           ...user,
-          department_name: userDepartment?.name || '-'
+          department_name: '-' // 默认为无部门
         };
       });
       
-      console.log("获取到的用户列表:", formattedUsers);
+      console.log("格式化后的用户列表:", formattedUsers);
       setUsers(formattedUsers);
     } catch (error) {
       console.error('获取用户列表失败:', error);
@@ -92,8 +93,9 @@ export const useUserData = () => {
     }
   };
 
-  // 修改初始加载顺序，确保先获取部门和角色，然后再获取用户
+  // 初始加载
   useEffect(() => {
+    // 顺序加载数据
     const loadData = async () => {
       await fetchDepartments();
       await fetchRoles();

@@ -19,13 +19,13 @@ export const useUserOperations = (fetchUsers: () => Promise<void>) => {
         // 更新用户
         console.log("更新用户数据:", values, "用户ID:", currentUser.id);
         
+        // 移除 department_id 字段，因为数据库中不存在该字段
         const { error } = await supabase
           .from('users')
           .update({
             username: values.username,
             email: values.email,
             phone: values.phone,
-            department_id: values.department_id,
             updated_at: new Date().toISOString()
           })
           .eq('id', currentUser.id);
@@ -71,10 +71,10 @@ export const useUserOperations = (fetchUsers: () => Promise<void>) => {
         });
       } else {
         // 创建用户
-        // 在实际应用中，这里应该使用 auth.signUp 方法
         // 生成一个随机ID
         const userId = crypto.randomUUID();
         
+        // 创建用户时不包含 department_id 字段
         const { error } = await supabase
           .from('users')
           .insert({
@@ -82,7 +82,6 @@ export const useUserOperations = (fetchUsers: () => Promise<void>) => {
             username: values.username,
             email: values.email,
             phone: values.phone,
-            department_id: values.department_id,
             tenant_id: values.tenant_id,
           });
 
