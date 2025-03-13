@@ -20,7 +20,10 @@ export const userFormSchema = z.object({
     })
     .superRefine((val, ctx) => {
       // 使用superRefine进行更复杂的验证，根据是否存在currentUser决定密码是否必填
-      if (!val && !ctx.path.includes("password") && !ctx.data.currentUser) {
+      const contextData = ctx.path[0] === 'password' ? ctx : undefined;
+      const hasCurrentUser = contextData?.contextualErrorMap?.data?.currentUser;
+      
+      if (!val && !hasCurrentUser) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "创建用户时密码不能为空",

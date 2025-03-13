@@ -15,10 +15,14 @@ export const useUserCreate = (refreshUsers: () => Promise<void>) => {
     try {
       console.log("开始创建用户，用户数据:", values);
       
-      // 1. 创建用户基本信息
+      // 1. 创建用户基本信息 - 使用.insert()而不是受限制的.upsert()
+      // 生成一个UUID用于新用户的ID
+      const newUserId = crypto.randomUUID();
+      
       const { data: userData, error: userError } = await supabase
         .from('users')
         .insert({
+          id: newUserId, // 显式提供ID
           username: values.username,
           name: values.name,
           email: values.email,
