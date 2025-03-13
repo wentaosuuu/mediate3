@@ -25,7 +25,8 @@ export const ErrorDisplay = ({ onRetry, onUseFallback, isHttps = false }: ErrorD
           {isHttps && 
             <span className="block mt-1 text-amber-600">
               系统已通过代理尝试解决HTTP/HTTPS混合内容问题。
-              如果问题仍然存在，请确认MaxKB服务是否正在运行在127.0.0.1:8080地址上。
+              如果问题仍然存在，请确认MaxKB服务是否正在运行，
+              并且能够通过http://127.0.0.1:8080/api访问。
             </span>
           }
         </p>

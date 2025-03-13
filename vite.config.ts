@@ -12,9 +12,11 @@ export default defineConfig(({ mode }) => ({
     // 配置代理，将MaxKB的请求转发到HTTP服务器
     proxy: {
       '/maxkb-api': {
-        target: 'http://127.0.0.1:8080',
+        target: 'http://127.0.0.1:8080', // MaxKB服务地址
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/maxkb-api/, '/api')
+        rewrite: (path) => path.replace(/^\/maxkb-api/, '/api'),
+        secure: false, // 允许无效/自签名证书
+        ws: true       // 支持WebSocket
       }
     }
   },

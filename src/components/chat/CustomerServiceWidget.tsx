@@ -19,6 +19,13 @@ export const CustomerServiceWidget = () => {
     setIsOpen(!isOpen);
     
     if (!isOpen) {
+      // 检测当前环境
+      const protocol = window.location.protocol;
+      const host = window.location.host;
+      
+      console.log(`当前环境：${protocol}//${host}`);
+      console.log(`尝试通过代理加载MaxKB：/maxkb-api/...`);
+      
       toast({
         title: "已打开客服窗口",
         description: "正在加载MaxKB客服系统..."

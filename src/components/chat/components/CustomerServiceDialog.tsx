@@ -21,6 +21,7 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
   const [showFallback, setShowFallback] = useState(false);
   const scriptLoaded = useRef(false);
   const maxKbContainerId = "maxkb-container";
+  const loadAttempts = useRef(0);
   
   // 加载MaxKB客服脚本
   useEffect(() => {
@@ -29,15 +30,25 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
       setLoadError(false);
       setShowFallback(false);
       
+      // 清除之前可能存在的脚本
+      const existingScript = document.getElementById('maxkb-script');
+      if (existingScript && existingScript.parentNode) {
+        existingScript.parentNode.removeChild(existingScript);
+      }
+      
+      // 清除可能存在的MaxKB相关元素
+      const container = document.getElementById(maxKbContainerId);
+      if (container) {
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
+        }
+      }
+      
+      // 创建新脚本标签
       const script = document.createElement('script');
+      script.id = 'maxkb-script';
       
-      // 使用代理解决混合内容问题
-      // 无论当前协议是什么，都使用相对路径，这样会自动匹配当前协议
-      const baseUrl = window.location.hostname === 'localhost' ? 
-        `${window.location.hostname}:${window.location.port}` : 
-        window.location.host;
-      
-      // 使用代理路径
+      // 使用代理路径，确保协议匹配当前页面协议
       script.src = `/maxkb-api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714`;
       script.async = true;
       script.defer = true;
@@ -47,6 +58,7 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
         console.log(`MaxKB脚本通过代理加载成功`);
         scriptLoaded.current = true;
         setIsLoading(false);
+        loadAttempts.current = 0;
         
         // 检查MaxKB是否在容器中成功初始化
         setTimeout(() => {
@@ -54,19 +66,29 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
           if (container && container.childElementCount === 0) {
             console.log("MaxKB未能成功初始化，可能是连接问题");
             setLoadError(true);
+            scriptLoaded.current = false;
           }
         }, 3000); // 给MaxKB 3秒钟时间来初始化
       };
       
       // 脚本加载失败处理
       script.onerror = () => {
-        console.error(`MaxKB脚本加载失败`);
-        setIsLoading(false);
-        setLoadError(true);
-        scriptLoaded.current = false;
+        console.error(`MaxKB脚本加载失败（尝试次数：${loadAttempts.current + 1}）`);
         
-        // 显示更详细的错误信息
-        console.error("可能的原因: 跨域问题、MaxKB服务未运行或网络连接问题");
+        // 如果是第一次尝试，重试一次
+        if (loadAttempts.current < 1) {
+          loadAttempts.current += 1;
+          console.log("正在重试加载MaxKB脚本...");
+          setTimeout(() => {
+            document.body.appendChild(script);
+          }, 1000);
+        } else {
+          setIsLoading(false);
+          setLoadError(true);
+          scriptLoaded.current = false;
+          loadAttempts.current = 0;
+          console.error("多次尝试后MaxKB脚本仍然加载失败");
+        }
       };
       
       document.body.appendChild(script);
@@ -89,7 +111,8 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
         loadError, 
         scriptLoaded: scriptLoaded.current,
         currentProtocol: window.location.protocol,
-        iframeContainer: document.getElementById(maxKbContainerId)
+        iframeContainer: document.getElementById(maxKbContainerId),
+        proxyUrl: `/maxkb-api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714`
       });
     }
   }, [isOpen, isLoading, loadError]);
@@ -97,6 +120,7 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
   // 重试连接
   const handleRetry = () => {
     scriptLoaded.current = false;
+    loadAttempts.current = 0;
     setLoadError(false);
     setIsLoading(true);
     setShowFallback(false);
