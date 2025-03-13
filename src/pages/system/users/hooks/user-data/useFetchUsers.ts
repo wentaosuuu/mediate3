@@ -31,9 +31,10 @@ export const useFetchUsers = () => {
       // 获取用户关联的部门信息
       const formattedUsers = await Promise.all((data || []).map(async (user) => {
         // 尝试获取部门信息
-        const { data: deptData } = await supabase.rpc('get_user_department', {
-          p_user_id: user.id
-        });
+        const { data: deptData } = await supabase.rpc(
+          'get_user_department', 
+          { p_user_id: user.id } as { p_user_id: string }
+        );
         
         const departmentInfo = deptData && deptData.length > 0 ? deptData[0] : null;
         
