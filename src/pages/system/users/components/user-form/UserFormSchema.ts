@@ -20,8 +20,11 @@ export const userFormSchema = z.object({
     })
     .superRefine((val, ctx) => {
       // 使用superRefine进行更复杂的验证，根据是否存在currentUser决定密码是否必填
-      const contextData = ctx.path[0] === 'password' ? ctx : undefined;
-      const hasCurrentUser = contextData?.contextualErrorMap?.data?.currentUser;
+      // 从上下文中获取表单的当前状态
+      const formData = ctx.path.length > 0 ? ctx : undefined;
+      
+      // 通过外部传入的context获取currentUser状态
+      const hasCurrentUser = formData && formData.addIssue && ctx.parent._contextual?.currentUser;
       
       if (!val && !hasCurrentUser) {
         ctx.addIssue({
