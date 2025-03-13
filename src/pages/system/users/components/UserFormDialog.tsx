@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { 
   Dialog, 
@@ -93,28 +93,26 @@ const UserFormDialog = ({
           </DialogDescription>
         </DialogHeader>
         
-        <FormProvider {...form}>
-          <Form>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* 基本信息组件 */}
-              <UserBasicInfo isLoading={isLoading} currentUser={currentUser} />
-              
-              {/* 部门和角色关联组件 */}
-              <UserAssociation 
-                isLoading={isLoading} 
-                departments={departments} 
-                roles={roles} 
-              />
-              
-              {/* 表单操作按钮组件 */}
-              <UserFormActions 
-                isLoading={isLoading} 
-                currentUser={currentUser} 
-                onCancel={() => onOpenChange(false)} 
-              />
-            </form>
-          </Form>
-        </FormProvider>
+        <Form {...form}>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* 基本信息组件 */}
+            <UserBasicInfo isLoading={isLoading} currentUser={currentUser} />
+            
+            {/* 部门和角色关联组件 */}
+            <UserAssociation 
+              isLoading={isLoading} 
+              departments={departments} 
+              roles={roles} 
+            />
+            
+            {/* 表单操作按钮组件 */}
+            <UserFormActions 
+              isLoading={isLoading} 
+              currentUser={currentUser} 
+              onCancel={() => onOpenChange(false)} 
+            />
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
