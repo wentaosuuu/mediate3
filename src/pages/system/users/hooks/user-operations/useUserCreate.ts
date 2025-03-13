@@ -17,43 +17,50 @@ export const useUserCreate = (fetchUsers: () => Promise<void>) => {
     try {
       console.log("创建用户，数据:", values);
       
-      // 生成一个随机ID
-      const userId = crypto.randomUUID();
-      
-      // 创建用户
-      const { error } = await supabase
+      // 注意: 不要生成自己的UUID - 让Supabase自动生成
+      // 修改: 不再自己指定ID，让数据库自动生成
+      const { data: userData, error: userError } = await supabase
         .from('users')
         .insert({
-          id: userId,
           username: values.username,
           email: values.email,
           phone: values.phone,
           tenant_id: values.tenant_id,
-        });
+        })
+        .select();
 
-      if (error) {
-        console.error('创建用户基本信息失败:', error);
-        throw error;
+      if (userError) {
+        console.error('创建用户基本信息失败:', userError);
+        throw userError;
       }
+      
+      console.log("用户创建成功，返回数据:", userData);
+      
+      // 确保我们有创建的用户ID
+      if (!userData || userData.length === 0) {
+        throw new Error("用户创建成功但未返回用户ID");
+      }
+      
+      const userId = userData[0].id;
       
       // 处理部门关联
       if (values.department_id) {
         try {
-          // 确保user_departments表存在
-          await supabase.rpc('create_user_departments_if_not_exists');
+          console.log("开始创建用户部门关联，用户ID:", userId, "部门ID:", values.department_id);
           
           // 创建用户部门关联
-          const { error: deptError } = await supabase.rpc(
-            'upsert_user_department', 
-            { 
-              p_user_id: userId, 
-              p_department_id: values.department_id 
-            }
-          );
+          const { error: deptError } = await supabase
+            .from('user_departments')
+            .insert({
+              user_id: userId,
+              department_id: values.department_id
+            });
           
           if (deptError) {
             console.error('创建部门关联失败:', deptError);
             // 记录错误但不中断流程
+          } else {
+            console.log("用户部门关联创建成功");
           }
         } catch (deptError) {
           console.error('处理部门关联时出错:', deptError);
@@ -64,6 +71,8 @@ export const useUserCreate = (fetchUsers: () => Promise<void>) => {
       // 处理角色关联
       if (values.role_id) {
         try {
+          console.log("开始创建用户角色关联，用户ID:", userId, "角色ID:", values.role_id);
+          
           const { error: roleError } = await supabase
             .from('user_roles')
             .insert({
@@ -74,6 +83,8 @@ export const useUserCreate = (fetchUsers: () => Promise<void>) => {
           if (roleError) {
             console.error('分配角色失败:', roleError);
             // 记录错误但不中断流程
+          } else {
+            console.log("用户角色关联创建成功");
           }
         } catch (roleError) {
           console.error('处理角色关联时出错:', roleError);

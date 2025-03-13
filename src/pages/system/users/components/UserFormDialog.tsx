@@ -104,6 +104,7 @@ const UserFormDialog = ({
       const success = await onSubmit(values);
       if (success) {
         console.log("表单提交成功，关闭对话框");
+        form.reset(); // 重置表单
         // 成功后关闭对话框
         onOpenChange(false);
       } else {
@@ -123,6 +124,9 @@ const UserFormDialog = ({
     <Dialog open={isOpen} onOpenChange={(open) => {
       // 如果不在加载状态，才允许关闭对话框
       if (!isLoading || !open) {
+        if (!open) {
+          form.reset(); // 关闭对话框时重置表单
+        }
         onOpenChange(open);
       }
     }}>
@@ -154,6 +158,7 @@ const UserFormDialog = ({
               currentUser={currentUser} 
               onCancel={() => {
                 if (!isLoading) {
+                  form.reset(); // 取消时重置表单
                   onOpenChange(false);
                 }
               }} 
