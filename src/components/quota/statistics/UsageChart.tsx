@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   BarChart,
@@ -11,19 +12,7 @@ import {
 } from 'recharts';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
-
-interface UsageData {
-  id: string;
-  amount: number;
-  service_type: string;
-  created_at: string;
-  staff: { username: string } | null;
-  staff_quota: {
-    department_quota: {
-      department: { name: string } | null;
-    } | null;
-  } | null;
-}
+import { UsageData } from '@/types/quota';
 
 interface UsageChartProps {
   data: UsageData[];
