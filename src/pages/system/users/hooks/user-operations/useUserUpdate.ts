@@ -60,6 +60,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
               
             if (deptUpdateError) {
               console.error('更新部门关联失败:', deptUpdateError);
+              throw deptUpdateError;
             } else {
               console.log('用户部门关联更新成功:', values.department_id);
             }
@@ -74,13 +75,14 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
               
             if (deptInsertError) {
               console.error('创建部门关联失败:', deptInsertError);
+              throw deptInsertError;
             } else {
               console.log('用户部门关联新建成功:', values.department_id);
             }
           }
         } catch (deptError) {
           console.error('处理部门关联时出错:', deptError);
-          // 记录错误但不中断流程
+          throw deptError;
         }
       }
       
@@ -98,6 +100,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
             
           if (fetchError && fetchError.code !== 'PGRST116') {
             console.error('获取角色关联失败:', fetchError);
+            throw fetchError;
           }
           
           if (existingRoles) {
@@ -109,6 +112,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
               
             if (roleUpdateError) {
               console.error('更新角色失败:', roleUpdateError);
+              throw roleUpdateError;
             } else {
               console.log('用户角色更新成功:', values.role_id);
             }
@@ -123,12 +127,14 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
               
             if (roleInsertError) {
               console.error('分配角色失败:', roleInsertError);
+              throw roleInsertError;
             } else {
               console.log('用户角色新建成功:', values.role_id);
             }
           }
         } catch (roleError) {
           console.error('处理角色关联时出错:', roleError);
+          throw roleError;
         }
       }
       

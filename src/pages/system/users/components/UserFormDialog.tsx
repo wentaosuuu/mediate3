@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { 
@@ -62,7 +62,7 @@ const UserFormDialog = ({
   });
 
   // 当currentUser改变时重置表单
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       console.log("重置表单数据:", currentUser);
       if (currentUser) {
@@ -94,7 +94,13 @@ const UserFormDialog = ({
   // 处理表单提交
   const handleSubmit = form.handleSubmit(async (values) => {
     console.log("提交表单数据:", values);
+    if (isLoading) {
+      console.log("系统正在处理中，请稍候");
+      return; // 防止重复提交
+    }
+    
     try {
+      console.log("开始提交表单");
       const success = await onSubmit(values);
       if (success) {
         console.log("表单提交成功，关闭对话框");
@@ -114,7 +120,12 @@ const UserFormDialog = ({
   });
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      // 如果不在加载状态，才允许关闭对话框
+      if (!isLoading || !open) {
+        onOpenChange(open);
+      }
+    }}>
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
           <DialogTitle>{currentUser ? "编辑用户" : "创建用户"}</DialogTitle>
@@ -141,7 +152,11 @@ const UserFormDialog = ({
             <UserFormActions 
               isLoading={isLoading} 
               currentUser={currentUser} 
-              onCancel={() => onOpenChange(false)} 
+              onCancel={() => {
+                if (!isLoading) {
+                  onOpenChange(false);
+                }
+              }} 
             />
           </form>
         </Form>
