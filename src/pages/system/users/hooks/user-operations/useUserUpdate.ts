@@ -15,7 +15,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
     let updatedSuccessfully = false;
     
     try {
-      console.log("更新用户数据:", values, "用户ID:", currentUser.id);
+      console.log("开始更新用户数据:", values, "用户ID:", currentUser.id);
       
       // 更新用户基本信息
       const { error } = await supabase
@@ -36,23 +36,45 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       // 处理部门关联
       if (values.department_id) {
         try {
-          // 确保user_departments表存在
-          await supabase.rpc('create_user_departments_if_not_exists');
+          console.log("更新用户部门关联, 部门ID:", values.department_id);
           
-          // 更新用户部门关联
-          const { error: deptError } = await supabase.rpc(
-            'upsert_user_department', 
-            { 
-              p_user_id: currentUser.id, 
-              p_department_id: values.department_id 
+          // 检查是否已有部门关联
+          const { data: existingDept, error: deptCheckError } = await supabase
+            .from('user_departments')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .maybeSingle();
+            
+          if (deptCheckError) {
+            console.error('检查用户部门关联失败:', deptCheckError);
+          }
+          
+          if (existingDept) {
+            // 已有部门关联，更新它
+            const { error: deptUpdateError } = await supabase
+              .from('user_departments')
+              .update({ department_id: values.department_id })
+              .eq('user_id', currentUser.id);
+              
+            if (deptUpdateError) {
+              console.error('更新部门关联失败:', deptUpdateError);
+            } else {
+              console.log('用户部门关联更新成功:', values.department_id);
             }
-          );
-          
-          if (deptError) {
-            console.error('更新部门关联失败:', deptError);
-            // 记录错误但不中断流程
           } else {
-            console.log('用户部门关联更新成功:', values.department_id);
+            // 没有部门关联，创建新的
+            const { error: deptInsertError } = await supabase
+              .from('user_departments')
+              .insert({
+                user_id: currentUser.id,
+                department_id: values.department_id
+              });
+              
+            if (deptInsertError) {
+              console.error('创建部门关联失败:', deptInsertError);
+            } else {
+              console.log('用户部门关联新建成功:', values.department_id);
+            }
           }
         } catch (deptError) {
           console.error('处理部门关联时出错:', deptError);
@@ -63,17 +85,20 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       // 处理角色关联
       if (values.role_id) {
         try {
+          console.log("更新用户角色关联, 角色ID:", values.role_id);
+          
           // 检查是否已有角色关联
           const { data: existingRoles, error: fetchError } = await supabase
             .from('user_roles')
             .select('*')
-            .eq('user_id', currentUser.id);
+            .eq('user_id', currentUser.id)
+            .maybeSingle();
             
-          if (fetchError) {
+          if (fetchError && fetchError.code !== 'PGRST116') {
             console.error('获取角色关联失败:', fetchError);
           }
           
-          if (existingRoles && existingRoles.length > 0) {
+          if (existingRoles) {
             // 已有角色关联，更新它
             const { error: roleUpdateError } = await supabase
               .from('user_roles')
