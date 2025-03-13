@@ -48,14 +48,14 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
       const script = document.createElement('script');
       script.id = 'maxkb-script';
       
-      // 使用新的直接指向chat路径的URL
-      script.src = `/maxkb-api/chat/62bacb3e3b761714`;
+      // 使用百度URL进行测试
+      script.src = `https://www.baidu.com`;
       script.async = true;
       script.defer = true;
       
       // 脚本加载成功处理
       script.onload = () => {
-        console.log(`MaxKB脚本通过代理加载成功`);
+        console.log(`百度脚本加载成功`);
         scriptLoaded.current = true;
         setIsLoading(false);
         loadAttempts.current = 0;
@@ -64,21 +64,21 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
         setTimeout(() => {
           const container = document.getElementById(maxKbContainerId);
           if (container && container.childElementCount === 0) {
-            console.log("MaxKB未能成功初始化，可能是连接问题");
+            console.log("百度内容未能成功初始化，可能是连接问题");
             setLoadError(true);
             scriptLoaded.current = false;
           }
-        }, 3000); // 给MaxKB 3秒钟时间来初始化
+        }, 3000); // 给3秒钟时间来初始化
       };
       
       // 脚本加载失败处理
       script.onerror = () => {
-        console.error(`MaxKB脚本加载失败（尝试次数：${loadAttempts.current + 1}）`);
+        console.error(`百度脚本加载失败（尝试次数：${loadAttempts.current + 1}）`);
         
         // 如果是第一次尝试，重试一次
         if (loadAttempts.current < 1) {
           loadAttempts.current += 1;
-          console.log("正在重试加载MaxKB脚本...");
+          console.log("正在重试加载百度脚本...");
           setTimeout(() => {
             document.body.appendChild(script);
           }, 1000);
@@ -87,7 +87,7 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
           setLoadError(true);
           scriptLoaded.current = false;
           loadAttempts.current = 0;
-          console.error("多次尝试后MaxKB脚本仍然加载失败");
+          console.error("多次尝试后百度脚本仍然加载失败");
         }
       };
       
@@ -112,7 +112,7 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
         scriptLoaded: scriptLoaded.current,
         currentProtocol: window.location.protocol,
         iframeContainer: document.getElementById(maxKbContainerId),
-        proxyUrl: `/maxkb-api/chat/62bacb3e3b761714`
+        proxyUrl: `https://www.baidu.com`
       });
     }
   }, [isOpen, isLoading, loadError]);

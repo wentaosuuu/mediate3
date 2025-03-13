@@ -21,12 +21,12 @@ export const ErrorDisplay = ({ onRetry, onUseFallback, isHttps = false }: ErrorD
         <AlertTriangle className="h-10 w-10 text-amber-500 mx-auto mb-2" />
         <p className="text-red-500 mb-4">客服系统连接失败</p>
         <p className="mb-4 text-sm text-gray-500">
-          可能是由于MaxKB服务未启动或网络连接问题导致
+          可能是由于百度服务未能正确加载或网络连接问题导致
           {isHttps && 
             <span className="block mt-1 text-amber-600">
-              系统已通过代理尝试解决HTTP/HTTPS混合内容问题。
-              如果问题仍然存在，请确认MaxKB服务是否正在运行，
-              并且能够通过http://127.0.0.1:8080/ui/chat/62bacb3e3b761714访问。
+              系统已尝试加载百度网站内容。
+              如果问题仍然存在，请确认您的网络连接是否正常，
+              并且能够通过https://www.baidu.com访问。
             </span>
           }
         </p>
