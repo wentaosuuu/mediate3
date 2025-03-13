@@ -10,7 +10,7 @@ export const useFetchUsers = () => {
   const { toast } = useToast();
 
   // 获取用户列表
-  const fetchUsers = async () => {
+  const fetchUsers = async (): Promise<void> => {
     setIsLoading(true);
     try {
       // 不尝试获取 department_id，因为该字段在 users 表中不存在
@@ -41,7 +41,6 @@ export const useFetchUsers = () => {
       
       console.log("格式化后的用户列表:", formattedUsers);
       setUsers(formattedUsers);
-      return formattedUsers;
     } catch (error) {
       console.error('获取用户列表失败:', error);
       toast({
@@ -49,7 +48,6 @@ export const useFetchUsers = () => {
         description: (error as Error).message,
         variant: "destructive",
       });
-      return [];
     } finally {
       setIsLoading(false);
     }
