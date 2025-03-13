@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // 用户表单验证模式
 const userFormSchema = z.object({
@@ -82,6 +83,7 @@ const UserFormDialog = ({
   // 当currentUser改变时重置表单
   React.useEffect(() => {
     if (isOpen) {
+      console.log("重置表单数据:", currentUser);
       form.reset({
         username: currentUser?.username || "",
         email: currentUser?.email || "",
@@ -96,6 +98,7 @@ const UserFormDialog = ({
 
   // 处理表单提交
   const handleSubmit = form.handleSubmit(async (values) => {
+    console.log("提交表单数据:", values);
     await onSubmit(values);
   });
 
@@ -183,20 +186,25 @@ const UserFormDialog = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>部门</FormLabel>
-                    <FormControl>
-                      <select
-                        className="w-full p-2 border rounded-md"
-                        {...field}
-                        disabled={isLoading}
-                      >
-                        <option value="">请选择部门</option>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value} 
+                      disabled={isLoading}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="请选择部门" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="">请选择部门</SelectItem>
                         {departments.map(dept => (
-                          <option key={dept.id} value={dept.id}>
+                          <SelectItem key={dept.id} value={dept.id}>
                             {dept.name}
-                          </option>
+                          </SelectItem>
                         ))}
-                      </select>
-                    </FormControl>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -208,20 +216,25 @@ const UserFormDialog = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>角色</FormLabel>
-                    <FormControl>
-                      <select
-                        className="w-full p-2 border rounded-md"
-                        {...field}
-                        disabled={isLoading}
-                      >
-                        <option value="">请选择角色</option>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value} 
+                      disabled={isLoading}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="请选择角色" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="">请选择角色</SelectItem>
                         {roles.map(role => (
-                          <option key={role.id} value={role.id}>
+                          <SelectItem key={role.id} value={role.id}>
                             {role.name}
-                          </option>
+                          </SelectItem>
                         ))}
-                      </select>
-                    </FormControl>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

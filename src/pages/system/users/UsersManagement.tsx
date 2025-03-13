@@ -94,17 +94,53 @@ const UsersManagement = () => {
     try {
       if (currentUser) {
         // 更新用户
+        console.log("更新用户数据:", values, "用户ID:", currentUser.id);
+        
         const { error } = await supabase
           .from('users')
           .update({
             username: values.username,
             email: values.email,
             phone: values.phone,
-            // 部门和角色关联需要额外表
+            updated_at: new Date().toISOString()
           })
           .eq('id', currentUser.id);
 
         if (error) throw error;
+        
+        // 如果选择了角色，则更新用户-角色关联
+        if (values.role_id) {
+          // 首先检查是否已有角色关联
+          const { data: existingRoles } = await supabase
+            .from('user_roles')
+            .select('*')
+            .eq('user_id', currentUser.id);
+            
+          if (existingRoles && existingRoles.length > 0) {
+            // 已有角色关联，更新它
+            const { error: roleUpdateError } = await supabase
+              .from('user_roles')
+              .update({ role_id: values.role_id })
+              .eq('user_id', currentUser.id);
+              
+            if (roleUpdateError) {
+              console.error('更新角色失败:', roleUpdateError);
+            }
+          } else {
+            // 没有角色关联，创建新的
+            const { error: roleInsertError } = await supabase
+              .from('user_roles')
+              .insert({
+                user_id: currentUser.id,
+                role_id: values.role_id
+              });
+              
+            if (roleInsertError) {
+              console.error('分配角色失败:', roleInsertError);
+            }
+          }
+        }
+        
         toast({
           title: "用户更新成功",
           description: `用户 ${values.username} 已更新`,
