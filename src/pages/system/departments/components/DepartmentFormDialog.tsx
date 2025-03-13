@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 const departmentFormSchema = z.object({
   name: z.string().min(2, { message: "部门名称至少需要2个字符" }),
   description: z.string().optional(),
-  tenant_id: z.string()
+  tenant_id: z.string().default("default") // 设置默认值确保总是有租户ID
 });
 
 type DepartmentFormValues = z.infer<typeof departmentFormSchema>;
@@ -53,7 +53,7 @@ const DepartmentFormDialog = ({
     defaultValues: {
       name: currentDepartment?.name || "",
       description: currentDepartment?.description || "",
-      tenant_id: currentDepartment?.tenant_id || "default" // 在实际应用中应该从系统或登录用户获取
+      tenant_id: currentDepartment?.tenant_id || "default" // 默认租户ID
     }
   });
 

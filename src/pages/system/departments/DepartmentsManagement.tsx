@@ -61,7 +61,8 @@ const DepartmentsManagement = () => {
           .from('departments')
           .update({
             name: values.name,
-            description: values.description
+            description: values.description,
+            updated_at: new Date().toISOString()
           })
           .eq('id', currentDepartment.id);
 
@@ -77,7 +78,8 @@ const DepartmentsManagement = () => {
           .insert({
             name: values.name,
             description: values.description,
-            tenant_id: values.tenant_id
+            tenant_id: values.tenant_id || 'default', // 确保有租户ID
+            created_at: new Date().toISOString()
           });
 
         if (error) throw error;
