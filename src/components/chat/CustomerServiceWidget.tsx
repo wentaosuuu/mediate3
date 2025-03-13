@@ -7,7 +7,8 @@ import {
   Dialog,
   DialogContent,
   DialogPortal,
-  DialogClose
+  DialogClose,
+  DialogTitle,
 } from "@/components/ui/dialog";
 
 /**
@@ -30,8 +31,8 @@ export const CustomerServiceWidget = () => {
       setLoadError(false);
       
       const script = document.createElement('script');
-      // 使用相对协议（省略http:），让浏览器自动匹配当前页面的协议
-      script.src = "//127.0.0.1:8080/api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714";
+      // 确保使用HTTP协议而非相对协议，因为我们已经配置了开发服务器使用HTTP
+      script.src = "http://127.0.0.1:8080/api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714";
       script.async = true;
       script.defer = true;
       
@@ -120,9 +121,9 @@ export const CustomerServiceWidget = () => {
         {isOpen && (
           <DialogPortal>
             <DialogContent className="fixed bottom-20 right-6 sm:max-w-[425px] w-96 h-[70vh] max-h-[600px] p-0">
-              {/* 浮窗标题栏 */}
+              {/* 浮窗标题栏 - 添加了DialogTitle以解决可访问性警告 */}
               <div className="flex items-center justify-between px-4 py-2 bg-primary text-white">
-                <h3 className="font-medium">在线客服</h3>
+                <DialogTitle className="font-medium text-white">在线客服</DialogTitle>
                 <DialogClose asChild>
                   <Button
                     variant="ghost"
@@ -169,7 +170,7 @@ export const CustomerServiceWidget = () => {
                           
                           // 重新加载脚本
                           const script = document.createElement('script');
-                          script.src = "//127.0.0.1:8080/api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714";
+                          script.src = "http://127.0.0.1:8080/api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714";
                           script.async = true;
                           script.defer = true;
                           document.body.appendChild(script);
