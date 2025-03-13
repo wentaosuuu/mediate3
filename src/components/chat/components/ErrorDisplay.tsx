@@ -26,7 +26,7 @@ export const ErrorDisplay = ({ onRetry, onUseFallback, isHttps = false }: ErrorD
             <span className="block mt-1 text-amber-600">
               系统已通过代理尝试解决HTTP/HTTPS混合内容问题。
               如果问题仍然存在，请确认MaxKB服务是否正在运行，
-              并且能够通过http://127.0.0.1:8080/ui访问。
+              并且能够通过http://127.0.0.1:8080/ui/chat/62bacb3e3b761714访问。
             </span>
           }
         </p>

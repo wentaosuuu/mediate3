@@ -9,12 +9,12 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    // 配置代理，将MaxKB的请求转发到正确的UI路径
+    // 配置代理，将MaxKB的请求转发到正确的/ui/chat路径
     proxy: {
       '/maxkb-api': {
         target: 'http://127.0.0.1:8080', // MaxKB服务地址
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/maxkb-api/, '/ui'), // 修正路径为/ui而不是/api
+        rewrite: (path) => path.replace(/^\/maxkb-api/, '/ui'), // 将/maxkb-api路径转发到/ui路径
         secure: false, // 允许无效/自签名证书
         ws: true       // 支持WebSocket
       }
