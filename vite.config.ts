@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => ({
     // 配置代理，用于测试MaxKB服务
     proxy: {
       '/maxkb-api': {
-        target: 'http://127.0.0.1:8080', // MaxKB服务地址
+        target: 'https://maxkb.fit2cloud.com', // 新的MaxKB服务地址
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/maxkb-api/, ''), // 将/maxkb-api路径转发到根路径
         secure: false, // 允许无效/自签名证书

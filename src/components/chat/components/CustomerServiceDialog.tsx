@@ -48,8 +48,8 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
       const script = document.createElement('script');
       script.id = 'maxkb-script';
       
-      // 使用完整的MaxKB URL
-      script.src = `http://127.0.0.1:8080/api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714`;
+      // 使用新的MaxKB URL
+      script.src = `https://maxkb.fit2cloud.com/ui/chat/05b106be72d62386?mode=embed`;
       script.async = true;
       script.defer = true;
       
@@ -112,7 +112,7 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
         scriptLoaded: scriptLoaded.current,
         currentProtocol: window.location.protocol,
         iframeContainer: document.getElementById(maxKbContainerId),
-        maxKbUrl: `http://127.0.0.1:8080/api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714`
+        maxKbUrl: `https://maxkb.fit2cloud.com/ui/chat/05b106be72d62386?mode=embed`
       });
     }
   }, [isOpen, isLoading, loadError]);

@@ -23,25 +23,24 @@ export const ErrorDisplay = ({ onRetry, onUseFallback, isHttps = false }: ErrorD
         <p className="mb-4 text-sm text-gray-500">
           可能是由于以下原因之一导致：
           <ul className="mt-2 list-disc text-left pl-5">
-            <li>MaxKB服务不可达（http://127.0.0.1:8080）</li>
-            <li>浏览器的混合内容阻止（当HTTPS页面加载HTTP内容）</li>
+            <li>MaxKB服务不可达（https://maxkb.fit2cloud.com）</li>
             <li>网络连接中断</li>
+            <li>服务器临时维护中</li>
           </ul>
           {isHttps && 
             <span className="block mt-2 text-amber-600">
-              检测到您正在使用HTTPS协议访问，但客服系统使用的是HTTP协议。
-              浏览器安全策略可能会阻止HTTPS页面加载HTTP资源，这称为"混合内容"问题。
+              如果您无法连接到客服系统，可能是网络问题或当前服务不可用。
               <br/>
               <strong>解决方法：</strong>
               <ol className="list-decimal text-left pl-5 mt-1">
                 <li>
-                  在浏览器地址栏右侧或左侧查找安全提示图标（不同浏览器可能是盾牌、锁、感叹号等）
+                  检查您的网络连接是否正常
                 </li>
                 <li>
-                  点击该图标，寻找"允许不安全内容"、"加载不安全脚本"或类似选项
+                  如果您使用的是公司或组织网络，可能存在访问限制
                 </li>
                 <li>
-                  或者尝试更改您的URL，从https://改为http://（去掉s）来访问本站
+                  稍后再试或联系系统管理员
                 </li>
               </ol>
             </span>
