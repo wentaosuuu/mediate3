@@ -14,6 +14,9 @@ import Balance from './pages/wallet/Balance';
 import Orders from './pages/wallet/Orders';
 import Purchase from './pages/wallet/Purchase';
 import Quota from './pages/wallet/Quota';
+import UsersManagement from './pages/system/Users';
+import RolesManagement from './pages/system/Roles';
+import DepartmentsManagement from './pages/system/Departments';
 import { CustomerServiceWidget } from './components/chat/CustomerServiceWidget';
 
 function App() {
@@ -34,6 +37,10 @@ function App() {
           <Route path="/wallet/orders" element={<Orders />} />
           <Route path="/wallet/purchase" element={<Purchase />} />
           <Route path="/wallet/quota" element={<Quota />} />
+          {/* 系统管理路由 */}
+          <Route path="/system/users" element={<UsersManagement />} />
+          <Route path="/system/roles" element={<RolesManagement />} />
+          <Route path="/system/departments" element={<DepartmentsManagement />} />
         </Routes>
         <CustomerServiceWidget />
       </BrowserRouter>
