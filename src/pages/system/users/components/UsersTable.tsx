@@ -18,6 +18,8 @@ interface User {
   phone?: string;
   created_at: string;
   updated_at?: string;
+  department_name?: string; // 新增部门名称字段
+  role_name?: string; // 新增角色名称字段
 }
 
 interface UsersTableProps {
@@ -43,6 +45,8 @@ const UsersTable = ({
             <TableHead>用户名</TableHead>
             <TableHead>邮箱</TableHead>
             <TableHead>电话</TableHead>
+            <TableHead>部门</TableHead>
+            <TableHead>角色</TableHead>
             <TableHead>创建时间</TableHead>
             <TableHead>更新时间</TableHead>
             <TableHead className="text-right">操作</TableHead>
@@ -51,13 +55,13 @@ const UsersTable = ({
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-4">
+              <TableCell colSpan={8} className="text-center py-4">
                 加载中...
               </TableCell>
             </TableRow>
           ) : users.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-4">
+              <TableCell colSpan={8} className="text-center py-4">
                 没有找到用户
               </TableCell>
             </TableRow>
@@ -67,6 +71,8 @@ const UsersTable = ({
                 <TableCell>{user.username}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.phone || '-'}</TableCell>
+                <TableCell>{user.department_name || '-'}</TableCell>
+                <TableCell>{user.role_name || '-'}</TableCell>
                 <TableCell>{new Date(user.created_at).toLocaleString()}</TableCell>
                 <TableCell>{user.updated_at ? new Date(user.updated_at).toLocaleString() : '-'}</TableCell>
                 <TableCell className="text-right space-x-2">

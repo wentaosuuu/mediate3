@@ -12,13 +12,15 @@ export const useUserCreate = (fetchUsers: () => Promise<void>) => {
   // 创建用户
   const createUser = async (values: UserFormValues) => {
     setIsLoading(true);
+    let createdSuccessfully = false;
+    
     try {
       console.log("创建用户，数据:", values);
       
       // 生成一个随机ID
       const userId = crypto.randomUUID();
       
-      // 创建用户时不包含 department_id 字段
+      // 创建用户
       const { error } = await supabase
         .from('users')
         .insert({
@@ -29,36 +31,28 @@ export const useUserCreate = (fetchUsers: () => Promise<void>) => {
           tenant_id: values.tenant_id,
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('创建用户基本信息失败:', error);
+        throw error;
+      }
       
-      // 如果选择了部门，则创建或更新用户-部门关联
+      // 处理部门关联
       if (values.department_id) {
         try {
-          // 首先检查用户部门表是否存在，如果不存在则创建
-          const { error: createTableError } = await supabase.rpc(
-            'create_user_departments_if_not_exists', 
-            {} as Record<string, never>
-          );
+          // 确保user_departments表存在
+          await supabase.rpc('create_user_departments_if_not_exists');
           
-          if (createTableError) {
-            console.error('创建用户部门表失败:', createTableError);
-            // 记录错误但不中断流程
-          }
-          
-          // 更新用户的部门关联
-          const { error: userDeptError } = await supabase.rpc(
+          // 创建用户部门关联
+          const { error: deptError } = await supabase.rpc(
             'upsert_user_department', 
             { 
               p_user_id: userId, 
               p_department_id: values.department_id 
-            } as { 
-              p_user_id: string, 
-              p_department_id: string 
             }
           );
           
-          if (userDeptError) {
-            console.error('创建部门关联失败:', userDeptError);
+          if (deptError) {
+            console.error('创建部门关联失败:', deptError);
             // 记录错误但不中断流程
           }
         } catch (deptError) {
@@ -67,7 +61,7 @@ export const useUserCreate = (fetchUsers: () => Promise<void>) => {
         }
       }
       
-      // 如果选择了角色，则添加用户-角色关联
+      // 处理角色关联
       if (values.role_id) {
         try {
           const { error: roleError } = await supabase
@@ -91,6 +85,8 @@ export const useUserCreate = (fetchUsers: () => Promise<void>) => {
         title: "用户创建成功",
         description: `用户 ${values.username} 已创建`,
       });
+      
+      createdSuccessfully = true;
       
       // 刷新用户列表
       await fetchUsers();

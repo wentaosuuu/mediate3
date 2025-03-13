@@ -20,6 +20,8 @@ export const useFetchUsers = () => {
   const fetchUsers = async (): Promise<void> => {
     setIsLoading(true);
     try {
+      console.log("开始获取用户列表...");
+      
       // 获取用户基本信息
       const { data, error } = await supabase
         .from('users')
@@ -35,40 +37,73 @@ export const useFetchUsers = () => {
 
       if (error) throw error;
       
-      // 获取用户关联的部门信息
-      const formattedUsers = await Promise.all((data || []).map(async (user) => {
+      if (!data || data.length === 0) {
+        console.log("没有找到用户");
+        setUsers([]);
+        setIsLoading(false);
+        return;
+      }
+      
+      console.log(`找到 ${data.length} 个用户`);
+      
+      // 获取用户关联的部门信息和角色信息
+      const formattedUsers = await Promise.all(data.map(async (user) => {
         try {
-          // 尝试获取部门信息
-          const { data: deptData, error: deptError } = await supabase.rpc(
-            'get_user_department',
-            { p_user_id: user.id } as { p_user_id: string }
-          );
+          // 获取部门信息
+          let departmentInfo: DepartmentInfo | null = null;
           
-          if (deptError) {
-            console.error(`获取用户 ${user.id} 的部门信息失败:`, deptError);
-            return {
-              ...user,
-              department_id: "",
-              department_name: "-"
-            };
+          try {
+            const { data: deptData, error: deptError } = await supabase.rpc(
+              'get_user_department',
+              { p_user_id: user.id }
+            );
+            
+            if (deptError) {
+              console.error(`获取用户 ${user.id} 的部门信息失败:`, deptError);
+            } else {
+              departmentInfo = deptData && Array.isArray(deptData) && deptData.length > 0 
+                ? deptData[0] as DepartmentInfo 
+                : null;
+            }
+          } catch (deptErr) {
+            console.error(`处理用户 ${user.id} 的部门信息时出错:`, deptErr);
           }
           
-          const departmentInfo = deptData && Array.isArray(deptData) && deptData.length > 0 
-            ? deptData[0] as DepartmentInfo 
-            : null;
-          
           // 获取用户角色信息
-          const { data: roleData, error: roleError } = await supabase
-            .from('user_roles')
-            .select('role_id')
-            .eq('user_id', user.id)
-            .single();
-            
+          let roleId = "";
+          let roleName = "";
+          
+          try {
+            const { data: roleData, error: roleError } = await supabase
+              .from('user_roles')
+              .select('role_id')
+              .eq('user_id', user.id)
+              .single();
+              
+            if (!roleError && roleData) {
+              roleId = roleData.role_id;
+              
+              // 获取角色名称
+              const { data: roleDetails, error: roleDetailsError } = await supabase
+                .from('roles')
+                .select('name')
+                .eq('id', roleId)
+                .single();
+                
+              if (!roleDetailsError && roleDetails) {
+                roleName = roleDetails.name;
+              }
+            }
+          } catch (roleErr) {
+            console.error(`处理用户 ${user.id} 的角色信息时出错:`, roleErr);
+          }
+          
           return {
             ...user,
             department_id: departmentInfo?.department_id || "",
             department_name: departmentInfo?.department_name || "-",
-            role_id: roleError ? "" : roleData?.role_id || ""
+            role_id: roleId || "",
+            role_name: roleName || "-"
           };
         } catch (err) {
           console.error(`处理用户 ${user.id} 的信息时出错:`, err);
@@ -76,7 +111,8 @@ export const useFetchUsers = () => {
             ...user,
             department_id: "",
             department_name: "-",
-            role_id: ""
+            role_id: "",
+            role_name: "-"
           };
         }
       }));

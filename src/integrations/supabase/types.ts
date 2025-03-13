@@ -623,6 +623,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_departments: {
+        Row: {
+          created_at: string | null
+          department_id: string | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          department_id?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          department_id?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_departments_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_departments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string | null

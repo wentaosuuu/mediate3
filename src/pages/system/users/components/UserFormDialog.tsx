@@ -14,6 +14,7 @@ import { userFormSchema, UserFormValues } from './user-form/UserFormSchema';
 import UserBasicInfo from './user-form/UserBasicInfo';
 import UserAssociation from './user-form/UserAssociation';
 import UserFormActions from './user-form/UserFormActions';
+import { useToast } from "@/hooks/use-toast";
 
 interface Department {
   id: string;
@@ -28,7 +29,7 @@ interface Role {
 interface UserFormDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (values: UserFormValues) => Promise<void>;
+  onSubmit: (values: UserFormValues) => Promise<boolean>;
   currentUser: any | null;
   isLoading: boolean;
   departments: Department[];
@@ -44,6 +45,7 @@ const UserFormDialog = ({
   departments,
   roles
 }: UserFormDialogProps) => {
+  const { toast } = useToast();
   
   // 表单初始化
   const form = useForm<UserFormValues>({
@@ -93,12 +95,24 @@ const UserFormDialog = ({
   const handleSubmit = form.handleSubmit(async (values) => {
     console.log("提交表单数据:", values);
     try {
-      await onSubmit(values);
-      // 成功后主动关闭对话框
-      onOpenChange(false);
+      const success = await onSubmit(values);
+      if (success) {
+        // 成功后主动关闭对话框
+        onOpenChange(false);
+        
+        // 显示成功消息
+        toast({
+          title: currentUser ? "更新成功" : "创建成功",
+          description: currentUser ? `用户 ${values.username} 已更新` : `用户 ${values.username} 已创建`,
+        });
+      }
     } catch (error) {
       console.error("表单提交失败:", error);
-      // 错误已在onSubmit中处理，这里不需要额外处理
+      toast({
+        title: "操作失败",
+        description: `${(error as Error).message}`,
+        variant: "destructive",
+      });
     }
   });
 
