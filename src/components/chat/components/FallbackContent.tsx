@@ -8,13 +8,11 @@ import React from 'react';
  */
 export const FallbackContent = () => {
   return (
-    <div className="flex-1 overflow-hidden">
-      <iframe 
-        src="https://www.bing.com" 
-        className="w-full h-full border-0"
-        title="备用客服窗口"
-        sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-      />
+    <div className="flex-1 overflow-hidden flex items-center justify-center">
+      <div className="text-center p-6">
+        <h3 className="text-lg font-medium mb-2">客服系统暂时不可用</h3>
+        <p className="text-gray-500">请稍后再试或联系技术支持</p>
+      </div>
     </div>
   );
 };

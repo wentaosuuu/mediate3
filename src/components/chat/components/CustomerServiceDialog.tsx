@@ -1,13 +1,5 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { X } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import {
-  DialogContent,
-  DialogPortal,
-  DialogClose,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Loading } from './Loading';
 import { ErrorDisplay } from './ErrorDisplay';
 import { MaxKbContainer } from './MaxKbContainer';
@@ -16,7 +8,7 @@ import { FallbackContent } from './FallbackContent';
 /**
  * 客服对话框组件
  * 
- * 包含MaxKB客服窗口的对话框，处理加载、错误和内容展示
+ * 包含MaxKB客服窗口，处理加载、错误和内容展示
  */
 interface CustomerServiceDialogProps {
   isOpen: boolean;
@@ -119,53 +111,26 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
   
   return (
     <>
-      {isOpen && (
-        <DialogPortal>
-          <DialogContent className="fixed bottom-20 right-6 sm:max-w-[425px] w-96 h-[70vh] max-h-[600px] p-0">
-            {/* 浮窗标题栏 */}
-            <div className="flex items-center justify-between px-4 py-2 bg-primary text-white">
-              <DialogTitle className="font-medium text-white">在线客服</DialogTitle>
-              <DialogClose asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-white hover:bg-primary/90 hover:text-white"
-                >
-                  <X className="h-5 w-5" />
-                </Button>
-              </DialogClose>
-            </div>
-            
-            {/* 客服内容区 */}
-            <div className="flex-1 flex flex-col h-full overflow-hidden">
-              {/* 加载中显示 */}
-              {isLoading && <Loading />}
-              
-              {/* 加载错误显示 */}
-              {loadError && !showFallback && (
-                <ErrorDisplay 
-                  onRetry={handleRetry}
-                  onUseFallback={handleUseFallback}
-                  isHttps={isHttps}
-                />
-              )}
-              
-              {/* MaxKB容器 */}
-              <MaxKbContainer 
-                containerId={maxKbContainerId}
-                isHidden={isLoading || loadError}
-              />
-              
-              {/* 如果加载失败并且用户选择了备用系统，显示备用内容 */}
-              {loadError && showFallback && (
-                <div className="absolute inset-0 pt-12">
-                  <FallbackContent />
-                </div>
-              )}
-            </div>
-          </DialogContent>
-        </DialogPortal>
+      {/* 加载中显示 */}
+      {isLoading && <Loading />}
+      
+      {/* 加载错误显示 */}
+      {loadError && !showFallback && (
+        <ErrorDisplay 
+          onRetry={handleRetry}
+          onUseFallback={handleUseFallback}
+          isHttps={isHttps}
+        />
       )}
+      
+      {/* MaxKB容器 */}
+      <MaxKbContainer 
+        containerId={maxKbContainerId}
+        isHidden={isLoading || loadError}
+      />
+      
+      {/* 如果加载失败并且用户选择了备用系统，显示备用内容 */}
+      {loadError && showFallback && <FallbackContent />}
     </>
   );
 };
