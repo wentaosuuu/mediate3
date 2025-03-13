@@ -13,7 +13,7 @@ export const useFetchUsers = () => {
   const fetchUsers = async (): Promise<void> => {
     setIsLoading(true);
     try {
-      // 不尝试获取 department_id，因为该字段在 users 表中不存在
+      // 获取用户基本信息
       const { data, error } = await supabase
         .from('users')
         .select(`
@@ -28,16 +28,21 @@ export const useFetchUsers = () => {
 
       if (error) throw error;
       
-      // 用户数据获取成功后，加载部门信息
-      console.log("获取到的用户列表原始数据:", data);
-      
-      // 将用户数据映射为前端需要的格式
-      const formattedUsers = (data || []).map(user => {
+      // 获取用户关联的部门信息
+      const formattedUsers = await Promise.all((data || []).map(async (user) => {
+        // 尝试获取部门信息
+        const { data: deptData } = await supabase.rpc('get_user_department', {
+          p_user_id: user.id
+        });
+        
+        const departmentInfo = deptData && deptData.length > 0 ? deptData[0] : null;
+        
         return {
           ...user,
-          department_name: '-' // 默认为无部门
+          department_id: departmentInfo?.department_id || "",
+          department_name: departmentInfo?.department_name || "-"
         };
-      });
+      }));
       
       console.log("格式化后的用户列表:", formattedUsers);
       setUsers(formattedUsers);
