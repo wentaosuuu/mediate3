@@ -10,7 +10,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
   const { toast } = useToast();
 
   // 更新用户
-  const updateUser = async (values: UserFormValues, currentUser: any) => {
+  const updateUser = async (values: UserFormValues, currentUser: any): Promise<boolean> => {
     setIsLoading(true);
     let updatedSuccessfully = false;
     
@@ -51,6 +51,8 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
           if (deptError) {
             console.error('更新部门关联失败:', deptError);
             // 记录错误但不中断流程
+          } else {
+            console.log('用户部门关联更新成功:', values.department_id);
           }
         } catch (deptError) {
           console.error('处理部门关联时出错:', deptError);
@@ -80,6 +82,8 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
               
             if (roleUpdateError) {
               console.error('更新角色失败:', roleUpdateError);
+            } else {
+              console.log('用户角色更新成功:', values.role_id);
             }
           } else {
             // 没有角色关联，创建新的
@@ -92,6 +96,8 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
               
             if (roleInsertError) {
               console.error('分配角色失败:', roleInsertError);
+            } else {
+              console.log('用户角色新建成功:', values.role_id);
             }
           }
         } catch (roleError) {

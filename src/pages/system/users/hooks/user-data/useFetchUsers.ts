@@ -60,10 +60,9 @@ export const useFetchUsers = () => {
             
             if (deptError) {
               console.error(`获取用户 ${user.id} 的部门信息失败:`, deptError);
-            } else {
-              departmentInfo = deptData && Array.isArray(deptData) && deptData.length > 0 
-                ? deptData[0] as DepartmentInfo 
-                : null;
+            } else if (deptData && Array.isArray(deptData) && deptData.length > 0) {
+              departmentInfo = deptData[0] as DepartmentInfo;
+              console.log(`用户 ${user.id} 的部门信息:`, departmentInfo);
             }
           } catch (deptErr) {
             console.error(`处理用户 ${user.id} 的部门信息时出错:`, deptErr);
@@ -80,7 +79,11 @@ export const useFetchUsers = () => {
               .eq('user_id', user.id)
               .single();
               
-            if (!roleError && roleData) {
+            if (roleError) {
+              if (roleError.code !== 'PGRST116') { // PGRST116表示没有记录，这不是真正的错误
+                console.error(`获取用户 ${user.id} 的角色ID失败:`, roleError);
+              }
+            } else if (roleData) {
               roleId = roleData.role_id;
               
               // 获取角色名称
@@ -90,8 +93,11 @@ export const useFetchUsers = () => {
                 .eq('id', roleId)
                 .single();
                 
-              if (!roleDetailsError && roleDetails) {
+              if (roleDetailsError) {
+                console.error(`获取角色 ${roleId} 的详细信息失败:`, roleDetailsError);
+              } else if (roleDetails) {
                 roleName = roleDetails.name;
+                console.log(`用户 ${user.id} 的角色信息:`, { roleId, roleName });
               }
             }
           } catch (roleErr) {

@@ -97,7 +97,7 @@ const UserFormDialog = ({
     try {
       const success = await onSubmit(values);
       if (success) {
-        // 成功后主动关闭对话框
+        // 成功后手动关闭对话框
         onOpenChange(false);
         
         // 显示成功消息
@@ -105,6 +105,8 @@ const UserFormDialog = ({
           title: currentUser ? "更新成功" : "创建成功",
           description: currentUser ? `用户 ${values.username} 已更新` : `用户 ${values.username} 已创建`,
         });
+      } else {
+        console.error("表单提交返回失败");
       }
     } catch (error) {
       console.error("表单提交失败:", error);
@@ -115,13 +117,6 @@ const UserFormDialog = ({
       });
     }
   });
-
-  // 当对话框关闭时记录日志
-  React.useEffect(() => {
-    if (!isOpen) {
-      console.log("对话框已关闭");
-    }
-  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
