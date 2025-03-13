@@ -1,5 +1,7 @@
+
 import LoginForm from "@/components/LoginForm";
 import FeatureGrid from "@/components/FeatureGrid";
+import { CustomerServiceWidget } from "@/components/chat/CustomerServiceWidget";
 
 const Index = () => {
   return (
@@ -21,6 +23,9 @@ const Index = () => {
           桂公网安备 45010302001104号ICP备17005801号-1
         </div>
       </div>
+      
+      {/* 添加客服小部件 */}
+      <CustomerServiceWidget />
     </div>
   );
 };
