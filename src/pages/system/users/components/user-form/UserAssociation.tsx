@@ -48,7 +48,7 @@ const UserAssociation = ({
             <FormLabel>部门</FormLabel>
             <Select 
               onValueChange={field.onChange} 
-              defaultValue={field.value} 
+              value={field.value || ""} // 修复：确保值不为undefined
               disabled={isLoading}
             >
               <FormControl>
@@ -57,7 +57,6 @@ const UserAssociation = ({
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="">请选择部门</SelectItem>
                 {departments.map(dept => (
                   <SelectItem key={dept.id} value={dept.id}>
                     {dept.name}
@@ -78,7 +77,7 @@ const UserAssociation = ({
             <FormLabel>角色</FormLabel>
             <Select 
               onValueChange={field.onChange} 
-              defaultValue={field.value} 
+              value={field.value || ""} // 修复：确保值不为undefined
               disabled={isLoading}
             >
               <FormControl>
@@ -87,7 +86,6 @@ const UserAssociation = ({
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="">请选择角色</SelectItem>
                 {roles.map(role => (
                   <SelectItem key={role.id} value={role.id}>
                     {role.name}

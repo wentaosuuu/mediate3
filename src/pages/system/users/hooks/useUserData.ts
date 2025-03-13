@@ -22,13 +22,23 @@ export const useUserData = () => {
           username, 
           email, 
           phone, 
+          department_id,
           tenant_id, 
           created_at, 
-          updated_at
+          updated_at,
+          departments(name)
         `);
 
       if (error) throw error;
-      setUsers(data || []);
+
+      // 处理部门名称
+      const formattedUsers = (data || []).map(user => ({
+        ...user,
+        department_name: user.departments?.name || '-'
+      }));
+      
+      console.log("获取到的用户列表:", formattedUsers);
+      setUsers(formattedUsers);
     } catch (error) {
       console.error('获取用户列表失败:', error);
       toast({
@@ -52,6 +62,11 @@ export const useUserData = () => {
       setDepartments(data || []);
     } catch (error) {
       console.error('获取部门列表失败:', error);
+      toast({
+        title: "获取部门列表失败",
+        description: (error as Error).message,
+        variant: "destructive",
+      });
     }
   };
 

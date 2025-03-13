@@ -49,13 +49,13 @@ const UserFormDialog = ({
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
-      username: currentUser?.username || "",
-      email: currentUser?.email || "",
-      phone: currentUser?.phone || "",
-      department_id: currentUser?.department_id || "",
-      role_id: currentUser?.role_id || "",
+      username: "",
+      email: "",
+      phone: "",
+      department_id: "",
+      role_id: "",
       password: "",
-      tenant_id: currentUser?.tenant_id || "default" // 在实际应用中应该从系统或登录用户获取
+      tenant_id: "default" // 在实际应用中应该从系统或登录用户获取
     }
   });
 
@@ -63,15 +63,29 @@ const UserFormDialog = ({
   React.useEffect(() => {
     if (isOpen) {
       console.log("重置表单数据:", currentUser);
-      form.reset({
-        username: currentUser?.username || "",
-        email: currentUser?.email || "",
-        phone: currentUser?.phone || "",
-        department_id: currentUser?.department_id || "",
-        role_id: currentUser?.role_id || "",
-        password: "",
-        tenant_id: currentUser?.tenant_id || "default"
-      });
+      if (currentUser) {
+        // 编辑用户模式
+        form.reset({
+          username: currentUser?.username || "",
+          email: currentUser?.email || "",
+          phone: currentUser?.phone || "",
+          department_id: currentUser?.department_id || "",
+          role_id: currentUser?.role_id || "",
+          password: "",  // 编辑模式不需要密码
+          tenant_id: currentUser?.tenant_id || "default"
+        });
+      } else {
+        // 创建用户模式
+        form.reset({
+          username: "",
+          email: "",
+          phone: "",
+          department_id: "",
+          role_id: "",
+          password: "",
+          tenant_id: "default"
+        });
+      }
     }
   }, [currentUser, isOpen, form]);
 
@@ -80,6 +94,13 @@ const UserFormDialog = ({
     console.log("提交表单数据:", values);
     await onSubmit(values);
   });
+
+  // 当对话框关闭时记录日志
+  React.useEffect(() => {
+    if (!isOpen) {
+      console.log("对话框已关闭");
+    }
+  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>

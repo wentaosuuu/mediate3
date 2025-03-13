@@ -25,6 +25,7 @@ export const useUserOperations = (fetchUsers: () => Promise<void>) => {
             username: values.username,
             email: values.email,
             phone: values.phone,
+            department_id: values.department_id,
             updated_at: new Date().toISOString()
           })
           .eq('id', currentUser.id);
@@ -81,6 +82,7 @@ export const useUserOperations = (fetchUsers: () => Promise<void>) => {
             username: values.username,
             email: values.email,
             phone: values.phone,
+            department_id: values.department_id,
             tenant_id: values.tenant_id,
           });
 
@@ -128,9 +130,33 @@ export const useUserOperations = (fetchUsers: () => Promise<void>) => {
   };
 
   // 打开编辑用户对话框
-  const openEditDialog = (user: any) => {
-    setCurrentUser(user);
-    setIsDialogOpen(true);
+  const openEditDialog = async (user: any) => {
+    try {
+      setIsLoading(true);
+      // 加载用户的角色信息
+      const { data: userRoles } = await supabase
+        .from('user_roles')
+        .select('role_id')
+        .eq('user_id', user.id)
+        .single();
+      
+      // 将角色信息添加到用户对象
+      const enhancedUser = {
+        ...user,
+        role_id: userRoles?.role_id || ""
+      };
+      
+      console.log("打开编辑对话框，用户数据:", enhancedUser);
+      setCurrentUser(enhancedUser);
+      setIsDialogOpen(true);
+    } catch (error) {
+      console.error("获取用户角色失败:", error);
+      // 如果获取角色失败，仍然打开对话框，但没有角色信息
+      setCurrentUser(user);
+      setIsDialogOpen(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 启用/禁用用户
