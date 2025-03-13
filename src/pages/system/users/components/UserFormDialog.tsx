@@ -98,7 +98,7 @@ const UserFormDialog = ({
       const success = await onSubmit(values);
       if (success) {
         console.log("表单提交成功，关闭对话框");
-        // 成功后手动关闭对话框
+        // 成功后关闭对话框
         onOpenChange(false);
       } else {
         console.error("表单提交返回失败");

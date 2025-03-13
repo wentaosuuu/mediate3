@@ -3,13 +3,6 @@ import { useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-// 定义部门信息接口
-interface DepartmentInfo {
-  user_id: string;
-  department_id: string;
-  department_name: string;
-}
-
 // 获取用户列表的钩子
 export const useFetchUsers = () => {
   const [users, setUsers] = useState<any[]>([]);
@@ -49,20 +42,28 @@ export const useFetchUsers = () => {
       // 获取用户关联的部门信息和角色信息
       const formattedUsers = await Promise.all(data.map(async (user) => {
         try {
-          // 获取部门信息
-          let departmentInfo: DepartmentInfo | null = null;
+          // 获取部门信息 - 直接查询user_departments和departments表
+          let departmentId = "";
+          let departmentName = "-";
           
           try {
-            const { data: deptData, error: deptError } = await supabase.rpc(
-              'get_user_department',
-              { p_user_id: user.id }
-            );
+            const { data: deptData, error: deptError } = await supabase
+              .from('user_departments')
+              .select(`
+                department_id,
+                departments:department_id (
+                  name
+                )
+              `)
+              .eq('user_id', user.id)
+              .maybeSingle();
             
             if (deptError) {
               console.error(`获取用户 ${user.id} 的部门信息失败:`, deptError);
-            } else if (deptData && Array.isArray(deptData) && deptData.length > 0) {
-              departmentInfo = deptData[0] as DepartmentInfo;
-              console.log(`用户 ${user.id} 的部门信息:`, departmentInfo);
+            } else if (deptData) {
+              departmentId = deptData.department_id;
+              departmentName = deptData.departments?.name || "-";
+              console.log(`用户 ${user.id} 的部门信息:`, { departmentId, departmentName });
             }
           } catch (deptErr) {
             console.error(`处理用户 ${user.id} 的部门信息时出错:`, deptErr);
@@ -70,35 +71,28 @@ export const useFetchUsers = () => {
           
           // 获取用户角色信息
           let roleId = "";
-          let roleName = "";
+          let roleName = "-";
           
           try {
             const { data: roleData, error: roleError } = await supabase
               .from('user_roles')
-              .select('role_id')
+              .select(`
+                role_id,
+                roles:role_id (
+                  name
+                )
+              `)
               .eq('user_id', user.id)
-              .single();
+              .maybeSingle();
               
             if (roleError) {
               if (roleError.code !== 'PGRST116') { // PGRST116表示没有记录，这不是真正的错误
-                console.error(`获取用户 ${user.id} 的角色ID失败:`, roleError);
+                console.error(`获取用户 ${user.id} 的角色信息失败:`, roleError);
               }
             } else if (roleData) {
               roleId = roleData.role_id;
-              
-              // 获取角色名称
-              const { data: roleDetails, error: roleDetailsError } = await supabase
-                .from('roles')
-                .select('name')
-                .eq('id', roleId)
-                .single();
-                
-              if (roleDetailsError) {
-                console.error(`获取角色 ${roleId} 的详细信息失败:`, roleDetailsError);
-              } else if (roleDetails) {
-                roleName = roleDetails.name;
-                console.log(`用户 ${user.id} 的角色信息:`, { roleId, roleName });
-              }
+              roleName = roleData.roles?.name || "-";
+              console.log(`用户 ${user.id} 的角色信息:`, { roleId, roleName });
             }
           } catch (roleErr) {
             console.error(`处理用户 ${user.id} 的角色信息时出错:`, roleErr);
@@ -106,10 +100,10 @@ export const useFetchUsers = () => {
           
           return {
             ...user,
-            department_id: departmentInfo?.department_id || "",
-            department_name: departmentInfo?.department_name || "-",
-            role_id: roleId || "",
-            role_name: roleName || "-"
+            department_id: departmentId,
+            department_name: departmentName,
+            role_id: roleId,
+            role_name: roleName
           };
         } catch (err) {
           console.error(`处理用户 ${user.id} 的信息时出错:`, err);

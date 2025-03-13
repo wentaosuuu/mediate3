@@ -21,7 +21,7 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
       setIsLoading(true);
       console.log("开始获取用户详细信息，用户ID:", user.id);
 
-      // 获取用户的部门信息
+      // 直接从user_departments表获取部门ID
       const departmentResult = await supabase
         .from('user_departments')
         .select('department_id')
@@ -30,6 +30,8 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
       
       if (departmentResult.error) {
         console.error("获取用户部门ID失败:", departmentResult.error);
+      } else {
+        console.log("获取到用户部门信息:", departmentResult.data);
       }
       
       // 加载用户的角色信息
@@ -42,6 +44,8 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
       if (roleResult.error && roleResult.error.code !== 'PGRST116') {
         // PGRST116是没有找到记录的错误，这种情况下我们只需要继续处理
         console.error("获取用户角色失败:", roleResult.error);
+      } else {
+        console.log("获取到用户角色信息:", roleResult.data);
       }
       
       // 将角色和部门信息添加到用户对象

@@ -12,11 +12,14 @@ export const useUserOperations = (fetchUsers: () => Promise<void>) => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   
   // 使用拆分后的功能模块
-  const { isLoading, createUser } = useUserCreate(fetchUsers);
-  const { updateUser } = useUserUpdate(fetchUsers);
-  const { isDialogOpen, setIsDialogOpen, openCreateDialog, openEditDialog } = useUserDialog(setCurrentUser);
-  const { toggleUserStatus } = useUserStatus(fetchUsers);
-  const { deleteUser } = useUserDelete(fetchUsers);
+  const { isLoading: createLoading, createUser } = useUserCreate(fetchUsers);
+  const { isLoading: updateLoading, updateUser } = useUserUpdate(fetchUsers);
+  const { isDialogOpen, setIsDialogOpen, isLoading: dialogLoading, openCreateDialog, openEditDialog } = useUserDialog(setCurrentUser);
+  const { isLoading: statusLoading, toggleUserStatus } = useUserStatus(fetchUsers);
+  const { isLoading: deleteLoading, deleteUser } = useUserDelete(fetchUsers);
+
+  // 合并加载状态
+  const isLoading = createLoading || updateLoading || dialogLoading || statusLoading || deleteLoading;
 
   // 处理用户创建或更新的统一入口
   const handleSubmit = async (values: UserFormValues): Promise<boolean> => {
@@ -27,9 +30,6 @@ export const useUserOperations = (fetchUsers: () => Promise<void>) => {
     } else {
       // 创建新用户
       success = await createUser(values);
-    }
-    if (success) {
-      setIsDialogOpen(false);
     }
     return success;
   };

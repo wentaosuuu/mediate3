@@ -31,6 +31,8 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       if (error) {
         console.error('更新用户基本信息失败:', error);
         throw error;
+      } else {
+        console.log('用户基本信息更新成功');
       }
       
       // 处理部门关联
