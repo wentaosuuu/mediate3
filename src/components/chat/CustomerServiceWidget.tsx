@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
  * 智能客服小部件
  * 
  * 使用MaxKB作为客服系统，通过动态加载脚本的方式实现
+ * 支持自适应协议（HTTP/HTTPS）
  */
 export const CustomerServiceWidget = () => {
   const { toast } = useToast();
@@ -19,9 +20,10 @@ export const CustomerServiceWidget = () => {
     setIsOpen(!isOpen);
     
     if (!isOpen) {
+      const protocol = window.location.protocol === 'https:' ? 'HTTPS' : 'HTTP';
       toast({
         title: "已打开客服窗口",
-        description: "正在加载MaxKB客服系统..."
+        description: `正在加载MaxKB客服系统 (${protocol})...`
       });
     }
   };

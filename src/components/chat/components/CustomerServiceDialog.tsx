@@ -30,14 +30,22 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
       setShowFallback(false);
       
       const script = document.createElement('script');
-      // 确保使用HTTP协议而非相对协议，因为我们已经配置了开发服务器使用HTTP
-      script.src = "http://127.0.0.1:8080/api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714";
+      
+      // 使用动态协议
+      const currentProtocol = window.location.protocol;
+      // 基本URL，去掉协议部分
+      const baseUrl = "127.0.0.1:8080";
+      // 如果当前是HTTPS，尝试也使用HTTPS访问MaxKB；否则使用HTTP
+      const protocol = currentProtocol === 'https:' ? 'https' : 'http';
+      
+      // 构建脚本URL
+      script.src = `${protocol}://${baseUrl}/api/application/embed?protocol=${protocol}&host=${baseUrl}&token=62bacb3e3b761714`;
       script.async = true;
       script.defer = true;
       
       // 脚本加载成功处理
       script.onload = () => {
-        console.log("MaxKB脚本加载成功");
+        console.log(`MaxKB脚本加载成功 (使用${protocol}协议)`);
         scriptLoaded.current = true;
         setIsLoading(false);
         
@@ -53,7 +61,7 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
       
       // 脚本加载失败处理
       script.onerror = () => {
-        console.error("MaxKB脚本加载失败");
+        console.error(`MaxKB脚本加载失败 (尝试使用${protocol}协议)`);
         setIsLoading(false);
         setLoadError(true);
         scriptLoaded.current = false;
@@ -94,12 +102,7 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
     setIsLoading(true);
     setShowFallback(false);
     
-    // 重新加载脚本
-    const script = document.createElement('script');
-    script.src = "http://127.0.0.1:8080/api/application/embed?protocol=http&host=127.0.0.1:8080&token=62bacb3e3b761714";
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
+    // 重新加载脚本 - 会重新触发useEffect
   };
   
   // 使用备用系统
@@ -107,6 +110,7 @@ export const CustomerServiceDialog = ({ isOpen, onOpenChange }: CustomerServiceD
     setShowFallback(true);
   };
   
+  // 获取当前协议
   const isHttps = window.location.protocol === 'https:';
   
   return (

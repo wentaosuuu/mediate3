@@ -24,7 +24,8 @@ export const ErrorDisplay = ({ onRetry, onUseFallback, isHttps = false }: ErrorD
           可能是由于MaxKB服务未启动、网络问题或跨域限制导致
           {isHttps && 
             <span className="block mt-1 text-amber-600">
-              检测到您正在使用HTTPS，而MaxKB使用HTTP，这可能导致浏览器阻止加载
+              检测到您正在使用HTTPS，系统将尝试通过HTTPS连接MaxKB。
+              如果您的MaxKB服务仅支持HTTP，请确保您的浏览器允许混合内容或切换到HTTP访问本站。
             </span>
           }
         </p>
