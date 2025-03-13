@@ -29,7 +29,7 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
         .eq('user_id', user.id)
         .maybeSingle();
       
-      if (departmentResult.error) {
+      if (departmentResult.error && departmentResult.error.code !== 'PGRST116') {
         console.error("获取用户部门信息失败:", departmentResult.error);
         // 不要因为错误中断流程
       }

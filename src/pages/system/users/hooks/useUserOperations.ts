@@ -41,9 +41,7 @@ export const useUserOperations = (fetchUsers: () => Promise<void>) => {
       
       // 如果操作成功，关闭对话框并刷新用户列表
       if (success) {
-        console.log("操作成功，准备关闭对话框并刷新列表");
-        await fetchUsers(); // 确保列表被刷新
-        setIsDialogOpen(false); // 关闭对话框
+        console.log("操作成功，刷新列表");
         return true;
       } else {
         console.error("操作返回失败状态");

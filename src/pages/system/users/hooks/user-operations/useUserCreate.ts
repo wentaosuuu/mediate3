@@ -12,17 +12,16 @@ export const useUserCreate = (fetchUsers: () => Promise<void>) => {
   // 创建用户
   const createUser = async (values: UserFormValues) => {
     setIsLoading(true);
-    let createdSuccessfully = false;
     
     try {
       console.log("创建用户，数据:", values);
       
-      // 注意: 不要生成自己的UUID - 让Supabase自动生成
-      // 修改: 不再自己指定ID，让数据库自动生成
+      // 创建用户基本信息，让Supabase自动生成ID
       const { data: userData, error: userError } = await supabase
         .from('users')
         .insert({
           username: values.username,
+          name: values.name,
           email: values.email,
           phone: values.phone,
           tenant_id: values.tenant_id,
@@ -94,10 +93,8 @@ export const useUserCreate = (fetchUsers: () => Promise<void>) => {
 
       toast({
         title: "用户创建成功",
-        description: `用户 ${values.username} 已创建`,
+        description: `用户 ${values.name} 已创建`,
       });
-      
-      createdSuccessfully = true;
       
       // 刷新用户列表
       await fetchUsers();

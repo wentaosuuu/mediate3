@@ -12,7 +12,6 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
   // 更新用户
   const updateUser = async (values: UserFormValues, currentUser: any): Promise<boolean> => {
     setIsLoading(true);
-    let updatedSuccessfully = false;
     
     try {
       console.log("开始更新用户数据:", values, "用户ID:", currentUser.id);
@@ -22,6 +21,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
         .from('users')
         .update({
           username: values.username,
+          name: values.name,
           email: values.email,
           phone: values.phone,
           updated_at: new Date().toISOString()
@@ -47,7 +47,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
             .eq('user_id', currentUser.id)
             .maybeSingle();
             
-          if (deptCheckError) {
+          if (deptCheckError && deptCheckError.code !== 'PGRST116') {
             console.error('检查用户部门关联失败:', deptCheckError);
           }
           
@@ -138,12 +138,9 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
         }
       }
       
-      // 标记更新成功
-      updatedSuccessfully = true;
-      
       toast({
         title: "用户更新成功",
-        description: `用户 ${values.username} 已更新`,
+        description: `用户 ${values.name} 已更新`,
       });
       
       // 刷新用户列表

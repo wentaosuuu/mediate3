@@ -21,9 +21,23 @@ const UserBasicInfo = ({ isLoading, currentUser }: { isLoading: boolean, current
         name="username"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>用户名</FormLabel>
+            <FormLabel>登录账号</FormLabel>
             <FormControl>
-              <Input {...field} placeholder="请输入用户名" disabled={isLoading} />
+              <Input {...field} placeholder="请输入登录账号" disabled={isLoading} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      
+      <FormField
+        control={form.control}
+        name="name"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>姓名</FormLabel>
+            <FormControl>
+              <Input {...field} placeholder="请输入姓名" disabled={isLoading} />
             </FormControl>
             <FormMessage />
           </FormItem>

@@ -20,7 +20,8 @@ export const useFetchUsers = () => {
         .from('users')
         .select(`
           id, 
-          username, 
+          username,
+          name, 
           email, 
           phone, 
           tenant_id, 

@@ -14,12 +14,13 @@ import {
 interface User {
   id: string;
   username: string;
+  name: string; // 添加姓名字段
   email: string;
   phone?: string;
   created_at: string;
   updated_at?: string;
-  department_name?: string; // 新增部门名称字段
-  role_name?: string; // 新增角色名称字段
+  department_name?: string;
+  role_name?: string;
 }
 
 interface UsersTableProps {
@@ -42,7 +43,8 @@ const UsersTable = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>用户名</TableHead>
+            <TableHead>登录账号</TableHead>
+            <TableHead>姓名</TableHead>
             <TableHead>邮箱</TableHead>
             <TableHead>电话</TableHead>
             <TableHead>部门</TableHead>
@@ -55,13 +57,13 @@ const UsersTable = ({
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-4">
+              <TableCell colSpan={9} className="text-center py-4">
                 加载中...
               </TableCell>
             </TableRow>
           ) : users.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-4">
+              <TableCell colSpan={9} className="text-center py-4">
                 没有找到用户
               </TableCell>
             </TableRow>
@@ -69,6 +71,7 @@ const UsersTable = ({
             users.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>{user.username}</TableCell>
+                <TableCell>{user.name || '-'}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.phone || '-'}</TableCell>
                 <TableCell>{user.department_name || '-'}</TableCell>

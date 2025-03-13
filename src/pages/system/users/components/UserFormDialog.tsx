@@ -52,12 +52,16 @@ const UserFormDialog = ({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
       username: "",
+      name: "",
       email: "",
       phone: "",
       department_id: "",
       role_id: "",
       password: "",
       tenant_id: "default" // 在实际应用中应该从系统或登录用户获取
+    },
+    context: {
+      currentUser: currentUser
     }
   });
 
@@ -69,6 +73,7 @@ const UserFormDialog = ({
         // 编辑用户模式
         form.reset({
           username: currentUser?.username || "",
+          name: currentUser?.name || "",
           email: currentUser?.email || "",
           phone: currentUser?.phone || "",
           department_id: currentUser?.department_id || "",
@@ -80,6 +85,7 @@ const UserFormDialog = ({
         // 创建用户模式
         form.reset({
           username: "",
+          name: "",
           email: "",
           phone: "",
           department_id: "",
