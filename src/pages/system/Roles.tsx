@@ -122,23 +122,33 @@ const RolesManagement = () => {
     }
   };
 
-  // 获取权限列表（模拟数据，实际需要创建权限表）
+  // 获取权限列表
   const fetchPermissions = async () => {
-    // 此处应该从后端获取权限列表
-    setPermissions([
-      { id: 'user:create', name: '创建用户' },
-      { id: 'user:read', name: '查看用户' },
-      { id: 'user:update', name: '更新用户' },
-      { id: 'user:delete', name: '删除用户' },
-      { id: 'role:create', name: '创建角色' },
-      { id: 'role:read', name: '查看角色' },
-      { id: 'role:update', name: '更新角色' },
-      { id: 'role:delete', name: '删除角色' },
-      { id: 'department:create', name: '创建部门' },
-      { id: 'department:read', name: '查看部门' },
-      { id: 'department:update', name: '更新部门' },
-      { id: 'department:delete', name: '删除部门' }
-    ]);
+    try {
+      const { data, error } = await supabase
+        .from('permissions')
+        .select('id, name');
+        
+      if (error) throw error;
+      setPermissions(data || []);
+    } catch (error) {
+      console.error('获取权限列表失败:', error);
+      // 使用备用数据
+      setPermissions([
+        { id: 'user:create', name: '创建用户' },
+        { id: 'user:read', name: '查看用户' },
+        { id: 'user:update', name: '更新用户' },
+        { id: 'user:delete', name: '删除用户' },
+        { id: 'role:create', name: '创建角色' },
+        { id: 'role:read', name: '查看角色' },
+        { id: 'role:update', name: '更新角色' },
+        { id: 'role:delete', name: '删除角色' },
+        { id: 'department:create', name: '创建部门' },
+        { id: 'department:read', name: '查看部门' },
+        { id: 'department:update', name: '更新部门' },
+        { id: 'department:delete', name: '删除部门' }
+      ]);
+    }
   };
 
   // 初始加载
@@ -151,19 +161,6 @@ const RolesManagement = () => {
   const handleSubmit = async (values: RoleFormValues) => {
     setIsLoading(true);
     try {
-      // 检查角色表是否存在
-      try {
-        await supabase.from('roles').select('id').limit(1);
-      } catch (error) {
-        toast({
-          title: "角色表不存在",
-          description: "需要先创建角色表和权限表才能保存数据",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-
       if (currentRole) {
         // 更新角色
         const { error } = await supabase
@@ -171,27 +168,68 @@ const RolesManagement = () => {
           .update({
             name: values.name,
             description: values.description,
-            // 权限关联需要额外表
           })
           .eq('id', currentRole.id);
 
         if (error) throw error;
+        
+        // 处理权限关联
+        if (values.permissions && values.permissions.length > 0) {
+          // 先删除旧的权限关联
+          await supabase
+            .from('role_permissions')
+            .delete()
+            .eq('role_id', currentRole.id);
+            
+          // 添加新的权限关联
+          const rolePermissions = values.permissions.map(permissionId => ({
+            role_id: currentRole.id,
+            permission_id: permissionId
+          }));
+          
+          const { error: permError } = await supabase
+            .from('role_permissions')
+            .insert(rolePermissions);
+            
+          if (permError) {
+            console.error('更新角色权限失败:', permError);
+          }
+        }
+        
         toast({
           title: "角色更新成功",
           description: `角色 ${values.name} 已更新`,
         });
       } else {
         // 创建角色
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('roles')
           .insert({
             name: values.name,
             description: values.description,
             tenant_id: values.tenant_id,
-            // 权限关联需要额外表
-          });
+          })
+          .select();
 
         if (error) throw error;
+        
+        // 处理权限关联
+        if (values.permissions && values.permissions.length > 0 && data && data.length > 0) {
+          const roleId = data[0].id;
+          const rolePermissions = values.permissions.map(permissionId => ({
+            role_id: roleId,
+            permission_id: permissionId
+          }));
+          
+          const { error: permError } = await supabase
+            .from('role_permissions')
+            .insert(rolePermissions);
+            
+          if (permError) {
+            console.error('设置角色权限失败:', permError);
+          }
+        }
+        
         toast({
           title: "角色创建成功",
           description: `角色 ${values.name} 已创建`,
@@ -213,6 +251,23 @@ const RolesManagement = () => {
     }
   };
 
+  // 获取角色的权限
+  const fetchRolePermissions = async (roleId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('role_permissions')
+        .select('permission_id')
+        .eq('role_id', roleId);
+        
+      if (error) throw error;
+      
+      return data?.map(item => item.permission_id) || [];
+    } catch (error) {
+      console.error('获取角色权限失败:', error);
+      return [];
+    }
+  };
+
   // 打开创建角色对话框
   const openCreateDialog = () => {
     setCurrentRole(null);
@@ -226,12 +281,16 @@ const RolesManagement = () => {
   };
 
   // 打开编辑角色对话框
-  const openEditDialog = (role: any) => {
+  const openEditDialog = async (role: any) => {
     setCurrentRole(role);
+    
+    // 获取角色的权限
+    const rolePermissions = await fetchRolePermissions(role.id);
+    
     form.reset({
       name: role.name,
       description: role.description || "",
-      permissions: role.permissions || [],
+      permissions: rolePermissions,
       tenant_id: role.tenant_id
     });
     setIsDialogOpen(true);
@@ -441,3 +500,4 @@ const RolesManagement = () => {
 };
 
 export default RolesManagement;
+

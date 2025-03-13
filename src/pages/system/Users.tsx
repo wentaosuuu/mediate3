@@ -114,10 +114,9 @@ const UsersManagement = () => {
     }
   };
 
-  // 获取角色列表（这里示例，实际需要创建角色表）
+  // 获取角色列表
   const fetchRoles = async () => {
     try {
-      // 此处假设有一个角色表，实际需要创建
       const { data, error } = await supabase
         .from('roles')
         .select('id, name');
@@ -164,19 +163,36 @@ const UsersManagement = () => {
         });
       } else {
         // 创建用户
-        // 注意：这里应该使用 auth.signUp 创建用户，然后在用户表中添加额外信息
-        // 实际实现应根据 Supabase 身份验证流程
+        // 在实际应用中，这里应该使用 auth.signUp 方法
+        // 生成一个随机ID
+        const userId = crypto.randomUUID();
+        
         const { error } = await supabase
           .from('users')
           .insert({
+            id: userId,
             username: values.username,
             email: values.email,
             phone: values.phone,
             tenant_id: values.tenant_id,
-            // 部门和角色关联需要额外表
           });
 
         if (error) throw error;
+        
+        // 如果选择了角色，则添加用户-角色关联
+        if (values.role_id) {
+          const { error: roleError } = await supabase
+            .from('user_roles')
+            .insert({
+              user_id: userId,
+              role_id: values.role_id
+            });
+            
+          if (roleError) {
+            console.error('分配角色失败:', roleError);
+          }
+        }
+
         toast({
           title: "用户创建成功",
           description: `用户 ${values.username} 已创建`,
@@ -502,3 +518,4 @@ const UsersManagement = () => {
 };
 
 export default UsersManagement;
+
