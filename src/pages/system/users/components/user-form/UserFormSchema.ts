@@ -14,8 +14,10 @@ export const userFormSchema = z.object({
     .optional()
     .superRefine((val, ctx) => {
       // 检查是否在编辑模式
-      // 获取表单数据中的__isEditMode标志
-      const isEditMode = ctx.path[0] === '__isEditMode' ? false : ctx.data?.__isEditMode === true;
+      // 在表单上下文中获取__isEditMode标志
+      // Zod的superRefine方法中，无法直接访问其他字段，所以我们使用path来检查
+      const isEditMode = ctx.path.includes('__isEditMode') || 
+                         (ctx.parent as any)?.__isEditMode === true;
       
       // 如果不是编辑模式且密码为空，则添加错误
       if (!val && !isEditMode) {
