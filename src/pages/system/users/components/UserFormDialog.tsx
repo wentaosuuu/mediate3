@@ -58,10 +58,8 @@ const UserFormDialog = ({
       department_id: "",
       role_id: "",
       password: "",
-      tenant_id: "default" // 在实际应用中应该从系统或登录用户获取
-    },
-    context: {
-      currentUser: currentUser
+      tenant_id: "default", // 在实际应用中应该从系统或登录用户获取
+      __isEditMode: false // 默认为创建模式
     }
   });
 
@@ -79,7 +77,8 @@ const UserFormDialog = ({
           department_id: currentUser?.department_id || "",
           role_id: currentUser?.role_id || "",
           password: "",  // 编辑模式不需要密码
-          tenant_id: currentUser?.tenant_id || "default"
+          tenant_id: currentUser?.tenant_id || "default",
+          __isEditMode: true // 标记为编辑模式
         });
       } else {
         // 创建用户模式
@@ -91,7 +90,8 @@ const UserFormDialog = ({
           department_id: "",
           role_id: "",
           password: "",
-          tenant_id: "default"
+          tenant_id: "default",
+          __isEditMode: false // 标记为创建模式
         });
       }
     }
@@ -107,7 +107,9 @@ const UserFormDialog = ({
     
     try {
       console.log("开始提交表单");
-      const success = await onSubmit(values);
+      // 移除临时标记字段，不需要提交到服务器
+      const { __isEditMode, ...submitValues } = values;
+      const success = await onSubmit(submitValues);
       if (success) {
         console.log("表单提交成功，关闭对话框");
         form.reset(); // 重置表单

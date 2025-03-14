@@ -23,11 +23,12 @@ export const userFormSchema = z.object({
       // 从上下文中获取表单的当前状态
       const formData = ctx.path.length > 0 ? ctx : undefined;
       
-      // 通过外部传递的上下文检查是否有currentUser
-      // 修复：我们不能直接使用meta，需要访问整个上下文
-      const hasCurrentUser = ctx.common && 'currentUser' in ctx.common ? !!ctx.common.currentUser : false;
+      // 检查是否在编辑模式（有currentUser）
+      // 我们使用表单中传递的外部上下文信息，但在zod的RefinementCtx中无法直接访问它
+      // 因此我们需要从UserFormDialog组件中传递一个额外的标志
+      const isEditMode = ctx.data?.__isEditMode === true;
       
-      if (!val && !hasCurrentUser) {
+      if (!val && !isEditMode) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "创建用户时密码不能为空",
@@ -35,7 +36,9 @@ export const userFormSchema = z.object({
         });
       }
     }),
-  tenant_id: z.string()
+  tenant_id: z.string(),
+  // 添加一个隐藏字段用于标记编辑模式
+  __isEditMode: z.boolean().optional().default(false)
 });
 
 export type UserFormValues = z.infer<typeof userFormSchema>;

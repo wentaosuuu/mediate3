@@ -13,21 +13,23 @@ export const useUserCreate = (refreshUsers: () => Promise<void>) => {
   const createUser = async (values: UserFormValues): Promise<boolean> => {
     setIsLoading(true);
     try {
-      console.log("开始创建用户，用户数据:", values);
+      // 确保移除可能存在的__isEditMode字段
+      const { __isEditMode, ...userData } = values;
+      console.log("开始创建用户，用户数据:", userData);
       
       // 1. 创建用户基本信息 - 使用.insert()而不是受限制的.upsert()
       // 生成一个UUID用于新用户的ID
       const newUserId = crypto.randomUUID();
       
-      const { data: userData, error: userError } = await supabase
+      const { data: userResult, error: userError } = await supabase
         .from('users')
         .insert({
           id: newUserId, // 显式提供ID
-          username: values.username,
-          name: values.name,
-          email: values.email,
-          phone: values.phone || null,
-          tenant_id: values.tenant_id
+          username: userData.username,
+          name: userData.name,
+          email: userData.email,
+          phone: userData.phone || null,
+          tenant_id: userData.tenant_id
         })
         .select('id, username, name, email')
         .single();
@@ -37,21 +39,21 @@ export const useUserCreate = (refreshUsers: () => Promise<void>) => {
         throw new Error(`创建用户失败: ${userError.message}`);
       }
       
-      if (!userData) {
+      if (!userResult) {
         throw new Error("创建用户后未返回用户数据");
       }
       
-      const userId = userData.id;
+      const userId = userResult.id;
       console.log("用户基本信息创建成功，用户ID:", userId);
       
       // 2. 如果提供了部门ID，创建用户-部门关联
-      if (values.department_id) {
-        console.log("为用户设置部门:", values.department_id);
+      if (userData.department_id) {
+        console.log("为用户设置部门:", userData.department_id);
         const { error: deptError } = await supabase.rpc(
           'upsert_user_department',
           { 
             p_user_id: userId, 
-            p_department_id: values.department_id 
+            p_department_id: userData.department_id 
           }
         );
         
@@ -67,13 +69,13 @@ export const useUserCreate = (refreshUsers: () => Promise<void>) => {
       }
       
       // 3. 如果提供了角色ID，创建用户-角色关联
-      if (values.role_id) {
-        console.log("为用户设置角色:", values.role_id);
+      if (userData.role_id) {
+        console.log("为用户设置角色:", userData.role_id);
         const { error: roleError } = await supabase
           .from('user_roles')
           .insert({
             user_id: userId,
-            role_id: values.role_id
+            role_id: userData.role_id
           });
         
         if (roleError) {
@@ -94,7 +96,7 @@ export const useUserCreate = (refreshUsers: () => Promise<void>) => {
       
       toast({
         title: "用户创建成功",
-        description: `已成功创建用户: ${values.username}`,
+        description: `已成功创建用户: ${userData.username}`,
       });
       
       return true;
