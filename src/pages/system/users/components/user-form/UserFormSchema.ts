@@ -23,10 +23,9 @@ export const userFormSchema = z.object({
       // 从上下文中获取表单的当前状态
       const formData = ctx.path.length > 0 ? ctx : undefined;
       
-      // 通过外部传入的context获取currentUser状态
-      // 修复：使用Zod正确的上下文API访问方式
-      const contextData = ctx.contextualErrorMap?.formData;
-      const hasCurrentUser = contextData?.currentUser;
+      // 通过form.context直接传递的currentUser
+      // 修复：使用ctx.data访问完整表单数据并从外部直接获取上下文
+      const hasCurrentUser = !!ctx?.meta?.currentUser;
       
       if (!val && !hasCurrentUser) {
         ctx.addIssue({
