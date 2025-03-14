@@ -12,22 +12,12 @@ export const userFormSchema = z.object({
   password: z.string()
     .min(6, { message: "密码至少需要6个字符" })
     .optional()
-    .refine((val) => {
-      // 这里简化refine参数，不使用ctx参数，在后面的验证中添加上下文判断
-      return true;
-    }, {
-      message: "创建用户时密码不能为空"
-    })
     .superRefine((val, ctx) => {
-      // 使用superRefine进行更复杂的验证，根据是否存在currentUser决定密码是否必填
-      // 从上下文中获取表单的当前状态
-      const formData = ctx.path.length > 0 ? ctx : undefined;
+      // 检查是否在编辑模式
+      // 获取表单数据中的__isEditMode标志
+      const isEditMode = ctx.path[0] === '__isEditMode' ? false : ctx.input.__isEditMode === true;
       
-      // 检查是否在编辑模式（有currentUser）
-      // 我们使用表单中传递的外部上下文信息，但在zod的RefinementCtx中无法直接访问它
-      // 因此我们需要从UserFormDialog组件中传递一个额外的标志
-      const isEditMode = ctx.data?.__isEditMode === true;
-      
+      // 如果不是编辑模式且密码为空，则添加错误
       if (!val && !isEditMode) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
