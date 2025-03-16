@@ -15,16 +15,8 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-
-interface Department {
-  id: string;
-  name: string;
-}
-
-interface Role {
-  id: string;
-  name: string;
-}
+import { Department } from '../../hooks/user-data/useFetchDepartments';
+import { Role } from '../../hooks/user-data/useFetchRoles';
 
 // 部门和角色关联组件
 const UserAssociation = ({ 
@@ -57,11 +49,17 @@ const UserAssociation = ({
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                {departments.map(dept => (
-                  <SelectItem key={dept.id} value={dept.id}>
-                    {dept.name}
+                {departments.length > 0 ? (
+                  departments.map(dept => (
+                    <SelectItem key={dept.id} value={dept.id}>
+                      {dept.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="" disabled>
+                    无可用部门
                   </SelectItem>
-                ))}
+                )}
               </SelectContent>
             </Select>
             <FormMessage />
@@ -86,11 +84,17 @@ const UserAssociation = ({
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                {roles.map(role => (
-                  <SelectItem key={role.id} value={role.id}>
-                    {role.name}
+                {roles.length > 0 ? (
+                  roles.map(role => (
+                    <SelectItem key={role.id} value={role.id}>
+                      {role.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="" disabled>
+                    无可用角色
                   </SelectItem>
-                ))}
+                )}
               </SelectContent>
             </Select>
             <FormMessage />

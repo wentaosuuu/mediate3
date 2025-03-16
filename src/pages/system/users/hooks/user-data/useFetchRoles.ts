@@ -3,9 +3,15 @@ import { useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+// 定义角色类型接口
+export interface Role {
+  id: string;
+  name: string;
+}
+
 // 获取角色列表的钩子
 export const useFetchRoles = () => {
-  const [roles, setRoles] = useState<any[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -13,22 +19,26 @@ export const useFetchRoles = () => {
   const fetchRoles = async () => {
     setIsLoading(true);
     try {
+      console.log("开始获取角色列表...");
       const { data, error } = await supabase
         .from('roles')
         .select('id, name');
 
       if (error) throw error;
+      
+      console.log(`成功获取 ${data?.length || 0} 个角色`);
+      console.log("角色数据:", data);
+      
       setRoles(data || []);
       return data || [];
     } catch (error) {
       console.error('获取角色列表失败:', error);
-      // 如果角色表还未创建，使用模拟数据
-      const mockRoles = [
-        { id: '1', name: '管理员' },
-        { id: '2', name: '普通用户' }
-      ];
-      setRoles(mockRoles);
-      return mockRoles;
+      toast({
+        title: "获取角色列表失败",
+        description: (error as Error).message,
+        variant: "destructive",
+      });
+      return [];
     } finally {
       setIsLoading(false);
     }

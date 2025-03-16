@@ -35,9 +35,11 @@ export const useUserData = () => {
   useEffect(() => {
     // 顺序加载数据
     const loadData = async () => {
+      console.log("开始加载所有用户相关数据...");
       await fetchDepartments();
       await fetchRoles();
       await fetchUsers();
+      console.log("所有用户相关数据加载完成！");
     };
     
     loadData();
@@ -49,6 +51,8 @@ export const useUserData = () => {
     roles,
     isLoading: isLoading || loadingState,
     fetchUsers,
+    fetchDepartments,
+    fetchRoles,
     setIsLoading
   };
 };

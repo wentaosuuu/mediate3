@@ -15,16 +15,8 @@ import UserBasicInfo from './user-form/UserBasicInfo';
 import UserAssociation from './user-form/UserAssociation';
 import UserFormActions from './user-form/UserFormActions';
 import { useToast } from "@/hooks/use-toast";
-
-interface Department {
-  id: string;
-  name: string;
-}
-
-interface Role {
-  id: string;
-  name: string;
-}
+import { Department } from '../hooks/user-data/useFetchDepartments';
+import { Role } from '../hooks/user-data/useFetchRoles';
 
 interface UserFormDialogProps {
   isOpen: boolean;
@@ -34,6 +26,7 @@ interface UserFormDialogProps {
   isLoading: boolean;
   departments: Department[];
   roles: Role[];
+  onRefreshData?: () => void; // 添加刷新数据的回调
 }
 
 const UserFormDialog = ({
@@ -43,7 +36,8 @@ const UserFormDialog = ({
   currentUser,
   isLoading,
   departments,
-  roles
+  roles,
+  onRefreshData
 }: UserFormDialogProps) => {
   const { toast } = useToast();
   
@@ -63,10 +57,20 @@ const UserFormDialog = ({
     }
   });
 
+  // 当对话框打开时，刷新部门和角色数据
+  useEffect(() => {
+    if (isOpen && onRefreshData) {
+      onRefreshData();
+    }
+  }, [isOpen, onRefreshData]);
+
   // 当currentUser改变时重置表单
   useEffect(() => {
     if (isOpen) {
       console.log("重置表单数据:", currentUser);
+      console.log("可用部门:", departments);
+      console.log("可用角色:", roles);
+      
       if (currentUser) {
         // 编辑用户模式
         form.reset({
@@ -95,7 +99,7 @@ const UserFormDialog = ({
         });
       }
     }
-  }, [currentUser, isOpen, form]);
+  }, [currentUser, isOpen, form, departments, roles]);
 
   // 处理表单提交
   const handleSubmit = form.handleSubmit(async (values) => {
