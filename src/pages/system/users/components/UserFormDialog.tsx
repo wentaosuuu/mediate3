@@ -57,23 +57,23 @@ const UserFormDialog = ({
     }
   });
 
-  // 当对话框打开时，刷新部门和角色数据
+  // 当对话框打开时，仅刷新一次部门和角色数据，避免无限循环
   useEffect(() => {
+    // 只有当对话框打开且刷新函数存在时才刷新数据
     if (isOpen && onRefreshData) {
       console.log("对话框打开，刷新数据");
       onRefreshData();
     }
+    // 依赖项中只包含isOpen，避免其他变量变化导致的重复刷新
   }, [isOpen, onRefreshData]);
 
-  // 当currentUser改变时重置表单
+  // 当currentUser改变时重置表单，注意依赖项的合理设置
   useEffect(() => {
     if (isOpen) {
       console.log("重置表单数据:", currentUser);
-      console.log("可用部门:", departments);
-      console.log("可用角色:", roles);
       
       if (currentUser) {
-        // 编辑用户模式
+        // 编辑用户模式 - 确保所有字段都有有效的默认值
         form.reset({
           username: currentUser?.username || "",
           name: currentUser?.name || "",
@@ -100,7 +100,8 @@ const UserFormDialog = ({
         });
       }
     }
-  }, [currentUser, isOpen, form, departments, roles]);
+    // 只在isOpen和currentUser变化时重置表单，避免因departments和roles导致的重复渲染
+  }, [currentUser, isOpen, form]);
 
   // 处理表单提交
   const handleSubmit = form.handleSubmit(async (values) => {

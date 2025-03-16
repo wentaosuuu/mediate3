@@ -30,6 +30,10 @@ const UserAssociation = ({
 }) => {
   const form = useFormContext();
   
+  // 确保departments和roles不为undefined
+  const safeRoles = roles || [];
+  const safeDepartments = departments || [];
+  
   return (
     <>
       <FormField
@@ -43,15 +47,16 @@ const UserAssociation = ({
                 disabled={isLoading}
                 onValueChange={field.onChange}
                 value={field.value || ""}
+                defaultValue=""
               >
                 <SelectTrigger>
                   <SelectValue placeholder="请选择部门" />
                 </SelectTrigger>
                 <SelectContent>
-                  {departments.length === 0 ? (
+                  {safeDepartments.length === 0 ? (
                     <SelectItem value="no_departments" disabled>暂无可用部门</SelectItem>
                   ) : (
-                    departments.map((department) => (
+                    safeDepartments.map((department) => (
                       <SelectItem key={department.id} value={department.id}>
                         {department.name}
                       </SelectItem>
@@ -76,15 +81,16 @@ const UserAssociation = ({
                 disabled={isLoading}
                 onValueChange={field.onChange}
                 value={field.value || ""}
+                defaultValue=""
               >
                 <SelectTrigger>
                   <SelectValue placeholder="请选择角色" />
                 </SelectTrigger>
                 <SelectContent>
-                  {roles.length === 0 ? (
+                  {safeRoles.length === 0 ? (
                     <SelectItem value="no_roles" disabled>暂无可用角色</SelectItem>
                   ) : (
-                    roles.map((role) => (
+                    safeRoles.map((role) => (
                       <SelectItem key={role.id} value={role.id}>
                         {role.name}
                       </SelectItem>

@@ -15,9 +15,7 @@ const UsersManagement = () => {
     departments, 
     roles, 
     isLoading: dataLoading, 
-    fetchUsers,
-    fetchDepartments,
-    fetchRoles
+    refreshAllData
   } = useUserData();
 
   // 使用自定义钩子处理用户操作
@@ -31,21 +29,13 @@ const UsersManagement = () => {
     openEditDialog,
     toggleUserStatus,
     deleteUser
-  } = useUserOperations(fetchUsers);
+  } = useUserOperations(refreshAllData);
 
   // 使用自定义钩子处理用户搜索
   const { searchQuery, setSearchQuery, filteredUsers } = useUserSearch(users);
 
   // 合并加载状态
   const isLoading = dataLoading || operationLoading;
-
-  // 刷新所有数据
-  const refreshAllData = async () => {
-    console.log("刷新所有用户相关数据...");
-    await fetchDepartments();
-    await fetchRoles();
-    await fetchUsers();
-  };
 
   return (
     <div className="p-6">

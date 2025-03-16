@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useFetchUsers } from './user-data/useFetchUsers';
 import { useFetchDepartments } from './user-data/useFetchDepartments';
 import { useFetchRoles } from './user-data/useFetchRoles';
@@ -30,20 +30,28 @@ export const useUserData = () => {
   
   // 设置加载状态（提供给外部使用）
   const [loadingState, setIsLoading] = useState(false);
+  
+  // 包装刷新函数，避免重复创建函数实例导致useEffect无限循环
+  const refreshAllData = useCallback(async () => {
+    console.log("刷新所有用户相关数据...");
+    try {
+      await Promise.all([
+        fetchDepartments(),
+        fetchRoles(),
+        fetchUsers()
+      ]);
+      console.log("所有用户相关数据加载完成！");
+    } catch (error) {
+      console.error("加载数据过程中发生错误:", error);
+    }
+  }, [fetchDepartments, fetchRoles, fetchUsers]);
 
   // 初始加载
   useEffect(() => {
     // 顺序加载数据
-    const loadData = async () => {
-      console.log("开始加载所有用户相关数据...");
-      await fetchDepartments();
-      await fetchRoles();
-      await fetchUsers();
-      console.log("所有用户相关数据加载完成！");
-    };
-    
-    loadData();
-  }, []);
+    console.log("开始加载所有用户相关数据...");
+    refreshAllData();
+  }, [refreshAllData]);
 
   return {
     users,
@@ -53,6 +61,7 @@ export const useUserData = () => {
     fetchUsers,
     fetchDepartments,
     fetchRoles,
-    setIsLoading
+    setIsLoading,
+    refreshAllData
   };
 };

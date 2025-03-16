@@ -17,6 +17,12 @@ export const useFetchRoles = () => {
 
   // 获取角色列表
   const fetchRoles = async (): Promise<void> => {
+    // 避免重复请求
+    if (isLoading) {
+      console.log("角色数据正在加载中，跳过重复请求");
+      return;
+    }
+    
     setIsLoading(true);
     try {
       console.log("开始获取角色列表...");
@@ -29,9 +35,12 @@ export const useFetchRoles = () => {
       console.log(`成功获取 ${data?.length || 0} 个角色`);
       console.log("角色数据:", data);
       
+      // 确保设置一个有效的数组，而不是null
       setRoles(data || []);
     } catch (error) {
       console.error('获取角色列表失败:', error);
+      // 出错时也设置为空数组，而不是保持之前的状态
+      setRoles([]);
       toast({
         title: "获取角色列表失败",
         description: (error as Error).message,

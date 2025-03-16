@@ -19,15 +19,30 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
   // 打开编辑用户对话框
   const openEditDialog = async (user: any) => {
     try {
+      // 避免重复加载
+      if (isLoading) {
+        console.log("正在加载中，请稍后重试");
+        return;
+      }
+      
       setIsLoading(true);
       console.log("开始获取用户详细信息，用户ID:", user.id);
+
+      // 如果user对象已经包含了department_id和role_id，直接使用
+      if (user.department_id && user.role_id) {
+        console.log("用户已包含部门和角色信息，直接使用:", user);
+        setCurrentUser(user);
+        setIsDialogOpen(true);
+        setIsLoading(false);
+        return;
+      }
 
       // 直接从user_departments表获取部门ID
       const departmentResult = await supabase
         .from('user_departments')
         .select('department_id, departments:department_id(name)')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
       
       // 如果发生错误但不是"没有找到记录"的错误
       let departmentId = "";
@@ -49,7 +64,7 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
         .from('user_roles')
         .select('role_id, roles:role_id(name)')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
       
       // 如果发生错误但不是"没有找到记录"的错误
       let roleId = "";
