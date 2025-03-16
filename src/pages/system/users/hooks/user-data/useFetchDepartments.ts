@@ -16,7 +16,7 @@ export const useFetchDepartments = () => {
   const { toast } = useToast();
 
   // 获取部门列表
-  const fetchDepartments = async () => {
+  const fetchDepartments = async (): Promise<void> => {
     setIsLoading(true);
     try {
       console.log("开始获取部门列表...");
@@ -30,7 +30,6 @@ export const useFetchDepartments = () => {
       console.log("部门数据:", data);
       
       setDepartments(data || []);
-      return data || [];
     } catch (error) {
       console.error('获取部门列表失败:', error);
       toast({
@@ -38,7 +37,6 @@ export const useFetchDepartments = () => {
         description: (error as Error).message,
         variant: "destructive",
       });
-      return [];
     } finally {
       setIsLoading(false);
     }

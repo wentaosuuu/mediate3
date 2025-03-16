@@ -60,6 +60,7 @@ const UserFormDialog = ({
   // 当对话框打开时，刷新部门和角色数据
   useEffect(() => {
     if (isOpen && onRefreshData) {
+      console.log("对话框打开，刷新数据");
       onRefreshData();
     }
   }, [isOpen, onRefreshData]);

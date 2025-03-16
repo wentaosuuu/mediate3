@@ -16,7 +16,7 @@ export const useFetchRoles = () => {
   const { toast } = useToast();
 
   // 获取角色列表
-  const fetchRoles = async () => {
+  const fetchRoles = async (): Promise<void> => {
     setIsLoading(true);
     try {
       console.log("开始获取角色列表...");
@@ -30,7 +30,6 @@ export const useFetchRoles = () => {
       console.log("角色数据:", data);
       
       setRoles(data || []);
-      return data || [];
     } catch (error) {
       console.error('获取角色列表失败:', error);
       toast({
@@ -38,7 +37,6 @@ export const useFetchRoles = () => {
         description: (error as Error).message,
         variant: "destructive",
       });
-      return [];
     } finally {
       setIsLoading(false);
     }

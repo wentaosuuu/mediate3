@@ -31,37 +31,35 @@ const UserAssociation = ({
   const form = useFormContext();
   
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <>
       <FormField
         control={form.control}
         name="department_id"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>部门</FormLabel>
-            <Select 
-              onValueChange={field.onChange} 
-              value={field.value || ""} // 修复：确保值不为undefined
-              disabled={isLoading}
-            >
-              <FormControl>
+            <FormLabel>所属部门</FormLabel>
+            <FormControl>
+              <Select
+                disabled={isLoading}
+                onValueChange={field.onChange}
+                value={field.value || ""}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="请选择部门" />
                 </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {departments.length > 0 ? (
-                  departments.map(dept => (
-                    <SelectItem key={dept.id} value={dept.id}>
-                      {dept.name}
-                    </SelectItem>
-                  ))
-                ) : (
-                  <SelectItem value="" disabled>
-                    无可用部门
-                  </SelectItem>
-                )}
-              </SelectContent>
-            </Select>
+                <SelectContent>
+                  {departments.length === 0 ? (
+                    <SelectItem value="no_departments" disabled>暂无可用部门</SelectItem>
+                  ) : (
+                    departments.map((department) => (
+                      <SelectItem key={department.id} value={department.id}>
+                        {department.name}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </FormControl>
             <FormMessage />
           </FormItem>
         )}
@@ -73,35 +71,33 @@ const UserAssociation = ({
         render={({ field }) => (
           <FormItem>
             <FormLabel>角色</FormLabel>
-            <Select 
-              onValueChange={field.onChange} 
-              value={field.value || ""} // 修复：确保值不为undefined
-              disabled={isLoading}
-            >
-              <FormControl>
+            <FormControl>
+              <Select
+                disabled={isLoading}
+                onValueChange={field.onChange}
+                value={field.value || ""}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="请选择角色" />
                 </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {roles.length > 0 ? (
-                  roles.map(role => (
-                    <SelectItem key={role.id} value={role.id}>
-                      {role.name}
-                    </SelectItem>
-                  ))
-                ) : (
-                  <SelectItem value="" disabled>
-                    无可用角色
-                  </SelectItem>
-                )}
-              </SelectContent>
-            </Select>
+                <SelectContent>
+                  {roles.length === 0 ? (
+                    <SelectItem value="no_roles" disabled>暂无可用角色</SelectItem>
+                  ) : (
+                    roles.map((role) => (
+                      <SelectItem key={role.id} value={role.id}>
+                        {role.name}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
-    </div>
+    </>
   );
 };
 
