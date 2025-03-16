@@ -45,13 +45,31 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
             .from('user_departments')
             .select('*')
             .eq('user_id', currentUser.id)
-            .maybeSingle();
+            .single();
             
-          if (deptCheckError && deptCheckError.code !== 'PGRST116') {
-            console.error('检查用户部门关联失败:', deptCheckError);
-          }
-          
-          if (existingDept) {
+          if (deptCheckError) {
+            // 如果错误是因为没有找到记录
+            if (deptCheckError.code === 'PGRST116') {
+              // 没有部门关联，创建新的
+              const { error: deptInsertError } = await supabase
+                .from('user_departments')
+                .insert({
+                  user_id: currentUser.id,
+                  department_id: values.department_id
+                });
+                
+              if (deptInsertError) {
+                console.error('创建部门关联失败:', deptInsertError);
+                throw deptInsertError;
+              } else {
+                console.log('用户部门关联新建成功:', values.department_id);
+              }
+            } else {
+              // 其他错误
+              console.error('检查用户部门关联失败:', deptCheckError);
+              throw deptCheckError;
+            }
+          } else {
             // 已有部门关联，更新它
             const { error: deptUpdateError } = await supabase
               .from('user_departments')
@@ -63,21 +81,6 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
               throw deptUpdateError;
             } else {
               console.log('用户部门关联更新成功:', values.department_id);
-            }
-          } else {
-            // 没有部门关联，创建新的
-            const { error: deptInsertError } = await supabase
-              .from('user_departments')
-              .insert({
-                user_id: currentUser.id,
-                department_id: values.department_id
-              });
-              
-            if (deptInsertError) {
-              console.error('创建部门关联失败:', deptInsertError);
-              throw deptInsertError;
-            } else {
-              console.log('用户部门关联新建成功:', values.department_id);
             }
           }
         } catch (deptError) {
@@ -96,14 +99,31 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
             .from('user_roles')
             .select('*')
             .eq('user_id', currentUser.id)
-            .maybeSingle();
+            .single();
             
-          if (fetchError && fetchError.code !== 'PGRST116') {
-            console.error('获取角色关联失败:', fetchError);
-            throw fetchError;
-          }
-          
-          if (existingRoles) {
+          if (fetchError) {
+            // 如果错误是因为没有找到记录
+            if (fetchError.code === 'PGRST116') {
+              // 没有角色关联，创建新的
+              const { error: roleInsertError } = await supabase
+                .from('user_roles')
+                .insert({
+                  user_id: currentUser.id,
+                  role_id: values.role_id
+                });
+                
+              if (roleInsertError) {
+                console.error('分配角色失败:', roleInsertError);
+                throw roleInsertError;
+              } else {
+                console.log('用户角色新建成功:', values.role_id);
+              }
+            } else {
+              // 其他错误
+              console.error('获取角色关联失败:', fetchError);
+              throw fetchError;
+            }
+          } else {
             // 已有角色关联，更新它
             const { error: roleUpdateError } = await supabase
               .from('user_roles')
@@ -115,21 +135,6 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
               throw roleUpdateError;
             } else {
               console.log('用户角色更新成功:', values.role_id);
-            }
-          } else {
-            // 没有角色关联，创建新的
-            const { error: roleInsertError } = await supabase
-              .from('user_roles')
-              .insert({
-                user_id: currentUser.id,
-                role_id: values.role_id
-              });
-              
-            if (roleInsertError) {
-              console.error('分配角色失败:', roleInsertError);
-              throw roleInsertError;
-            } else {
-              console.log('用户角色新建成功:', values.role_id);
             }
           }
         } catch (roleError) {

@@ -10,95 +10,62 @@ export const useFetchUsers = () => {
   const { toast } = useToast();
 
   // 获取用户列表
-  const fetchUsers = async (): Promise<void> => {
+  const fetchUsers = async () => {
     setIsLoading(true);
+    
     try {
       console.log("开始获取用户列表...");
       
-      // 获取用户基本信息
-      const { data, error } = await supabase
+      // 获取基本用户信息
+      const { data: userData, error: userError } = await supabase
         .from('users')
-        .select(`
-          id, 
-          username,
-          name, 
-          email, 
-          phone, 
-          tenant_id, 
-          created_at, 
-          updated_at
-        `);
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (userError) throw userError;
       
-      if (!data || data.length === 0) {
+      if (!userData) {
         console.log("没有找到用户");
         setUsers([]);
-        setIsLoading(false);
-        return;
+        return [];
       }
       
-      console.log(`找到 ${data.length} 个用户`);
+      console.log(`找到 ${userData.length} 个用户`);
       
-      // 获取用户关联的部门信息和角色信息
-      const formattedUsers = await Promise.all(data.map(async (user) => {
-        try {
-          // 获取部门信息 - 直接查询user_departments和departments表
+      // 为每个用户获取部门和角色信息
+      const enhancedUsers = await Promise.all(
+        userData.map(async (user) => {
+          // 获取用户的部门信息
+          const { data: deptData, error: deptError } = await supabase
+            .from('user_departments')
+            .select('department_id, departments:department_id(name)')
+            .eq('user_id', user.id)
+            .maybeSingle();
+          
           let departmentId = "";
           let departmentName = "-";
           
-          try {
-            const { data: deptData, error: deptError } = await supabase
-              .from('user_departments')
-              .select(`
-                department_id,
-                departments:department_id (
-                  name
-                )
-              `)
-              .eq('user_id', user.id)
-              .maybeSingle();
-            
-            if (deptError) {
-              console.error(`获取用户 ${user.id} 的部门信息失败:`, deptError);
-            } else if (deptData) {
-              departmentId = deptData.department_id;
-              departmentName = deptData.departments?.name || "-";
-              console.log(`用户 ${user.id} 的部门信息:`, { departmentId, departmentName });
-            }
-          } catch (deptErr) {
-            console.error(`处理用户 ${user.id} 的部门信息时出错:`, deptErr);
+          if (!deptError && deptData) {
+            departmentId = deptData.department_id || "";
+            departmentName = deptData.departments?.name || "-";
           }
           
-          // 获取用户角色信息
+          // 获取用户的角色信息
+          const { data: roleData, error: roleError } = await supabase
+            .from('user_roles')
+            .select('role_id, roles:role_id(name)')
+            .eq('user_id', user.id)
+            .maybeSingle();
+          
           let roleId = "";
           let roleName = "-";
           
-          try {
-            const { data: roleData, error: roleError } = await supabase
-              .from('user_roles')
-              .select(`
-                role_id,
-                roles:role_id (
-                  name
-                )
-              `)
-              .eq('user_id', user.id)
-              .maybeSingle();
-              
-            if (roleError) {
-              if (roleError.code !== 'PGRST116') { // PGRST116表示没有记录，这不是真正的错误
-                console.error(`获取用户 ${user.id} 的角色信息失败:`, roleError);
-              }
-            } else if (roleData) {
-              roleId = roleData.role_id;
-              roleName = roleData.roles?.name || "-";
-              console.log(`用户 ${user.id} 的角色信息:`, { roleId, roleName });
-            }
-          } catch (roleErr) {
-            console.error(`处理用户 ${user.id} 的角色信息时出错:`, roleErr);
+          if (!roleError && roleData) {
+            roleId = roleData.role_id || "";
+            roleName = roleData.roles?.name || "-";
           }
           
+          // 返回增强的用户对象
           return {
             ...user,
             department_id: departmentId,
@@ -106,27 +73,20 @@ export const useFetchUsers = () => {
             role_id: roleId,
             role_name: roleName
           };
-        } catch (err) {
-          console.error(`处理用户 ${user.id} 的信息时出错:`, err);
-          return {
-            ...user,
-            department_id: "",
-            department_name: "-",
-            role_id: "",
-            role_name: "-"
-          };
-        }
-      }));
+        })
+      );
       
-      console.log("格式化后的用户列表:", formattedUsers);
-      setUsers(formattedUsers);
+      console.log("格式化后的用户列表:", enhancedUsers);
+      setUsers(enhancedUsers);
+      return enhancedUsers;
     } catch (error) {
-      console.error('获取用户列表失败:', error);
+      console.error("获取用户列表失败:", error);
       toast({
         title: "获取用户列表失败",
         description: (error as Error).message,
         variant: "destructive",
       });
+      return [];
     } finally {
       setIsLoading(false);
     }
@@ -136,7 +96,6 @@ export const useFetchUsers = () => {
     users,
     setUsers,
     isLoading,
-    setIsLoading,
     fetchUsers
   };
 };

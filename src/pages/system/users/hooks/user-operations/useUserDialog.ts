@@ -27,15 +27,21 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
         .from('user_departments')
         .select('department_id, departments:department_id(name)')
         .eq('user_id', user.id)
-        .maybeSingle();
+        .single();
       
-      if (departmentResult.error && departmentResult.error.code !== 'PGRST116') {
-        console.error("获取用户部门信息失败:", departmentResult.error);
-        // 不要因为错误中断流程
+      // 如果发生错误但不是"没有找到记录"的错误
+      let departmentId = "";
+      let departmentName = "-";
+      
+      if (departmentResult.error) {
+        if (departmentResult.error.code !== 'PGRST116') {
+          console.error("获取用户部门信息失败:", departmentResult.error);
+        }
+      } else {
+        departmentId = departmentResult.data?.department_id || "";
+        departmentName = departmentResult.data?.departments?.name || "-";
       }
       
-      const departmentId = departmentResult.data?.department_id || "";
-      const departmentName = departmentResult.data?.departments?.name || "-";
       console.log("获取到用户部门信息:", { departmentId, departmentName });
       
       // 加载用户的角色信息
@@ -43,15 +49,21 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
         .from('user_roles')
         .select('role_id, roles:role_id(name)')
         .eq('user_id', user.id)
-        .maybeSingle();
+        .single();
       
-      if (roleResult.error && roleResult.error.code !== 'PGRST116') {
-        // PGRST116是没有找到记录的错误，这种情况下我们只需要继续处理
-        console.error("获取用户角色失败:", roleResult.error);
+      // 如果发生错误但不是"没有找到记录"的错误
+      let roleId = "";
+      let roleName = "-";
+      
+      if (roleResult.error) {
+        if (roleResult.error.code !== 'PGRST116') {
+          console.error("获取用户角色失败:", roleResult.error);
+        }
+      } else {
+        roleId = roleResult.data?.role_id || "";
+        roleName = roleResult.data?.roles?.name || "-";
       }
       
-      const roleId = roleResult.data?.role_id || "";
-      const roleName = roleResult.data?.roles?.name || "-";
       console.log("获取到用户角色信息:", { roleId, roleName });
       
       // 将角色和部门信息添加到用户对象
