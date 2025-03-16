@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Trash2, Edit2, UserCheck, UserX } from "lucide-react";
+import { Trash2, Edit2 } from "lucide-react";
 import {
   Table,
   TableBody,

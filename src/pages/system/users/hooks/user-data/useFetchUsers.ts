@@ -27,7 +27,7 @@ export const useFetchUsers = () => {
       if (!userData) {
         console.log("没有找到用户");
         setUsers([]);
-        return [];
+        return;
       }
       
       console.log(`找到 ${userData.length} 个用户`);
@@ -78,7 +78,6 @@ export const useFetchUsers = () => {
       
       console.log("格式化后的用户列表:", enhancedUsers);
       setUsers(enhancedUsers);
-      return enhancedUsers;
     } catch (error) {
       console.error("获取用户列表失败:", error);
       toast({
@@ -86,7 +85,6 @@ export const useFetchUsers = () => {
         description: (error as Error).message,
         variant: "destructive",
       });
-      return [];
     } finally {
       setIsLoading(false);
     }

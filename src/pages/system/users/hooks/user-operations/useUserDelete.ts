@@ -8,12 +8,15 @@ export const useUserDelete = (fetchUsers: () => Promise<void>) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // 删除用户
-  const deleteUser = async (userId: string) => {
-    if (!confirm("确定要删除此用户吗？此操作不可撤销。")) return false;
+  // 删除用户 - 接收整个用户对象，而不仅仅是ID
+  const deleteUser = async (user: any): Promise<void> => {
+    if (!confirm("确定要删除此用户吗？此操作不可撤销。")) return;
     
     setIsLoading(true);
     try {
+      // 从用户对象中获取ID
+      const userId = user.id;
+      
       const { error } = await supabase
         .from('users')
         .delete()
@@ -26,7 +29,6 @@ export const useUserDelete = (fetchUsers: () => Promise<void>) => {
       });
       
       await fetchUsers();
-      return true;
     } catch (error) {
       console.error('删除用户失败:', error);
       toast({
@@ -34,7 +36,6 @@ export const useUserDelete = (fetchUsers: () => Promise<void>) => {
         description: (error as Error).message,
         variant: "destructive",
       });
-      return false;
     } finally {
       setIsLoading(false);
     }
