@@ -3,109 +3,70 @@ import { useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-// 处理用户对话框状态的钩子
-export const useUserDialog = (setCurrentUser: (user: any) => void) => {
+/**
+ * 用户表单对话框状态管理钩子
+ * 负责处理对话框的打开关闭和用户选择
+ */
+export const useUserDialog = (setCurrentUser: (user: any | null) => void) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   // 打开创建用户对话框
   const openCreateDialog = () => {
-    console.log("打开创建用户对话框");
     setCurrentUser(null);
     setIsDialogOpen(true);
   };
 
   // 打开编辑用户对话框
   const openEditDialog = async (user: any) => {
+    setIsLoading(true);
     try {
-      // 避免重复加载
-      if (isLoading) {
-        console.log("正在加载中，请稍后重试");
-        return;
-      }
+      console.log("准备打开编辑对话框，用户ID:", user.id);
       
-      setIsLoading(true);
-      console.log("开始获取用户详细信息，用户ID:", user.id);
-
-      // 如果user对象已经包含了department_id和role_id，直接使用
-      if (user.department_id && user.role_id) {
-        console.log("用户已包含部门和角色信息，直接使用:", user);
-        setCurrentUser({...user}); // 使用对象的副本避免引用问题
-        setIsDialogOpen(true);
-        setIsLoading(false);
-        return;
-      }
-
-      // 直接从user_departments表获取部门ID和部门名称
-      const departmentResult = await supabase
+      // 获取完整的用户信息，包括部门和角色
+      // 先获取部门信息
+      const { data: deptData, error: deptError } = await supabase
         .from('user_departments')
-        .select('department_id, departments:department_id(id, name)')
+        .select('department_id, departments:department_id(name)')
         .eq('user_id', user.id)
         .maybeSingle();
       
-      // 处理部门查询结果
-      let departmentId = "";
-      let departmentName = "-";
-      
-      if (departmentResult.error) {
-        if (departmentResult.error.code !== 'PGRST116') {
-          console.error("获取用户部门信息失败:", departmentResult.error);
-        } else {
-          console.log("用户没有关联部门记录");
-        }
-      } else if (departmentResult.data) {
-        departmentId = departmentResult.data.department_id || "";
-        departmentName = departmentResult.data.departments?.name || "-";
-        console.log("成功获取到用户部门:", departmentId, departmentName);
+      if (deptError && deptError.code !== 'PGRST116') {
+        console.error("获取用户部门信息失败:", deptError);
+        throw new Error(`获取用户部门失败: ${deptError.message}`);
       }
       
-      console.log("获取到用户部门信息:", { departmentId, departmentName });
-      
-      // 加载用户的角色信息
-      const roleResult = await supabase
+      // 获取角色信息
+      const { data: roleData, error: roleError } = await supabase
         .from('user_roles')
-        .select('role_id, roles:role_id(id, name)')
+        .select('role_id, roles:role_id(name)')
         .eq('user_id', user.id)
         .maybeSingle();
       
-      // 处理角色查询结果
-      let roleId = "";
-      let roleName = "-";
-      
-      if (roleResult.error) {
-        if (roleResult.error.code !== 'PGRST116') {
-          console.error("获取用户角色失败:", roleResult.error);
-        } else {
-          console.log("用户没有关联角色记录");
-        }
-      } else if (roleResult.data) {
-        roleId = roleResult.data.role_id || "";
-        roleName = roleResult.data.roles?.name || "-";
-        console.log("成功获取到用户角色:", roleId, roleName);
+      if (roleError && roleError.code !== 'PGRST116') {
+        console.error("获取用户角色信息失败:", roleError);
+        throw new Error(`获取用户角色失败: ${roleError.message}`);
       }
       
-      console.log("获取到用户角色信息:", { roleId, roleName });
-      
-      // 将角色和部门信息添加到用户对象，使用对象副本而不是直接修改原对象
-      const enhancedUser = {
+      // 合并用户信息
+      const enrichedUser = {
         ...user,
-        department_id: departmentId,
-        department_name: departmentName,
-        role_id: roleId,
-        role_name: roleName
+        department_id: deptData?.department_id || "",
+        department_name: deptData?.departments?.name || "-",
+        role_id: roleData?.role_id || "",
+        role_name: roleData?.roles?.name || "-"
       };
       
-      console.log("打开编辑对话框，用户数据:", enhancedUser);
-      setCurrentUser(enhancedUser);
+      console.log("完整的用户信息:", enrichedUser);
+      
+      // 设置当前用户并打开对话框
+      setCurrentUser(enrichedUser);
       setIsDialogOpen(true);
     } catch (error) {
-      console.error("获取用户详细信息失败:", error);
-      // 如果获取详细信息失败，仍然打开对话框，但可能没有完整信息
-      setCurrentUser({...user}); // 使用对象的副本
-      setIsDialogOpen(true);
+      console.error("打开编辑对话框失败:", error);
       toast({
-        title: "获取用户信息失败",
+        title: "获取用户详情失败",
         description: (error as Error).message,
         variant: "destructive",
       });

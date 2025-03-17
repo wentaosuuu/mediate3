@@ -1,45 +1,24 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import UserHeader from './components/UserHeader';
-import UserSearch from './components/UserSearch';
-import UsersTable from './components/UsersTable';
-import UserFormDialog from './components/UserFormDialog';
-import { useUserData } from './hooks/useUserData';
+import UsersContainer from './components/UsersContainer';
 import { useUserOperations } from './hooks/useUserOperations';
-import { useUserSearch } from './hooks/useUserSearch';
+import { useUserData } from './hooks/useUserData';
 
+/**
+ * 用户管理页面组件
+ * 整合了用户管理的所有功能
+ */
 const UsersManagement = () => {
-  // 使用自定义钩子获取用户数据
-  const { 
-    users, 
-    departments, 
-    roles, 
-    isLoading: dataLoading, 
-    refreshAllData
-  } = useUserData();
-
-  // 使用自定义钩子处理用户操作
-  const {
-    currentUser,
-    isDialogOpen,
-    isLoading: operationLoading,
-    setIsDialogOpen,
-    handleSubmit,
-    openCreateDialog,
-    openEditDialog,
-    toggleUserStatus,
-    deleteUser
-  } = useUserOperations(refreshAllData);
-
-  // 使用自定义钩子处理用户搜索
-  const { searchQuery, setSearchQuery, filteredUsers } = useUserSearch(users);
-
-  // 合并加载状态
-  const isLoading = dataLoading || operationLoading;
+  // 使用自定义钩子获取用户数据，仅用于刷新功能
+  const { refreshAllData } = useUserData();
+  
+  // 使用自定义钩子处理用户操作，仅获取创建用户方法
+  const { openCreateDialog } = useUserOperations(refreshAllData);
 
   // 防止组件销毁后的状态更新
   const isMounted = useRef(true);
-  useEffect(() => {
+  React.useEffect(() => {
     return () => {
       isMounted.current = false;
     };
@@ -50,32 +29,8 @@ const UsersManagement = () => {
       {/* 用户管理头部 */}
       <UserHeader onCreateUser={openCreateDialog} />
 
-      {/* 用户搜索组件 */}
-      <UserSearch 
-        searchQuery={searchQuery} 
-        setSearchQuery={setSearchQuery} 
-      />
-
-      {/* 用户表格组件 */}
-      <UsersTable
-        users={filteredUsers}
-        isLoading={isLoading}
-        onEditUser={openEditDialog}
-        onToggleStatus={toggleUserStatus}
-        onDeleteUser={deleteUser}
-      />
-
-      {/* 用户表单对话框 */}
-      <UserFormDialog
-        isOpen={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        onSubmit={handleSubmit}
-        currentUser={currentUser}
-        isLoading={isLoading}
-        departments={departments}
-        roles={roles}
-        onRefreshData={refreshAllData}
-      />
+      {/* 用户管理容器组件 */}
+      <UsersContainer />
     </div>
   );
 };
