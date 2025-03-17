@@ -21,7 +21,7 @@ export const updateUserBasicInfo = async (userId: string, values: UserFormValues
       username: values.username,
       name: values.name,
       email: values.email,
-      phone: values.phone,
+      phone: values.phone || null,
       updated_at: new Date().toISOString()
     };
     
@@ -31,7 +31,7 @@ export const updateUserBasicInfo = async (userId: string, values: UserFormValues
       .from('users')
       .update(updateData)
       .eq('id', userId)
-      .select('id, username, name, email')
+      .select('id, username, name, email, phone')
       .single();
 
     if (error) {

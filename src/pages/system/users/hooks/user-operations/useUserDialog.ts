@@ -32,7 +32,7 @@ export const useUserDialog = (setCurrentUser: (user: any | null) => void) => {
       // 先获取部门信息
       const { data: deptData, error: deptError } = await supabase
         .from('user_departments')
-        .select('department_id, departments:department_id(name)')
+        .select('department_id, departments:department_id(id, name)')
         .eq('user_id', user.id)
         .maybeSingle();
       
@@ -41,10 +41,12 @@ export const useUserDialog = (setCurrentUser: (user: any | null) => void) => {
         throw new Error(`获取用户部门失败: ${deptError.message}`);
       }
       
+      console.log("获取到的部门数据:", deptData);
+      
       // 获取角色信息
       const { data: roleData, error: roleError } = await supabase
         .from('user_roles')
-        .select('role_id, roles:role_id(name)')
+        .select('role_id, roles:role_id(id, name)')
         .eq('user_id', user.id)
         .maybeSingle();
       
@@ -52,6 +54,8 @@ export const useUserDialog = (setCurrentUser: (user: any | null) => void) => {
         console.error("获取用户角色信息失败:", roleError);
         throw new Error(`获取用户角色失败: ${roleError.message}`);
       }
+      
+      console.log("获取到的角色数据:", roleData);
       
       // 合并用户信息
       const enrichedUser = {

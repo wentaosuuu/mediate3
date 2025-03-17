@@ -39,11 +39,13 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       const updatedUserInfo = await updateUserBasicInfo(userId, values);
       console.log("基本信息更新成功:", updatedUserInfo);
       
-      // 2. 处理部门关联 - 即使部门ID为空也调用，它会处理对应的情况
+      // 2. 处理部门关联 - 这里无论传入什么值都会处理
+      console.log("开始处理部门关联，部门ID:", values.department_id);
       await departmentAssociationModule.handle(userId, values.department_id);
       console.log("部门关联处理成功");
       
-      // 3. 处理角色关联 - 即使角色ID为空也调用，它会处理对应的情况  
+      // 3. 处理角色关联 - 这里无论传入什么值都会处理
+      console.log("开始处理角色关联，角色ID:", values.role_id);
       await roleAssociationModule.handle(userId, values.role_id);
       console.log("角色关联处理成功");
       

@@ -49,6 +49,7 @@ export const useUserForm = (
     } else {
       console.log("重置表单为编辑模式:", currentUser);
       
+      // 我们必须确保从currentUser中获取正确的部门ID和角色ID
       form.reset({
         username: currentUser.username || "",
         name: currentUser.name || "",
