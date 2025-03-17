@@ -49,10 +49,10 @@ const UserAssociation = ({
                 value={field.value || ""}
                 defaultValue={field.value || ""}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-white">
                   <SelectValue placeholder="请选择部门" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white">
                   {safeDepartments.length === 0 ? (
                     <SelectItem value="no_departments" disabled>暂无可用部门</SelectItem>
                   ) : (
@@ -83,10 +83,10 @@ const UserAssociation = ({
                 value={field.value || ""}
                 defaultValue={field.value || ""}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-white">
                   <SelectValue placeholder="请选择角色" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white">
                   {safeRoles.length === 0 ? (
                     <SelectItem value="no_roles" disabled>暂无可用角色</SelectItem>
                   ) : (

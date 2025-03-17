@@ -24,19 +24,17 @@ export const updateUserBasicInfo = async (userId: string, values: UserFormValues
       name: values.name,
       email: values.email,
       phone: values.phone || null,
-      department_id: values.department_id || null,  // 确保部门ID被包含在基本信息更新中
-      role_id: values.role_id || null,  // 确保角色ID被包含在基本信息更新中
       updated_at: new Date().toISOString()
     };
     
-    console.log("准备更新用户基本信息，完整更新数据:", updateData);
+    console.log("准备更新用户基本信息，更新数据:", updateData);
     
     // 执行更新操作
     const { data, error } = await supabase
       .from('users')
       .update(updateData)
       .eq('id', userId)
-      .select('id, username, name, email, phone, department_id, role_id')
+      .select('id, username, name, email, phone')
       .single();
 
     if (error) {
@@ -45,7 +43,6 @@ export const updateUserBasicInfo = async (userId: string, values: UserFormValues
       throw error;
     } else {
       console.log('用户基本信息更新成功，返回数据:', data);
-      toast.success("用户信息保存成功！");
       return data;
     }
   } catch (error) {

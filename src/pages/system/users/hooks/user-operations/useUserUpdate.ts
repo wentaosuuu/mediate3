@@ -5,6 +5,7 @@ import { UserFormValues } from '../../components/user-form/UserFormSchema';
 import { updateUserBasicInfo } from './user-update/useBasicInfoUpdate';
 import { departmentAssociationModule } from './user-update/useDepartmentAssociation';
 import { roleAssociationModule } from './user-update/useRoleAssociation';
+import { toast } from "sonner";
 
 /**
  * 处理用户更新的钩子
@@ -12,7 +13,7 @@ import { roleAssociationModule } from './user-update/useRoleAssociation';
  */
 export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
 
   // 更新用户主函数
   const updateUser = async (values: UserFormValues, currentUser: any): Promise<boolean> => {
@@ -21,11 +22,12 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
     
     if (!currentUser || !currentUser.id) {
       console.error("更新用户失败: 当前用户ID不存在");
-      toast({
+      uiToast({
         title: "更新用户失败",
         description: "无法获取用户ID",
         variant: "destructive",
       });
+      toast.error("更新失败：无法获取用户ID");
       return false;
     }
     
@@ -39,21 +41,22 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       const updatedUserInfo = await updateUserBasicInfo(userId, values);
       console.log("基本信息更新成功:", updatedUserInfo);
       
-      // 2. 处理部门关联 - 这里无论传入什么值都会处理
+      // 2. 处理部门关联
       console.log("开始处理部门关联，部门ID:", values.department_id);
       await departmentAssociationModule.handle(userId, values.department_id);
       console.log("部门关联处理成功");
       
-      // 3. 处理角色关联 - 这里无论传入什么值都会处理
+      // 3. 处理角色关联
       console.log("开始处理角色关联，角色ID:", values.role_id);
       await roleAssociationModule.handle(userId, values.role_id);
       console.log("角色关联处理成功");
       
       // 显示成功提示
-      toast({
+      uiToast({
         title: "用户更新成功",
         description: `用户 ${values.name || values.username} 已更新`,
       });
+      toast.success(`用户 ${values.name || values.username} 更新成功`);
       
       // 刷新用户列表
       console.log("即将刷新用户列表以显示更新结果");
@@ -62,11 +65,12 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       return true;
     } catch (error) {
       console.error('更新用户失败:', error);
-      toast({
+      uiToast({
         title: "更新用户失败",
         description: (error as Error).message,
         variant: "destructive",
       });
+      toast.error(`更新失败：${(error as Error).message}`);
       return false;
     } finally {
       setIsLoading(false);

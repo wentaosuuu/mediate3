@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 /**
  * 处理用户与角色的关联
@@ -43,6 +44,7 @@ export const roleAssociationModule = {
             
           if (deleteError) {
             console.error("删除用户角色关联失败:", deleteError);
+            toast.error(`删除角色关联失败: ${deleteError.message}`);
             throw deleteError;
           }
           console.log("成功删除用户角色关联");
@@ -66,6 +68,7 @@ export const roleAssociationModule = {
             
           if (updateError) {
             console.error("更新用户角色关联失败:", updateError);
+            toast.error(`更新角色关联失败: ${updateError.message}`);
             throw updateError;
           }
           console.log("成功更新用户角色关联");
@@ -84,6 +87,7 @@ export const roleAssociationModule = {
           
         if (insertError) {
           console.error("创建用户角色关联失败:", insertError);
+          toast.error(`创建角色关联失败: ${insertError.message}`);
           throw insertError;
         }
         console.log("成功创建用户角色关联");

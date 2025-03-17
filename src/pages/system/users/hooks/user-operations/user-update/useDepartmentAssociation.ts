@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 /**
  * 处理用户与部门的关联
@@ -43,6 +44,7 @@ export const departmentAssociationModule = {
             
           if (deleteError) {
             console.error("删除用户部门关联失败:", deleteError);
+            toast.error(`删除部门关联失败: ${deleteError.message}`);
             throw deleteError;
           }
           console.log("成功删除用户部门关联");
@@ -66,6 +68,7 @@ export const departmentAssociationModule = {
             
           if (updateError) {
             console.error("更新用户部门关联失败:", updateError);
+            toast.error(`更新部门关联失败: ${updateError.message}`);
             throw updateError;
           }
           console.log("成功更新用户部门关联");
@@ -84,6 +87,7 @@ export const departmentAssociationModule = {
           
         if (insertError) {
           console.error("创建用户部门关联失败:", insertError);
+          toast.error(`创建部门关联失败: ${insertError.message}`);
           throw insertError;
         }
         console.log("成功创建用户部门关联");
