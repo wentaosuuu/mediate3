@@ -41,6 +41,7 @@ const UserFormDialog = ({
 }: UserFormDialogProps) => {
   const { toast } = useToast();
   const didInitialRefresh = useRef(false);
+  const isSubmitting = useRef(false);
   
   // 表单初始化
   const form = useForm<UserFormValues>({
@@ -70,6 +71,7 @@ const UserFormDialog = ({
     // 当对话框关闭时，重置刷新标志
     if (!isOpen) {
       didInitialRefresh.current = false;
+      isSubmitting.current = false;
     }
   }, [isOpen, onRefreshData]);
 
@@ -108,13 +110,14 @@ const UserFormDialog = ({
   // 处理表单提交
   const handleSubmit = form.handleSubmit(async (values) => {
     console.log("提交表单数据:", values);
-    if (isLoading) {
+    if (isLoading || isSubmitting.current) {
       console.log("系统正在处理中，请稍候");
       return; // 防止重复提交
     }
     
     try {
       console.log("开始提交表单");
+      isSubmitting.current = true;
       // 移除临时标记字段，不需要提交到服务器
       const { __isEditMode, ...submitValues } = values;
       const success = await onSubmit(submitValues);
@@ -133,6 +136,8 @@ const UserFormDialog = ({
         description: `${(error as Error).message}`,
         variant: "destructive",
       });
+    } finally {
+      isSubmitting.current = false;
     }
   });
 

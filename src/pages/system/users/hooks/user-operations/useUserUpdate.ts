@@ -45,29 +45,28 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
             .from('user_departments')
             .select('*')
             .eq('user_id', currentUser.id)
-            .single();
+            .maybeSingle();
             
           if (deptCheckError) {
-            // 如果错误是因为没有找到记录
-            if (deptCheckError.code === 'PGRST116') {
-              // 没有部门关联，创建新的
-              const { error: deptInsertError } = await supabase
-                .from('user_departments')
-                .insert({
-                  user_id: currentUser.id,
-                  department_id: values.department_id
-                });
-                
-              if (deptInsertError) {
-                console.error('创建部门关联失败:', deptInsertError);
-                throw deptInsertError;
-              } else {
-                console.log('用户部门关联新建成功:', values.department_id);
-              }
+            // 如果错误不是因为没有找到记录，而是其他错误
+            console.error('检查用户部门关联时出错:', deptCheckError);
+            throw deptCheckError;
+          }
+          
+          if (!existingDept) {
+            // 没有部门关联，创建新的
+            const { error: deptInsertError } = await supabase
+              .from('user_departments')
+              .insert({
+                user_id: currentUser.id,
+                department_id: values.department_id
+              });
+              
+            if (deptInsertError) {
+              console.error('创建部门关联失败:', deptInsertError);
+              throw deptInsertError;
             } else {
-              // 其他错误
-              console.error('检查用户部门关联失败:', deptCheckError);
-              throw deptCheckError;
+              console.log('用户部门关联新建成功:', values.department_id);
             }
           } else {
             // 已有部门关联，更新它
@@ -95,33 +94,32 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
           console.log("更新用户角色关联, 角色ID:", values.role_id);
           
           // 检查是否已有角色关联
-          const { data: existingRoles, error: fetchError } = await supabase
+          const { data: existingRole, error: roleCheckError } = await supabase
             .from('user_roles')
             .select('*')
             .eq('user_id', currentUser.id)
-            .single();
+            .maybeSingle();
             
-          if (fetchError) {
-            // 如果错误是因为没有找到记录
-            if (fetchError.code === 'PGRST116') {
-              // 没有角色关联，创建新的
-              const { error: roleInsertError } = await supabase
-                .from('user_roles')
-                .insert({
-                  user_id: currentUser.id,
-                  role_id: values.role_id
-                });
-                
-              if (roleInsertError) {
-                console.error('分配角色失败:', roleInsertError);
-                throw roleInsertError;
-              } else {
-                console.log('用户角色新建成功:', values.role_id);
-              }
+          if (roleCheckError) {
+            // 如果错误不是因为没有找到记录，而是其他错误
+            console.error('检查用户角色关联时出错:', roleCheckError);
+            throw roleCheckError;
+          }
+          
+          if (!existingRole) {
+            // 没有角色关联，创建新的
+            const { error: roleInsertError } = await supabase
+              .from('user_roles')
+              .insert({
+                user_id: currentUser.id,
+                role_id: values.role_id
+              });
+              
+            if (roleInsertError) {
+              console.error('分配角色失败:', roleInsertError);
+              throw roleInsertError;
             } else {
-              // 其他错误
-              console.error('获取角色关联失败:', fetchError);
-              throw fetchError;
+              console.log('用户角色新建成功:', values.role_id);
             }
           } else {
             // 已有角色关联，更新它

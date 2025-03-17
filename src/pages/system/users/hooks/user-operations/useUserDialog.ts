@@ -52,9 +52,9 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
         if (departmentResult.error.code !== 'PGRST116') {
           console.error("获取用户部门信息失败:", departmentResult.error);
         }
-      } else {
-        departmentId = departmentResult.data?.department_id || "";
-        departmentName = departmentResult.data?.departments?.name || "-";
+      } else if (departmentResult.data) {
+        departmentId = departmentResult.data.department_id || "";
+        departmentName = departmentResult.data.departments?.name || "-";
       }
       
       console.log("获取到用户部门信息:", { departmentId, departmentName });
@@ -74,9 +74,9 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
         if (roleResult.error.code !== 'PGRST116') {
           console.error("获取用户角色失败:", roleResult.error);
         }
-      } else {
-        roleId = roleResult.data?.role_id || "";
-        roleName = roleResult.data?.roles?.name || "-";
+      } else if (roleResult.data) {
+        roleId = roleResult.data.role_id || "";
+        roleName = roleResult.data.roles?.name || "-";
       }
       
       console.log("获取到用户角色信息:", { roleId, roleName });

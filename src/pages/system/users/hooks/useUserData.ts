@@ -45,6 +45,7 @@ export const useUserData = () => {
     
     console.log("刷新所有用户相关数据...");
     isRefreshing.current = true;
+    setIsLoading(true); // 设置外部加载状态为true
     
     try {
       // 依次请求数据，避免并发请求可能导致的问题
@@ -56,6 +57,7 @@ export const useUserData = () => {
       console.error("加载数据过程中发生错误:", error);
     } finally {
       isRefreshing.current = false;
+      setIsLoading(false); // 恢复外部加载状态
     }
   }, [fetchDepartments, fetchRoles, fetchUsers]);
 
