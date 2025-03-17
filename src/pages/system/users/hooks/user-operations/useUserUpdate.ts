@@ -11,11 +11,10 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
 
   // 更新用户
   const updateUser = async (values: UserFormValues, currentUser: any): Promise<boolean> => {
+    console.log("开始更新用户，数据:", values, "用户ID:", currentUser.id);
     setIsLoading(true);
     
     try {
-      console.log("开始更新用户数据:", values, "用户ID:", currentUser.id);
-      
       // 更新用户基本信息
       const { error } = await supabase
         .from('users')
@@ -38,7 +37,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       // 处理部门关联
       if (values.department_id) {
         try {
-          console.log("更新用户部门关联, 部门ID:", values.department_id);
+          console.log("准备更新用户的部门关联, 部门ID:", values.department_id);
           
           // 检查是否已有部门关联
           const { data: existingDept, error: deptCheckError } = await supabase
@@ -47,13 +46,14 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
             .eq('user_id', currentUser.id)
             .maybeSingle();
             
-          if (deptCheckError) {
+          if (deptCheckError && deptCheckError.code !== 'PGRST116') {
             console.error('检查用户部门关联时出错:', deptCheckError);
             throw deptCheckError;
           }
           
           if (!existingDept) {
             // 没有部门关联，创建新的
+            console.log("用户没有部门关联，创建新关联");
             const { error: deptInsertError } = await supabase
               .from('user_departments')
               .insert({
@@ -69,6 +69,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
             }
           } else {
             // 已有部门关联，更新它
+            console.log("用户已有部门关联，更新为:", values.department_id);
             const { error: deptUpdateError } = await supabase
               .from('user_departments')
               .update({ department_id: values.department_id })
@@ -85,12 +86,26 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
           console.error('处理部门关联时出错:', deptError);
           throw deptError;
         }
+      } else {
+        // 如果没有选择部门，但之前有部门，则删除部门关联
+        console.log("用户未选择部门，检查是否需要删除现有部门关联");
+        const { error: deptDeleteError } = await supabase
+          .from('user_departments')
+          .delete()
+          .eq('user_id', currentUser.id);
+          
+        if (deptDeleteError && deptDeleteError.code !== 'PGRST116') {
+          console.error('删除部门关联失败:', deptDeleteError);
+          // 不抛出异常，允许继续处理
+        } else {
+          console.log('用户部门关联已删除或不存在');
+        }
       }
       
       // 处理角色关联
       if (values.role_id) {
         try {
-          console.log("更新用户角色关联, 角色ID:", values.role_id);
+          console.log("准备更新用户的角色关联, 角色ID:", values.role_id);
           
           // 检查是否已有角色关联
           const { data: existingRole, error: roleCheckError } = await supabase
@@ -99,13 +114,14 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
             .eq('user_id', currentUser.id)
             .maybeSingle();
             
-          if (roleCheckError) {
+          if (roleCheckError && roleCheckError.code !== 'PGRST116') {
             console.error('检查用户角色关联时出错:', roleCheckError);
             throw roleCheckError;
           }
           
           if (!existingRole) {
             // 没有角色关联，创建新的
+            console.log("用户没有角色关联，创建新关联");
             const { error: roleInsertError } = await supabase
               .from('user_roles')
               .insert({
@@ -121,6 +137,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
             }
           } else {
             // 已有角色关联，更新它
+            console.log("用户已有角色关联，更新为:", values.role_id);
             const { error: roleUpdateError } = await supabase
               .from('user_roles')
               .update({ role_id: values.role_id })
@@ -137,6 +154,20 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
           console.error('处理角色关联时出错:', roleError);
           throw roleError;
         }
+      } else {
+        // 如果没有选择角色，但之前有角色，则删除角色关联
+        console.log("用户未选择角色，检查是否需要删除现有角色关联");
+        const { error: roleDeleteError } = await supabase
+          .from('user_roles')
+          .delete()
+          .eq('user_id', currentUser.id);
+          
+        if (roleDeleteError && roleDeleteError.code !== 'PGRST116') {
+          console.error('删除角色关联失败:', roleDeleteError);
+          // 不抛出异常，允许继续处理
+        } else {
+          console.log('用户角色关联已删除或不存在');
+        }
       }
       
       // 显示成功提示
@@ -147,6 +178,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       
       // 刷新用户列表
       await fetchUsers();
+      console.log("更新用户流程完成，返回成功状态");
       return true;
     } catch (error) {
       console.error('更新用户失败:', error);

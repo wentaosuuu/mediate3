@@ -44,7 +44,7 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
         .eq('user_id', user.id)
         .maybeSingle();
       
-      // 如果发生错误但不是"没有找到记录"的错误
+      // 处理部门查询结果
       let departmentId = "";
       let departmentName = "-";
       
@@ -69,7 +69,7 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
         .eq('user_id', user.id)
         .maybeSingle();
       
-      // 如果发生错误但不是"没有找到记录"的错误
+      // 处理角色查询结果
       let roleId = "";
       let roleName = "-";
       

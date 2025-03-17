@@ -72,6 +72,7 @@ const UserFormDialog = ({
     if (!isOpen) {
       didInitialRefresh.current = false;
       isSubmitting.current = false;
+      console.log("对话框关闭，重置所有标志");
     }
   }, [isOpen, onRefreshData]);
 
@@ -104,6 +105,9 @@ const UserFormDialog = ({
         tenant_id: currentUser.tenant_id || "default",
         __isEditMode: true // 标记为编辑模式
       });
+
+      // 调试数据
+      console.log("设置表单值后，form.getValues():", form.getValues());
     }
   }, [currentUser, isOpen, form]);
 
@@ -118,10 +122,11 @@ const UserFormDialog = ({
     try {
       console.log("开始提交表单");
       isSubmitting.current = true;
+      
       // 移除临时标记字段，不需要提交到服务器
       const { __isEditMode, ...submitValues } = values;
       
-      console.log("处理的表单数据:", submitValues);
+      console.log("处理的表单数据:", submitValues, "当前用户:", currentUser);
       const success = await onSubmit(submitValues);
       
       if (success) {
@@ -129,8 +134,18 @@ const UserFormDialog = ({
         form.reset(); // 重置表单
         // 成功后关闭对话框
         onOpenChange(false);
+        
+        toast({
+          title: currentUser ? "更新用户成功" : "创建用户成功",
+          description: `操作已完成`,
+        });
       } else {
         console.error("表单提交返回失败");
+        toast({
+          title: "操作失败",
+          description: "请检查输入并重试",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("表单提交失败:", error);
