@@ -37,10 +37,10 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
         return;
       }
 
-      // 直接从user_departments表获取部门ID
+      // 直接从user_departments表获取部门ID和部门名称
       const departmentResult = await supabase
         .from('user_departments')
-        .select('department_id, departments:department_id(name)')
+        .select('department_id, departments:department_id(id, name)')
         .eq('user_id', user.id)
         .maybeSingle();
       
@@ -65,7 +65,7 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
       // 加载用户的角色信息
       const roleResult = await supabase
         .from('user_roles')
-        .select('role_id, roles:role_id(name)')
+        .select('role_id, roles:role_id(id, name)')
         .eq('user_id', user.id)
         .maybeSingle();
       

@@ -1,22 +1,11 @@
 
 import React, { useEffect, useRef } from 'react';
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle
-} from "@/components/ui/dialog";
-import { Form } from "@/components/ui/form";
-import { userFormSchema, UserFormValues } from './user-form/UserFormSchema';
-import UserBasicInfo from './user-form/UserBasicInfo';
-import UserAssociation from './user-form/UserAssociation';
-import UserFormActions from './user-form/UserFormActions';
-import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import UserFormContent from './user-form/UserFormContent';
+import { UserFormValues } from './user-form/UserFormSchema';
 import { Department } from '../hooks/user-data/useFetchDepartments';
 import { Role } from '../hooks/user-data/useFetchRoles';
+import { useUserForm } from '../hooks/user-form/useUserForm';
 
 interface UserFormDialogProps {
   isOpen: boolean;
@@ -39,25 +28,15 @@ const UserFormDialog = ({
   roles,
   onRefreshData
 }: UserFormDialogProps) => {
-  const { toast } = useToast();
   const didInitialRefresh = useRef(false);
-  const isSubmitting = useRef(false);
   
-  // 表单初始化
-  const form = useForm<UserFormValues>({
-    resolver: zodResolver(userFormSchema),
-    defaultValues: {
-      username: "",
-      name: "",
-      email: "",
-      phone: "",
-      department_id: "",
-      role_id: "",
-      password: "",
-      tenant_id: "default", // 在实际应用中应该从系统或登录用户获取
-      __isEditMode: false // 默认为创建模式
-    }
-  });
+  // 使用表单钩子
+  const { form, handleSubmit, resetForm } = useUserForm(
+    currentUser, 
+    onSubmit, 
+    () => onOpenChange(false), 
+    isLoading
+  );
 
   // 当对话框打开时，仅执行一次刷新数据，避免无限循环
   useEffect(() => {
@@ -71,148 +50,41 @@ const UserFormDialog = ({
     // 当对话框关闭时，重置刷新标志
     if (!isOpen) {
       didInitialRefresh.current = false;
-      isSubmitting.current = false;
-      console.log("对话框关闭，重置所有标志");
+      console.log("对话框关闭，重置标志");
     }
   }, [isOpen, onRefreshData]);
 
-  // 当currentUser改变时重置表单
-  useEffect(() => {
-    if (currentUser === null) {
-      console.log("重置表单为创建模式");
-      form.reset({
-        username: "",
-        name: "",
-        email: "",
-        phone: "",
-        department_id: "",
-        role_id: "",
-        password: "",
-        tenant_id: "default",
-        __isEditMode: false
-      });
-    } else if (currentUser && isOpen) {
-      console.log("重置表单为编辑模式:", currentUser);
-      
-      form.reset({
-        username: currentUser.username || "",
-        name: currentUser.name || "",
-        email: currentUser.email || "",
-        phone: currentUser.phone || "",
-        department_id: currentUser.department_id || "",
-        role_id: currentUser.role_id || "",
-        password: "",  // 编辑模式不需要密码
-        tenant_id: currentUser.tenant_id || "default",
-        __isEditMode: true // 标记为编辑模式
-      });
-
-      // 调试数据
-      console.log("设置表单值后，form.getValues():", form.getValues());
-    }
-  }, [currentUser, isOpen, form]);
-
-  // 处理表单提交
-  const handleSubmit = form.handleSubmit(async (values) => {
-    console.log("提交表单数据:", values);
-    if (isLoading || isSubmitting.current) {
-      console.log("系统正在处理中，请稍候");
-      return; // 防止重复提交
-    }
-    
-    try {
-      console.log("开始提交表单");
-      isSubmitting.current = true;
-      
-      // 移除临时标记字段，不需要提交到服务器
-      const { __isEditMode, ...submitValues } = values;
-      
-      console.log("处理的表单数据:", submitValues, "当前用户:", currentUser);
-      const success = await onSubmit(submitValues);
-      
-      if (success) {
-        console.log("表单提交成功，关闭对话框");
-        form.reset(); // 重置表单
-        // 成功后关闭对话框
-        onOpenChange(false);
-        
-        toast({
-          title: currentUser ? "更新用户成功" : "创建用户成功",
-          description: `操作已完成`,
-        });
-      } else {
-        console.error("表单提交返回失败");
-        toast({
-          title: "操作失败",
-          description: "请检查输入并重试",
-          variant: "destructive",
-        });
+  // 处理对话框关闭
+  const handleOpenChange = (open: boolean) => {
+    // 如果不在加载状态，才允许关闭对话框
+    if (!isLoading || !open) {
+      if (!open) {
+        resetForm(); // 关闭对话框时重置表单
       }
-    } catch (error) {
-      console.error("表单提交失败:", error);
-      toast({
-        title: "操作失败",
-        description: `${(error as Error).message}`,
-        variant: "destructive",
-      });
-    } finally {
-      isSubmitting.current = false;
+      onOpenChange(open);
     }
-  });
+  };
 
-  // 监听表单值变化，调试用
-  useEffect(() => {
-    const subscription = form.watch((value) => {
-      console.log("表单值变化:", value);
-    });
-    
-    return () => subscription.unsubscribe();
-  }, [form]);
+  // 处理取消按钮点击
+  const handleCancel = () => {
+    if (!isLoading) {
+      resetForm(); // 取消时重置表单
+      onOpenChange(false);
+    }
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      // 如果不在加载状态，才允许关闭对话框
-      if (!isLoading || !open) {
-        if (!open) {
-          form.reset(); // 关闭对话框时重置表单
-        }
-        onOpenChange(open);
-      }
-    }}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[550px]">
-        <DialogHeader>
-          <DialogTitle>{currentUser ? "编辑用户" : "创建用户"}</DialogTitle>
-          <DialogDescription>
-            {currentUser 
-              ? "修改用户信息，完成后点击保存。" 
-              : "填写用户信息，完成后点击创建。"}
-          </DialogDescription>
-        </DialogHeader>
-        
-        <Form {...form}>
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* 基本信息组件 */}
-            <UserBasicInfo isLoading={isLoading} currentUser={currentUser} />
-            
-            {/* 部门和角色关联组件 */}
-            <UserAssociation 
-              isLoading={isLoading} 
-              departments={departments} 
-              roles={roles} 
-            />
-            
-            {/* 表单操作按钮组件 */}
-            <UserFormActions 
-              isLoading={isLoading} 
-              currentUser={currentUser} 
-              onCancel={() => {
-                if (!isLoading) {
-                  form.reset(); // 取消时重置表单
-                  onOpenChange(false);
-                }
-              }} 
-            />
-          </form>
-        </Form>
+        <UserFormContent
+          form={form}
+          onSubmit={handleSubmit}
+          onCancel={handleCancel}
+          currentUser={currentUser}
+          isLoading={isLoading}
+          departments={departments}
+          roles={roles}
+        />
       </DialogContent>
     </Dialog>
   );
