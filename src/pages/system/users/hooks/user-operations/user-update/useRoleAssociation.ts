@@ -11,19 +11,29 @@ export const roleAssociationModule = {
   checkExisting: async (userId: string) => {
     console.log("检查用户角色关联, 用户ID:", userId);
     
-    const { data, error } = await supabase
-      .from('user_roles')
-      .select('*')
-      .eq('user_id', userId)
-      .maybeSingle();
-      
-    if (error && error.code !== 'PGRST116') {
-      console.error('检查用户角色关联时出错:', error);
-      throw error;
+    if (!userId) {
+      console.error("检查用户角色关联失败: 用户ID为空");
+      throw new Error("用户ID不能为空");
     }
     
-    console.log("用户角色关联检查结果:", data ? "存在" : "不存在");
-    return data;
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+        
+      if (error && error.code !== 'PGRST116') {
+        console.error('检查用户角色关联时出错:', error);
+        throw error;
+      }
+      
+      console.log("用户角色关联检查结果:", data ? "存在" : "不存在");
+      return data;
+    } catch (error) {
+      console.error('检查用户角色关联时发生错误:', error);
+      throw error;
+    }
   },
 
   /**
@@ -32,18 +42,28 @@ export const roleAssociationModule = {
   create: async (userId: string, roleId: string) => {
     console.log("创建新的角色关联, 用户ID:", userId, "角色ID:", roleId);
     
-    const { error } = await supabase
-      .from('user_roles')
-      .insert({
-        user_id: userId,
-        role_id: roleId
-      });
-      
-    if (error) {
-      console.error('分配角色失败:', error);
+    if (!userId || !roleId) {
+      console.error("创建角色关联失败: 用户ID或角色ID为空");
+      throw new Error("用户ID和角色ID不能为空");
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .insert({
+          user_id: userId,
+          role_id: roleId
+        });
+        
+      if (error) {
+        console.error('分配角色失败:', error);
+        throw error;
+      } else {
+        console.log('用户角色新建成功:', roleId);
+      }
+    } catch (error) {
+      console.error('创建角色关联过程中发生错误:', error);
       throw error;
-    } else {
-      console.log('用户角色新建成功:', roleId);
     }
   },
 
@@ -53,16 +73,26 @@ export const roleAssociationModule = {
   update: async (userId: string, roleId: string) => {
     console.log("更新角色关联, 用户ID:", userId, "新角色ID:", roleId);
     
-    const { error } = await supabase
-      .from('user_roles')
-      .update({ role_id: roleId })
-      .eq('user_id', userId);
-      
-    if (error) {
-      console.error('更新角色失败:', error);
+    if (!userId || !roleId) {
+      console.error("更新角色关联失败: 用户ID或角色ID为空");
+      throw new Error("用户ID和角色ID不能为空");
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .update({ role_id: roleId })
+        .eq('user_id', userId);
+        
+      if (error) {
+        console.error('更新角色失败:', error);
+        throw error;
+      } else {
+        console.log('用户角色更新成功:', roleId);
+      }
+    } catch (error) {
+      console.error('更新角色关联过程中发生错误:', error);
       throw error;
-    } else {
-      console.log('用户角色更新成功:', roleId);
     }
   },
 
@@ -72,16 +102,26 @@ export const roleAssociationModule = {
   delete: async (userId: string) => {
     console.log("删除角色关联, 用户ID:", userId);
     
-    const { error } = await supabase
-      .from('user_roles')
-      .delete()
-      .eq('user_id', userId);
-      
-    if (error && error.code !== 'PGRST116') {
-      console.error('删除角色关联失败:', error);
+    if (!userId) {
+      console.error("删除角色关联失败: 用户ID为空");
+      throw new Error("用户ID不能为空");
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId);
+        
+      if (error && error.code !== 'PGRST116') {
+        console.error('删除角色关联失败:', error);
+        // 不抛出异常，允许继续处理
+      } else {
+        console.log('用户角色关联已删除或不存在');
+      }
+    } catch (error) {
+      console.error('删除角色关联过程中发生错误:', error);
       // 不抛出异常，允许继续处理
-    } else {
-      console.log('用户角色关联已删除或不存在');
     }
   },
 
@@ -91,6 +131,11 @@ export const roleAssociationModule = {
   handle: async (userId: string, roleId?: string) => {
     try {
       console.log("处理用户角色关联, 用户ID:", userId, "角色ID:", roleId || "无");
+      
+      if (!userId) {
+        console.error("处理角色关联失败: 用户ID为空");
+        throw new Error("用户ID不能为空");
+      }
       
       if (roleId) {
         // 有角色ID，需要关联或更新角色
@@ -109,6 +154,7 @@ export const roleAssociationModule = {
       }
       
       console.log("处理用户角色关联完成");
+      return true; // 返回成功标志
     } catch (error) {
       console.error('处理角色关联时出错:', error);
       throw error;

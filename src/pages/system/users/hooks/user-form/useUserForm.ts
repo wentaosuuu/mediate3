@@ -114,15 +114,6 @@ export const useUserForm = (
     }
   });
 
-  // 监听表单值变化，调试用
-  useEffect(() => {
-    const subscription = form.watch((value) => {
-      console.log("表单值变化:", value);
-    });
-    
-    return () => subscription.unsubscribe();
-  }, [form]);
-
   // 重置表单
   const resetForm = () => {
     form.reset();

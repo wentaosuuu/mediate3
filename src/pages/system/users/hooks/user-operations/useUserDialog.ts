@@ -24,6 +24,10 @@ export const useUserDialog = (setCurrentUser: (user: any | null) => void) => {
     try {
       console.log("准备打开编辑对话框，用户ID:", user.id);
       
+      if (!user || !user.id) {
+        throw new Error("用户信息不完整");
+      }
+      
       // 获取完整的用户信息，包括部门和角色
       // 先获取部门信息
       const { data: deptData, error: deptError } = await supabase
