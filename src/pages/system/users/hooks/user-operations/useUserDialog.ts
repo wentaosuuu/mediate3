@@ -51,10 +51,13 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
       if (departmentResult.error) {
         if (departmentResult.error.code !== 'PGRST116') {
           console.error("获取用户部门信息失败:", departmentResult.error);
+        } else {
+          console.log("用户没有关联部门记录");
         }
       } else if (departmentResult.data) {
         departmentId = departmentResult.data.department_id || "";
         departmentName = departmentResult.data.departments?.name || "-";
+        console.log("成功获取到用户部门:", departmentId, departmentName);
       }
       
       console.log("获取到用户部门信息:", { departmentId, departmentName });
@@ -73,10 +76,13 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
       if (roleResult.error) {
         if (roleResult.error.code !== 'PGRST116') {
           console.error("获取用户角色失败:", roleResult.error);
+        } else {
+          console.log("用户没有关联角色记录");
         }
       } else if (roleResult.data) {
         roleId = roleResult.data.role_id || "";
         roleName = roleResult.data.roles?.name || "-";
+        console.log("成功获取到用户角色:", roleId, roleName);
       }
       
       console.log("获取到用户角色信息:", { roleId, roleName });

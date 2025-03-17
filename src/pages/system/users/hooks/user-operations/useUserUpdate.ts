@@ -48,7 +48,6 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
             .maybeSingle();
             
           if (deptCheckError) {
-            // 如果错误不是因为没有找到记录，而是其他错误
             console.error('检查用户部门关联时出错:', deptCheckError);
             throw deptCheckError;
           }
@@ -101,7 +100,6 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
             .maybeSingle();
             
           if (roleCheckError) {
-            // 如果错误不是因为没有找到记录，而是其他错误
             console.error('检查用户角色关联时出错:', roleCheckError);
             throw roleCheckError;
           }
@@ -141,6 +139,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
         }
       }
       
+      // 显示成功提示
       toast({
         title: "用户更新成功",
         description: `用户 ${values.name} 已更新`,

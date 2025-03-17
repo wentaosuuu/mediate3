@@ -120,7 +120,10 @@ const UserFormDialog = ({
       isSubmitting.current = true;
       // 移除临时标记字段，不需要提交到服务器
       const { __isEditMode, ...submitValues } = values;
+      
+      console.log("处理的表单数据:", submitValues);
       const success = await onSubmit(submitValues);
+      
       if (success) {
         console.log("表单提交成功，关闭对话框");
         form.reset(); // 重置表单
@@ -140,6 +143,15 @@ const UserFormDialog = ({
       isSubmitting.current = false;
     }
   });
+
+  // 监听表单值变化，调试用
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      console.log("表单值变化:", value);
+    });
+    
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
