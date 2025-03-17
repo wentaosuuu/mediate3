@@ -25,16 +25,25 @@ export const useUserSubmit = ({
     console.log("useUserSubmit - 处理表单提交，当前用户:", currentUser, "表单数据:", values);
     
     try {
+      // 处理特殊值"none"，将其转换为空字符串
+      const processedValues = {
+        ...values,
+        department_id: values.department_id === "none" ? "" : values.department_id,
+        role_id: values.role_id === "none" ? "" : values.role_id
+      };
+      
+      console.log("处理后的提交数据:", processedValues);
+      
       let success = false;
       if (currentUser) {
         // 更新现有用户
         console.log("更新用户流程开始，用户ID:", currentUser.id);
-        success = await updateUser(values, currentUser);
+        success = await updateUser(processedValues, currentUser);
         console.log("更新用户流程结束，结果:", success);
       } else {
         // 创建新用户
         console.log("创建用户流程开始");
-        success = await createUser(values);
+        success = await createUser(processedValues);
         console.log("创建用户流程结束，结果:", success);
       }
       

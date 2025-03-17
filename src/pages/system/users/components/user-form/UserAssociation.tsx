@@ -36,7 +36,7 @@ const UserAssociation = ({
                 </SelectTrigger>
               </FormControl>
               <SelectContent className="bg-white">
-                <SelectItem value="">无部门</SelectItem>
+                <SelectItem value="none">无部门</SelectItem>
                 {departments.map((dept) => (
                   <SelectItem key={dept.id} value={dept.id}>
                     {dept.name}
@@ -66,7 +66,7 @@ const UserAssociation = ({
                 </SelectTrigger>
               </FormControl>
               <SelectContent className="bg-white">
-                <SelectItem value="">无角色</SelectItem>
+                <SelectItem value="none">无角色</SelectItem>
                 {roles.map((role) => (
                   <SelectItem key={role.id} value={role.id}>
                     {role.name}

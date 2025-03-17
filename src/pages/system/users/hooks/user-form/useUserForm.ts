@@ -24,8 +24,8 @@ export const useUserForm = (
       name: "",
       email: "",
       phone: "",
-      department_id: "",
-      role_id: "",
+      department_id: "none",
+      role_id: "none",
       password: "",
       tenant_id: "default", // 在实际应用中应该从系统或登录用户获取
       __isEditMode: false // 默认为创建模式
@@ -41,8 +41,8 @@ export const useUserForm = (
         name: "",
         email: "",
         phone: "",
-        department_id: "",
-        role_id: "",
+        department_id: "none",
+        role_id: "none",
         password: "",
         tenant_id: "default",
         __isEditMode: false
@@ -51,13 +51,14 @@ export const useUserForm = (
       console.log("重置表单为编辑模式:", currentUser);
       
       // 确保从currentUser中获取正确的部门ID和角色ID
+      // 如果值为空，设置为"none"
       form.reset({
         username: currentUser.username || "",
         name: currentUser.name || "",
         email: currentUser.email || "",
         phone: currentUser.phone || "",
-        department_id: currentUser.department_id || "",
-        role_id: currentUser.role_id || "",
+        department_id: currentUser.department_id || "none",
+        role_id: currentUser.role_id || "none",
         password: "",  // 编辑模式不需要密码
         tenant_id: currentUser.tenant_id || "default",
         __isEditMode: true // 标记为编辑模式
