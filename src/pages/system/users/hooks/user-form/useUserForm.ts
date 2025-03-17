@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { userFormSchema, UserFormValues } from '../../components/user-form/UserFormSchema';
+import { toast } from "sonner";
 
 // 处理用户表单的钩子
 export const useUserForm = (
@@ -12,7 +13,7 @@ export const useUserForm = (
   onCloseDialog: () => void,
   isLoading: boolean
 ) => {
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   const isSubmitting = useRef(false);
 
   // 表单初始化
@@ -49,7 +50,7 @@ export const useUserForm = (
     } else {
       console.log("重置表单为编辑模式:", currentUser);
       
-      // 我们必须确保从currentUser中获取正确的部门ID和角色ID
+      // 确保从currentUser中获取正确的部门ID和角色ID
       form.reset({
         username: currentUser.username || "",
         name: currentUser.name || "",
@@ -72,12 +73,14 @@ export const useUserForm = (
     console.log("提交表单数据:", values);
     if (isLoading || isSubmitting.current) {
       console.log("系统正在处理中，请稍候");
+      toast.info("系统正在处理中，请稍候");
       return; // 防止重复提交
     }
     
     try {
       console.log("开始提交表单");
       isSubmitting.current = true;
+      toast.loading("正在处理...");
       
       // 移除临时标记字段，不需要提交到服务器
       const { __isEditMode, ...submitValues } = values;
@@ -91,13 +94,15 @@ export const useUserForm = (
         // 成功后关闭对话框
         onCloseDialog();
         
-        toast({
+        toast.success(currentUser ? "更新用户成功" : "创建用户成功");
+        uiToast({
           title: currentUser ? "更新用户成功" : "创建用户成功",
           description: `操作已完成`,
         });
       } else {
         console.error("表单提交返回失败");
-        toast({
+        toast.error("操作失败，请检查输入并重试");
+        uiToast({
           title: "操作失败",
           description: "请检查输入并重试",
           variant: "destructive",
@@ -105,7 +110,8 @@ export const useUserForm = (
       }
     } catch (error) {
       console.error("表单提交失败:", error);
-      toast({
+      toast.error(`操作失败: ${(error as Error).message}`);
+      uiToast({
         title: "操作失败",
         description: `${(error as Error).message}`,
         variant: "destructive",
