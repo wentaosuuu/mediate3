@@ -33,7 +33,14 @@ const UserFormDialog = ({
   // 使用表单钩子
   const { form, handleSubmit, resetForm } = useUserForm(
     currentUser, 
-    onSubmit, 
+    async (values) => {
+      const result = await onSubmit(values);
+      if (result) {
+        // 如果提交成功，关闭对话框
+        onOpenChange(false);
+      }
+      return result;
+    }, 
     () => onOpenChange(false), 
     isLoading
   );

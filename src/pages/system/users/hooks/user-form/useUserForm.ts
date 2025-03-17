@@ -92,8 +92,6 @@ export const useUserForm = (
       if (success) {
         console.log("表单提交成功，关闭对话框");
         form.reset(); // 重置表单
-        // 成功后关闭对话框
-        onCloseDialog();
         
         toast.success(currentUser ? "更新用户成功" : "创建用户成功");
         uiToast({

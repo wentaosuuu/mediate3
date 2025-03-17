@@ -43,13 +43,25 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       
       // 2. 处理部门关联
       console.log("开始处理部门关联，部门ID:", values.department_id);
-      await departmentAssociationModule.handle(userId, values.department_id);
-      console.log("部门关联处理成功");
+      if (values.department_id) {
+        await departmentAssociationModule.handle(userId, values.department_id);
+        console.log("部门关联处理成功");
+      } else {
+        // 如果部门ID为空，移除关联
+        await departmentAssociationModule.remove(userId);
+        console.log("部门关联已移除");
+      }
       
       // 3. 处理角色关联
       console.log("开始处理角色关联，角色ID:", values.role_id);
-      await roleAssociationModule.handle(userId, values.role_id);
-      console.log("角色关联处理成功");
+      if (values.role_id) {
+        await roleAssociationModule.handle(userId, values.role_id);
+        console.log("角色关联处理成功");
+      } else {
+        // 如果角色ID为空，移除关联
+        await roleAssociationModule.remove(userId);
+        console.log("角色关联已移除");
+      }
       
       // 显示成功提示
       uiToast({
