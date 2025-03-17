@@ -16,7 +16,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
 
   // 更新用户主函数
   const updateUser = async (values: UserFormValues, currentUser: any): Promise<boolean> => {
-    console.log("开始更新用户，数据:", values);
+    console.log("开始更新用户，表单数据:", values);
     console.log("当前用户信息:", currentUser);
     
     if (!currentUser || !currentUser.id) {
@@ -29,17 +29,23 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       return false;
     }
     
+    const userId = currentUser.id;
     setIsLoading(true);
     
     try {
+      console.log("开始用户更新流程，用户ID:", userId);
+      
       // 1. 更新用户基本信息
-      await updateUserBasicInfo(currentUser.id, values);
+      const updatedUserInfo = await updateUserBasicInfo(userId, values);
+      console.log("基本信息更新成功:", updatedUserInfo);
       
-      // 2. 处理部门关联
-      await departmentAssociationModule.handle(currentUser.id, values.department_id);
+      // 2. 处理部门关联 - 即使部门ID为空也调用，它会处理对应的情况
+      await departmentAssociationModule.handle(userId, values.department_id);
+      console.log("部门关联处理成功");
       
-      // 3. 处理角色关联
-      await roleAssociationModule.handle(currentUser.id, values.role_id);
+      // 3. 处理角色关联 - 即使角色ID为空也调用，它会处理对应的情况  
+      await roleAssociationModule.handle(userId, values.role_id);
+      console.log("角色关联处理成功");
       
       // 显示成功提示
       toast({
@@ -48,6 +54,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       });
       
       // 刷新用户列表
+      console.log("即将刷新用户列表以显示更新结果");
       await fetchUsers();
       console.log("更新用户流程完成，返回成功状态");
       return true;
