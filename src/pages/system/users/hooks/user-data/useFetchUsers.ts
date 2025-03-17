@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -8,9 +8,17 @@ export const useFetchUsers = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const fetchingRef = useRef(false);
 
   // 获取用户列表
   const fetchUsers = async () => {
+    // 使用 ref 避免重复请求
+    if (fetchingRef.current || isLoading) {
+      console.log("用户数据正在加载中，跳过重复请求");
+      return;
+    }
+    
+    fetchingRef.current = true;
     setIsLoading(true);
     
     try {
@@ -27,6 +35,8 @@ export const useFetchUsers = () => {
       if (!userData) {
         console.log("没有找到用户");
         setUsers([]);
+        fetchingRef.current = false;
+        setIsLoading(false);
         return;
       }
       
@@ -87,6 +97,7 @@ export const useFetchUsers = () => {
       });
     } finally {
       setIsLoading(false);
+      fetchingRef.current = false;
     }
   };
 

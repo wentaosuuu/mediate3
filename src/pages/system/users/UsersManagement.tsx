@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import UserHeader from './components/UserHeader';
 import UserSearch from './components/UserSearch';
 import UsersTable from './components/UsersTable';
@@ -36,6 +36,14 @@ const UsersManagement = () => {
 
   // 合并加载状态
   const isLoading = dataLoading || operationLoading;
+
+  // 防止组件销毁后的状态更新
+  const isMounted = useRef(true);
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   return (
     <div className="p-6">
