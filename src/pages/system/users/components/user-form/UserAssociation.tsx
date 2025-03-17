@@ -47,7 +47,7 @@ const UserAssociation = ({
                 disabled={isLoading}
                 onValueChange={field.onChange}
                 value={field.value || ""}
-                defaultValue=""
+                defaultValue={field.value || ""}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="请选择部门" />
@@ -81,7 +81,7 @@ const UserAssociation = ({
                 disabled={isLoading}
                 onValueChange={field.onChange}
                 value={field.value || ""}
-                defaultValue=""
+                defaultValue={field.value || ""}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="请选择角色" />

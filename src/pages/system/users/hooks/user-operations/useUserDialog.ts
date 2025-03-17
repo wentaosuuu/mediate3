@@ -31,7 +31,7 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
       // 如果user对象已经包含了department_id和role_id，直接使用
       if (user.department_id && user.role_id) {
         console.log("用户已包含部门和角色信息，直接使用:", user);
-        setCurrentUser(user);
+        setCurrentUser({...user}); // 使用对象的副本避免引用问题
         setIsDialogOpen(true);
         setIsLoading(false);
         return;
@@ -81,7 +81,7 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
       
       console.log("获取到用户角色信息:", { roleId, roleName });
       
-      // 将角色和部门信息添加到用户对象
+      // 将角色和部门信息添加到用户对象，使用对象副本而不是直接修改原对象
       const enhancedUser = {
         ...user,
         department_id: departmentId,
@@ -96,7 +96,7 @@ export const useUserDialog = (setCurrentUser: (user: any) => void) => {
     } catch (error) {
       console.error("获取用户详细信息失败:", error);
       // 如果获取详细信息失败，仍然打开对话框，但可能没有完整信息
-      setCurrentUser(user);
+      setCurrentUser({...user}); // 使用对象的副本
       setIsDialogOpen(true);
       toast({
         title: "获取用户信息失败",

@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { 
@@ -40,6 +40,7 @@ const UserFormDialog = ({
   onRefreshData
 }: UserFormDialogProps) => {
   const { toast } = useToast();
+  const didInitialRefresh = useRef(false);
   
   // 表单初始化
   const form = useForm<UserFormValues>({
@@ -57,50 +58,51 @@ const UserFormDialog = ({
     }
   });
 
-  // 当对话框打开时，仅刷新一次部门和角色数据，避免无限循环
+  // 当对话框打开时，仅执行一次刷新数据，避免无限循环
   useEffect(() => {
-    // 只有当对话框打开且刷新函数存在时才刷新数据
-    if (isOpen && onRefreshData) {
-      console.log("对话框打开，刷新数据");
+    // 只有当对话框首次打开且刷新函数存在时才刷新数据
+    if (isOpen && onRefreshData && !didInitialRefresh.current) {
+      console.log("对话框首次打开，刷新数据");
       onRefreshData();
+      didInitialRefresh.current = true;
     }
-    // 依赖项中只包含isOpen，避免其他变量变化导致的重复刷新
+    
+    // 当对话框关闭时，重置刷新标志
+    if (!isOpen) {
+      didInitialRefresh.current = false;
+    }
   }, [isOpen, onRefreshData]);
 
-  // 当currentUser改变时重置表单，注意依赖项的合理设置
+  // 当currentUser改变时重置表单
   useEffect(() => {
-    if (isOpen) {
-      console.log("重置表单数据:", currentUser);
+    if (currentUser === null) {
+      console.log("重置表单为创建模式");
+      form.reset({
+        username: "",
+        name: "",
+        email: "",
+        phone: "",
+        department_id: "",
+        role_id: "",
+        password: "",
+        tenant_id: "default",
+        __isEditMode: false
+      });
+    } else if (currentUser && isOpen) {
+      console.log("重置表单为编辑模式:", currentUser);
       
-      if (currentUser) {
-        // 编辑用户模式 - 确保所有字段都有有效的默认值
-        form.reset({
-          username: currentUser?.username || "",
-          name: currentUser?.name || "",
-          email: currentUser?.email || "",
-          phone: currentUser?.phone || "",
-          department_id: currentUser?.department_id || "",
-          role_id: currentUser?.role_id || "",
-          password: "",  // 编辑模式不需要密码
-          tenant_id: currentUser?.tenant_id || "default",
-          __isEditMode: true // 标记为编辑模式
-        });
-      } else {
-        // 创建用户模式
-        form.reset({
-          username: "",
-          name: "",
-          email: "",
-          phone: "",
-          department_id: "",
-          role_id: "",
-          password: "",
-          tenant_id: "default",
-          __isEditMode: false // 标记为创建模式
-        });
-      }
+      form.reset({
+        username: currentUser.username || "",
+        name: currentUser.name || "",
+        email: currentUser.email || "",
+        phone: currentUser.phone || "",
+        department_id: currentUser.department_id || "",
+        role_id: currentUser.role_id || "",
+        password: "",  // 编辑模式不需要密码
+        tenant_id: currentUser.tenant_id || "default",
+        __isEditMode: true // 标记为编辑模式
+      });
     }
-    // 只在isOpen和currentUser变化时重置表单，避免因departments和roles导致的重复渲染
   }, [currentUser, isOpen, form]);
 
   // 处理表单提交

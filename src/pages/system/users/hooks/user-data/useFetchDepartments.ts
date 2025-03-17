@@ -1,5 +1,5 @@
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,7 +17,7 @@ export const useFetchDepartments = () => {
   const fetchingRef = useRef(false);
 
   // 获取部门列表
-  const fetchDepartments = async (): Promise<void> => {
+  const fetchDepartments = useCallback(async (): Promise<void> => {
     // 使用 ref 避免重复请求，解决竞态条件
     if (fetchingRef.current || isLoading) {
       console.log("部门数据正在加载中，跳过重复请求");
@@ -53,7 +53,7 @@ export const useFetchDepartments = () => {
       setIsLoading(false);
       fetchingRef.current = false;
     }
-  };
+  }, [isLoading, toast]);
 
   return {
     departments,

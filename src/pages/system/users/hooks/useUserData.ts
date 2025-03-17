@@ -33,19 +33,29 @@ export const useUserData = () => {
   
   // 使用 ref 来防止重复加载
   const initialLoadDone = useRef(false);
+  const isRefreshing = useRef(false);
   
   // 包装刷新函数，避免重复创建函数实例导致useEffect无限循环
   const refreshAllData = useCallback(async () => {
+    // 使用 ref 避免并发刷新请求
+    if (isRefreshing.current) {
+      console.log("数据刷新已在进行中，跳过重复请求");
+      return;
+    }
+    
     console.log("刷新所有用户相关数据...");
+    isRefreshing.current = true;
+    
     try {
-      await Promise.all([
-        fetchDepartments(),
-        fetchRoles(),
-        fetchUsers()
-      ]);
+      // 依次请求数据，避免并发请求可能导致的问题
+      await fetchDepartments();
+      await fetchRoles();
+      await fetchUsers();
       console.log("所有用户相关数据加载完成！");
     } catch (error) {
       console.error("加载数据过程中发生错误:", error);
+    } finally {
+      isRefreshing.current = false;
     }
   }, [fetchDepartments, fetchRoles, fetchUsers]);
 
