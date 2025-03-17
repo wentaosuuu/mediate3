@@ -73,6 +73,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       // 刷新用户列表
       console.log("即将刷新用户列表以显示更新结果");
       await fetchUsers();
+      
       console.log("更新用户流程完成，返回成功状态");
       return true;
     } catch (error) {

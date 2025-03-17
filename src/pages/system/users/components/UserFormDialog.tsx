@@ -34,12 +34,23 @@ const UserFormDialog = ({
   const { form, handleSubmit, resetForm } = useUserForm(
     currentUser, 
     async (values) => {
-      const result = await onSubmit(values);
-      if (result) {
-        // 如果提交成功，关闭对话框
-        onOpenChange(false);
+      console.log("UserFormDialog - 提交表单开始", values);
+      try {
+        const result = await onSubmit(values);
+        console.log("UserFormDialog - 提交表单结果:", result);
+        
+        if (result) {
+          // 如果提交成功，关闭对话框
+          console.log("UserFormDialog - 提交成功，准备关闭对话框");
+          resetForm(); // 先重置表单
+          onOpenChange(false); // 然后关闭对话框
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.error("UserFormDialog - 提交表单出错:", error);
+        return false;
       }
-      return result;
     }, 
     () => onOpenChange(false), 
     isLoading

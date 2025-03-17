@@ -15,6 +15,11 @@ export const departmentAssociationModule = {
   async handle(userId: string, departmentId: string): Promise<void> {
     console.log("处理用户部门关联，用户ID:", userId, "部门ID:", departmentId);
     
+    if (!departmentId || departmentId === "none") {
+      console.log("部门ID无效，调用移除方法");
+      return this.remove(userId);
+    }
+    
     try {
       // 检查是否已存在关联
       const { data: existingAssoc, error: checkError } = await supabase
@@ -75,7 +80,7 @@ export const departmentAssociationModule = {
         .delete()
         .eq('user_id', userId);
       
-      if (error) {
+      if (error && error.code !== 'PGRST116') {  // 忽略"没有行"的错误
         console.error("移除用户部门关联失败:", error);
         throw new Error(`移除部门关联失败: ${error.message}`);
       }

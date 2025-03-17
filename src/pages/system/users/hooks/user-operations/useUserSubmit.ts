@@ -49,7 +49,7 @@ export const useUserSubmit = ({
       
       // 如果操作成功，返回结果
       if (success) {
-        console.log("操作成功");
+        console.log("操作成功，返回true");
         return true;
       } else {
         console.error("操作返回失败状态");

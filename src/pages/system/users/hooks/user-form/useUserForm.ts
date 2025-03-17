@@ -1,7 +1,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { userFormSchema, UserFormValues } from '../../components/user-form/UserFormSchema';
 import { toast } from "sonner";
@@ -15,6 +15,7 @@ export const useUserForm = (
 ) => {
   const { toast: uiToast } = useToast();
   const isSubmitting = useRef(false);
+  const [localIsLoading, setLocalIsLoading] = useState(false);
 
   // 表单初始化
   const form = useForm<UserFormValues>({
@@ -72,7 +73,7 @@ export const useUserForm = (
   // 处理表单提交
   const handleSubmit = form.handleSubmit(async (values) => {
     console.log("提交表单数据:", values);
-    if (isLoading || isSubmitting.current) {
+    if (isLoading || localIsLoading || isSubmitting.current) {
       console.log("系统正在处理中，请稍候");
       toast.info("系统正在处理中，请稍候");
       return; // 防止重复提交
@@ -81,6 +82,7 @@ export const useUserForm = (
     try {
       console.log("开始提交表单");
       isSubmitting.current = true;
+      setLocalIsLoading(true);
       toast.loading("正在处理...");
       
       // 移除临时标记字段，不需要提交到服务器
@@ -90,7 +92,7 @@ export const useUserForm = (
       const success = await onSubmit(submitValues);
       
       if (success) {
-        console.log("表单提交成功，关闭对话框");
+        console.log("表单提交成功");
         form.reset(); // 重置表单
         
         toast.success(currentUser ? "更新用户成功" : "创建用户成功");
@@ -98,6 +100,8 @@ export const useUserForm = (
           title: currentUser ? "更新用户成功" : "创建用户成功",
           description: `操作已完成`,
         });
+        
+        return success;
       } else {
         console.error("表单提交返回失败");
         toast.error("操作失败，请检查输入并重试");
@@ -106,6 +110,7 @@ export const useUserForm = (
           description: "请检查输入并重试",
           variant: "destructive",
         });
+        return false;
       }
     } catch (error) {
       console.error("表单提交失败:", error);
@@ -115,19 +120,23 @@ export const useUserForm = (
         description: `${(error as Error).message}`,
         variant: "destructive",
       });
+      return false;
     } finally {
       isSubmitting.current = false;
+      setLocalIsLoading(false);
     }
   });
 
   // 重置表单
   const resetForm = () => {
+    console.log("执行表单重置");
     form.reset();
   };
 
   return {
     form,
     handleSubmit,
-    resetForm
+    resetForm,
+    isLocalLoading: localIsLoading
   };
 };

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import UserHeader from './UserHeader';
 import UserSearch from './UserSearch';
 import UsersTable from './UsersTable';
@@ -19,7 +19,8 @@ const UsersContainer = () => {
     departments, 
     roles, 
     isLoading: dataLoading, 
-    refreshAllData
+    refreshAllData,
+    fetchUsers
   } = useUserData();
 
   // 使用自定义钩子处理用户操作
@@ -40,6 +41,12 @@ const UsersContainer = () => {
 
   // 合并加载状态
   const isLoading = dataLoading || operationLoading;
+
+  // 首次加载数据
+  useEffect(() => {
+    console.log("UsersContainer组件挂载，初始化数据");
+    refreshAllData();
+  }, []);
 
   return (
     <>
