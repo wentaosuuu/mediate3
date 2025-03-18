@@ -60,6 +60,11 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       if (error) {
         console.error('更新用户基本信息失败:', error);
         toast.error(`保存失败：${error.message || '数据库更新错误'}`);
+        uiToast({
+          title: "更新用户信息失败",
+          description: error.message,
+          variant: "destructive",
+        });
         throw error;
       }
       
@@ -82,6 +87,11 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
           if (deptError) {
             console.error("部门关联处理失败:", deptError);
             toast.error(`部门关联处理失败: ${deptError.message}`);
+            uiToast({
+              title: "部门关联处理失败",
+              description: deptError.message,
+              variant: "destructive",
+            });
           } else {
             console.log("部门关联处理成功");
           }
@@ -95,6 +105,11 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
           
           if (deleteError) {
             console.error("移除部门关联失败:", deleteError);
+            uiToast({
+              title: "移除部门关联失败",
+              description: deleteError.message,
+              variant: "destructive",
+            });
           } else {
             console.log("部门关联已移除");
           }
@@ -127,6 +142,11 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
               
             if (updateError) {
               console.error("更新角色关联失败:", updateError);
+              uiToast({
+                title: "更新角色关联失败",
+                description: updateError.message,
+                variant: "destructive",
+              });
             } else {
               console.log("角色关联已更新");
             }
@@ -138,6 +158,11 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
               
             if (insertError) {
               console.error("创建角色关联失败:", insertError);
+              uiToast({
+                title: "创建角色关联失败",
+                description: insertError.message,
+                variant: "destructive",
+              });
             } else {
               console.log("角色关联已创建");
             }
@@ -152,6 +177,11 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
           
           if (deleteError) {
             console.error("移除角色关联失败:", deleteError);
+            uiToast({
+              title: "移除角色关联失败",
+              description: deleteError.message,
+              variant: "destructive",
+            });
           } else {
             console.log("角色关联已移除");
           }
@@ -163,6 +193,10 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       
       // 显示成功提示
       toast.success(`用户 ${values.name || values.username} 更新成功`);
+      uiToast({
+        title: "用户更新成功",
+        description: `已成功更新用户: ${values.name || values.username}`,
+      });
       
       // 刷新用户列表
       await fetchUsers();
