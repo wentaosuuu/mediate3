@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Form } from "@/components/ui/form";
-import { DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import UserBasicInfo from './UserBasicInfo';
 import UserAssociation from './UserAssociation';
 import UserFormActions from './UserFormActions';
@@ -9,7 +8,6 @@ import { Department } from '../../hooks/user-data/useFetchDepartments';
 import { Role } from '../../hooks/user-data/useFetchRoles';
 import { UseFormReturn } from "react-hook-form";
 import { UserFormValues } from './UserFormSchema';
-import { useFormSubmitHandler } from '../../hooks/user-form/useFormSubmitHandler';
 import { Logger } from "@/utils/logger";
 
 // 创建专用日志记录器
@@ -17,7 +15,7 @@ const logger = new Logger("UserFormContent");
 
 interface UserFormContentProps {
   form: UseFormReturn<UserFormValues>;
-  onSubmit: (values: UserFormValues) => Promise<boolean>;
+  onSubmit: (e: React.FormEvent) => Promise<void>;
   onCancel: () => void;
   currentUser: any | null;
   isLoading: boolean;
@@ -35,39 +33,17 @@ const UserFormContent = ({
   departments,
   roles
 }: UserFormContentProps) => {
-  // 使用专门的钩子处理表单提交
-  const { handleFormSubmit, isSubmitting } = useFormSubmitHandler(form, onSubmit, isLoading);
-  
-  // 计算最终的加载状态
-  const combinedLoading = isLoading || isSubmitting;
-  
-  logger.info("渲染表单，当前用户:", currentUser);
+  logger.info("渲染表单，当前用户:", currentUser?.id);
 
   return (
-    <>
-      <FormHeader currentUser={currentUser} />
-      
-      <Form {...form}>
-        <form onSubmit={handleFormSubmit} className="space-y-5">
-          <UserBasicInfo isLoading={combinedLoading} currentUser={currentUser} />
-          <UserAssociation isLoading={combinedLoading} departments={departments} roles={roles} />
-          <UserFormActions isLoading={combinedLoading} currentUser={currentUser} onCancel={onCancel} />
-        </form>
-      </Form>
-    </>
+    <Form {...form}>
+      <form onSubmit={onSubmit} className="space-y-5">
+        <UserBasicInfo isLoading={isLoading} currentUser={currentUser} />
+        <UserAssociation isLoading={isLoading} departments={departments} roles={roles} />
+        <UserFormActions isLoading={isLoading} currentUser={currentUser} onCancel={onCancel} />
+      </form>
+    </Form>
   );
 };
-
-// 表单头部组件
-const FormHeader = ({ currentUser }: { currentUser: any | null }) => (
-  <DialogHeader>
-    <DialogTitle>{currentUser ? "编辑用户" : "创建用户"}</DialogTitle>
-    <DialogDescription>
-      {currentUser 
-        ? "修改用户信息，完成后点击保存。" 
-        : "填写用户信息，完成后点击创建。"}
-    </DialogDescription>
-  </DialogHeader>
-);
 
 export default UserFormContent;
