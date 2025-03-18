@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { DialogFooter } from "@/components/ui/dialog";
+import { Loader2 } from 'lucide-react';
 
 // 表单操作按钮组件
 const UserFormActions = ({ 
@@ -17,14 +18,27 @@ const UserFormActions = ({
   
   return (
     <DialogFooter>
-      <Button type="button" variant="outline" onClick={onCancel}>
+      <Button 
+        type="button" 
+        variant="outline" 
+        onClick={onCancel}
+        disabled={isLoading}
+      >
         取消
       </Button>
       <Button 
         type="submit" 
         disabled={isLoading}
+        className="min-w-[80px]"
       >
-        {isLoading ? "处理中..." : currentUser ? "保存" : "创建"}
+        {isLoading ? (
+          <span className="flex items-center gap-1">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            处理中...
+          </span>
+        ) : (
+          currentUser ? "保存" : "创建"
+        )}
       </Button>
     </DialogFooter>
   );

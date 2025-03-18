@@ -48,11 +48,7 @@ export const useUserForm = (
       const result = await onSubmit(values);
       console.log("表单提交结果:", result);
       
-      if (result) {
-        toast.success("操作成功");
-      } else {
-        toast.error("操作失败");
-      }
+      // 结果处理已移至onSubmit回调中的逻辑，这里不再重复处理
     } catch (error) {
       console.error("表单提交出错:", error);
       toast.error(`操作失败: ${(error as Error).message}`);

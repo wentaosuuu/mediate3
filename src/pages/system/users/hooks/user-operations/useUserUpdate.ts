@@ -27,7 +27,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
         description: "无法获取用户ID",
         variant: "destructive",
       });
-      toast.error("更新失败：无法获取用户ID");
+      toast.error("更新失败：无法获取用户ID", { id: "update-toast" });
       return false;
     }
     
@@ -61,7 +61,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
         }
       } catch (deptError) {
         console.error("部门关联处理失败:", deptError);
-        toast.error(`部门关联处理失败: ${(deptError as Error).message}`);
+        toast.error(`部门关联处理失败: ${(deptError as Error).message}`, { id: "update-toast" });
         // 继续处理其他更新，不中断整个流程
       }
       
@@ -78,12 +78,12 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
         }
       } catch (roleError) {
         console.error("角色关联处理失败:", roleError);
-        toast.error(`角色关联处理失败: ${(roleError as Error).message}`);
+        toast.error(`角色关联处理失败: ${(roleError as Error).message}`, { id: "update-toast" });
         // 继续处理，不中断整个流程
       }
       
       // 显示成功提示
-      toast.success(`用户 ${values.name || values.username} 更新成功`);
+      toast.success(`用户 ${values.name || values.username} 更新成功`, { id: "update-toast" });
       
       // 立即刷新用户列表
       console.log("立即刷新用户列表以显示更新结果");
@@ -94,7 +94,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       return true;
     } catch (error) {
       console.error('更新用户失败:', error);
-      toast.error(`更新失败：${(error as Error).message}`);
+      toast.error(`更新失败：${(error as Error).message}`, { id: "update-toast" });
       return false;
     } finally {
       setIsLoading(false);

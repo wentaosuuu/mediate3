@@ -23,7 +23,7 @@ const UserFormDialog = ({
   onOpenChange,
   onSubmit,
   currentUser,
-  isLoading,
+  isLoading: externalLoading,
   departments,
   roles
 }: UserFormDialogProps) => {
@@ -43,38 +43,45 @@ const UserFormDialog = ({
         return false;
       }
       
-      console.log("UserFormDialog - 提交表单开始", values);
+      console.log("UserFormDialog - 提交表单开始，数据:", values);
+      
+      // 设置提交状态
       isSubmitting.current = true;
       setIsSubmittingState(true);
       setLocalLoading(true);
-      toast.loading("正在保存用户数据...");
       
       try {
-        // 确保onSubmit函数被调用并等待结果
+        // 显示加载提示
+        toast.loading("正在保存用户数据...", { id: "user-save" });
+        
+        // 调用onSubmit函数处理表单数据
         console.log("调用onSubmit函数处理表单数据");
         const result = await onSubmit(values);
         console.log("UserFormDialog - 提交表单结果:", result);
         
         if (result) {
-          // 提交成功，重置表单
+          // 提交成功，显示成功消息
+          toast.success(`用户${currentUser ? '更新' : '创建'}成功`, { id: "user-save" });
+          
+          // 重置表单
           console.log("UserFormDialog - 提交成功，重置表单");
           resetForm();
           
           // 关闭对话框
           console.log("UserFormDialog - 关闭对话框");
-          onOpenChange(false);
+          setTimeout(() => {
+            onOpenChange(false);
+          }, 500);
           
-          // 显示成功消息
-          toast.success(`用户${currentUser ? '更新' : '创建'}成功`);
           return true;
         } else {
           console.log("UserFormDialog - 提交失败");
-          toast.error(`用户${currentUser ? '更新' : '创建'}失败`);
+          toast.error(`用户${currentUser ? '更新' : '创建'}失败`, { id: "user-save" });
           return false;
         }
       } catch (error) {
         console.error("UserFormDialog - 提交表单出错:", error);
-        toast.error(`操作失败: ${(error as Error).message}`);
+        toast.error(`操作失败: ${(error as Error).message}`, { id: "user-save" });
         return false;
       } finally {
         // 无论成功还是失败，都重置提交状态和加载状态
@@ -82,12 +89,11 @@ const UserFormDialog = ({
           isSubmitting.current = false;
           setIsSubmittingState(false);
           setLocalLoading(false);
-          toast.dismiss(); // 清除所有loading toast
         }, 500);
       }
     }, 
     () => onOpenChange(false), 
-    isLoading
+    externalLoading
   );
 
   // 处理对话框关闭
@@ -124,7 +130,7 @@ const UserFormDialog = ({
   };
 
   // 综合加载状态
-  const combinedLoading = isLoading || isLocalLoading || isSubmitting.current || isSubmittingState;
+  const combinedLoading = externalLoading || isLocalLoading || isSubmitting.current || isSubmittingState;
 
   // 监听表单变化，调试用
   useEffect(() => {

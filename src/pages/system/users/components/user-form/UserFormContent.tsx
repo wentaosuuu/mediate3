@@ -34,6 +34,8 @@ const UserFormContent = ({
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault(); // 阻止默认提交行为
     console.log("表单提交被触发，准备处理数据");
+    // 打印表单值，检查数据是否正确
+    console.log("表单数据:", form.getValues());
     onSubmit(); // 调用传入的onSubmit函数
   };
 
