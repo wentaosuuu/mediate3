@@ -23,14 +23,29 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        // 这里使用模拟用户ID，实际项目中应该从认证系统获取
-        const userId = "mock-user-id"; // 实际应用中替换为真实用户ID
+        // 获取当前登录用户
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError) throw authError;
+        
+        if (!user) {
+          console.warn("未找到登录用户，使用模拟数据");
+          // 如果没有登录用户，使用模拟数据（开发模式）
+          setUserInfo({
+            username: '张三',
+            department: '云宝宝',
+            role: '云宝人员'
+          });
+          return;
+        }
+        
+        console.log("当前登录用户ID:", user.id);
         
         // 获取用户基本信息
         const { data: userData, error: userError } = await supabase
           .from('users')
           .select('id, username, name')
-          .eq('id', userId)
+          .eq('id', user.id)
           .single();
           
         if (userError) throw userError;
@@ -39,14 +54,14 @@ const Dashboard = () => {
         const { data: userDept, error: deptError } = await supabase
           .from('user_departments')
           .select('departments:department_id(name)')
-          .eq('user_id', userId)
+          .eq('user_id', user.id)
           .maybeSingle();
           
         // 获取用户角色信息  
         const { data: userRole, error: roleError } = await supabase
           .from('user_roles')
           .select('roles:role_id(name)')
-          .eq('user_id', userId)
+          .eq('user_id', user.id)
           .maybeSingle();
           
         setUserInfo({
@@ -55,8 +70,15 @@ const Dashboard = () => {
           role: userRole?.roles?.name || '无角色'
         });
         
+        console.log("已加载用户信息:", {
+          username: userData?.username || userData?.name,
+          department: userDept?.departments?.name,
+          role: userRole?.roles?.name
+        });
+        
       } catch (error) {
         console.error("获取用户信息失败:", error);
+        toast.error("获取用户信息失败，使用默认数据");
         // 出错时使用默认值
         setUserInfo({
           username: '张三', // 默认用户名
@@ -66,19 +88,14 @@ const Dashboard = () => {
       }
     };
     
-    // 由于目前可能没有真实用户认证，我们直接使用模拟数据
-    // fetchUserInfo(); // 实际项目中取消注释此行
-    
-    // 使用模拟数据 - 已更新为正确的部门和角色
-    setUserInfo({
-      username: '张三',
-      department: '云宝宝',
-      role: '云宝人员'
-    });
+    // 调用获取用户信息函数
+    fetchUserInfo();
     
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // 退出登录时清除supabase session
+    await supabase.auth.signOut();
     navigate('/');
   };
 

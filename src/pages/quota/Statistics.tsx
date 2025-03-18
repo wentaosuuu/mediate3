@@ -1,22 +1,90 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { MainContent } from '@/components/dashboard/MainContent';
 import { QuotaStatistics } from '@/components/quota/statistics/QuotaStatistics';
+import { supabase } from "@/integrations/supabase/client";
 
 const Statistics = () => {
   const navigate = useNavigate();
 
-  // Mock user data - 更新为正确的用户信息
-  const mockUser = {
-    username: '张三',
-    department: '云宝宝',
-    role: '云宝人员'
-  };
+  // 用户信息状态
+  const [userInfo, setUserInfo] = useState({
+    username: '加载中...',
+    department: '加载中...',
+    role: '加载中...'
+  });
 
-  const handleLogout = () => {
+  // 获取用户部门和角色信息
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        // 获取当前登录用户
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError) throw authError;
+        
+        if (!user) {
+          console.warn("未找到登录用户，使用模拟数据");
+          // 如果没有登录用户，使用模拟数据（开发模式）
+          setUserInfo({
+            username: '张三',
+            department: '云宝宝',
+            role: '云宝人员'
+          });
+          return;
+        }
+        
+        // 获取用户基本信息
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id, username, name')
+          .eq('id', user.id)
+          .single();
+          
+        if (userError) throw userError;
+        
+        // 获取用户部门信息
+        const { data: userDept, error: deptError } = await supabase
+          .from('user_departments')
+          .select('departments:department_id(name)')
+          .eq('user_id', user.id)
+          .maybeSingle();
+          
+        // 获取用户角色信息  
+        const { data: userRole, error: roleError } = await supabase
+          .from('user_roles')
+          .select('roles:role_id(name)')
+          .eq('user_id', user.id)
+          .maybeSingle();
+          
+        setUserInfo({
+          username: userData?.username || userData?.name || '用户',
+          department: userDept?.departments?.name || '无部门',
+          role: userRole?.roles?.name || '无角色'
+        });
+        
+      } catch (error) {
+        console.error("获取用户信息失败:", error);
+        // 出错时使用默认值
+        setUserInfo({
+          username: '张三',
+          department: '云宝宝',
+          role: '云宝人员'
+        });
+      }
+    };
+    
+    // 调用获取用户信息函数
+    fetchUserInfo();
+    
+  }, []);
+
+  const handleLogout = async () => {
+    // 退出登录时清除supabase session
+    await supabase.auth.signOut();
     navigate('/');
   };
 
@@ -31,14 +99,14 @@ const Statistics = () => {
 
       <div className="pl-64 min-h-screen">
         <TopBar
-          username={mockUser.username}
-          department={mockUser.department}
-          role={mockUser.role}
+          username={userInfo.username}
+          department={userInfo.department}
+          role={userInfo.role}
           onLogout={handleLogout}
           onSearch={() => {}}
           searchQuery=""
         />
-        <MainContent username={mockUser.username} currentPath="/quota/statistics">
+        <MainContent username={userInfo.username} currentPath="/quota/statistics">
           <QuotaStatistics />
         </MainContent>
       </div>
