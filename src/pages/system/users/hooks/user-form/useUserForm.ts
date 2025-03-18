@@ -1,8 +1,7 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import { UserFormSchema, UserFormValues } from "../../components/user-form/UserFormSchema";
+import { userFormSchema, UserFormValues } from "../../components/user-form/UserFormSchema";
 
 interface UseUserFormProps {
   currentUser: any | null;
@@ -26,7 +25,7 @@ export const useUserForm = (
 
   // 初始化表单
   const form = useForm<UserFormValues>({
-    resolver: zodResolver(UserFormSchema),
+    resolver: zodResolver(userFormSchema),
     defaultValues: {
       username: "",
       email: "",
