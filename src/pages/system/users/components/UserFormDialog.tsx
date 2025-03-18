@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import UserFormContent from './user-form/UserFormContent';
@@ -40,7 +41,9 @@ const UserFormDialog = ({
       // 防止重复提交 - 如果已经在提交中，直接返回
       if (isSubmitting.current) {
         logger.info("表单正在提交中，忽略重复请求");
-        toast.info("正在处理，请稍候...");
+        toast.info("正在处理，请稍候...", {
+          style: { backgroundColor: '#E0F2FE', color: '#0369A1', border: '1px solid #7DD3FC' }
+        });
         return false;
       }
       
@@ -68,8 +71,11 @@ const UserFormDialog = ({
         logger.info("UserFormDialog - 提交表单结果:", result);
         
         if (result) {
-          // 提交成功
-          toast.success(`用户${currentUser ? '更新' : '创建'}成功`, { id: toastId });
+          // 提交成功 - 绿色背景
+          toast.success(`用户${currentUser ? '更新' : '创建'}成功`, { 
+            id: toastId,
+            style: { backgroundColor: '#DCFCE7', color: '#166534', border: '1px solid #86EFAC' } 
+          });
           
           // 重置表单并关闭对话框（添加延迟以便用户看到成功消息）
           setTimeout(() => {
@@ -80,12 +86,19 @@ const UserFormDialog = ({
           return true;
         } else {
           logger.warn("UserFormDialog - 提交失败");
-          toast.error(`用户${currentUser ? '更新' : '创建'}失败`, { id: toastId });
+          // 提交失败 - 红色背景
+          toast.error(`用户${currentUser ? '更新' : '创建'}失败`, { 
+            id: toastId,
+            style: { backgroundColor: '#FEE2E2', color: '#B91C1C', border: '1px solid #F87171' } 
+          });
           return false;
         }
       } catch (error) {
         logger.error("UserFormDialog - 提交表单出错:", error);
-        toast.error(`操作失败: ${(error as Error).message}`);
+        // 出错提示 - 红色背景
+        toast.error(`操作失败: ${(error as Error).message}`, {
+          style: { backgroundColor: '#FEE2E2', color: '#B91C1C', border: '1px solid #F87171' }
+        });
         return false;
       } finally {
         // 延迟清理提交状态以防止快速点击导致的重复提交
@@ -104,7 +117,9 @@ const UserFormDialog = ({
     // 防止重复提交
     if (isSubmitting.current) {
       logger.info("表单正在提交中，忽略重复请求");
-      toast.info("正在处理，请稍候...");
+      toast.info("正在处理，请稍候...", {
+        style: { backgroundColor: '#E0F2FE', color: '#0369A1', border: '1px solid #7DD3FC' }
+      });
       return false;
     }
     
@@ -131,7 +146,11 @@ const UserFormDialog = ({
       logger.info("UserFormDialog - 提交表单结果:", result);
       
       if (result) {
-        toast.success(`用户${currentUser ? '更新' : '创建'}成功`, { id: toastId });
+        // 成功提示 - 绿色背景
+        toast.success(`用户${currentUser ? '更新' : '创建'}成功`, { 
+          id: toastId,
+          style: { backgroundColor: '#DCFCE7', color: '#166534', border: '1px solid #86EFAC' } 
+        });
         // 添加延迟以便用户看到成功消息
         setTimeout(() => {
           resetForm();
@@ -140,12 +159,19 @@ const UserFormDialog = ({
         return true;
       } else {
         logger.warn("UserFormDialog - 提交失败");
-        toast.error(`用户${currentUser ? '更新' : '创建'}失败`, { id: toastId });
+        // 失败提示 - 红色背景
+        toast.error(`用户${currentUser ? '更新' : '创建'}失败`, { 
+          id: toastId,
+          style: { backgroundColor: '#FEE2E2', color: '#B91C1C', border: '1px solid #F87171' } 
+        });
         return false;
       }
     } catch (error) {
       logger.error("UserFormDialog - 提交表单出错:", error);
-      toast.error(`操作失败: ${(error as Error).message}`);
+      // 错误提示 - 红色背景
+      toast.error(`操作失败: ${(error as Error).message}`, {
+        style: { backgroundColor: '#FEE2E2', color: '#B91C1C', border: '1px solid #F87171' }
+      });
       return false;
     } finally {
       setTimeout(() => {
@@ -160,7 +186,9 @@ const UserFormDialog = ({
     // 如果正在提交，阻止关闭
     if (isSubmitting.current && open === false) {
       logger.info("表单正在提交中，阻止关闭对话框");
-      toast.info("表单正在提交中，请稍候...");
+      toast.info("表单正在提交中，请稍候...", {
+        style: { backgroundColor: '#E0F2FE', color: '#0369A1', border: '1px solid #7DD3FC' }
+      });
       return;
     }
     
@@ -179,7 +207,9 @@ const UserFormDialog = ({
   const handleCancel = () => {
     if (isSubmitting.current) {
       logger.info("表单正在提交中，阻止取消操作");
-      toast.info("正在处理，请稍候...");
+      toast.info("正在处理，请稍候...", {
+        style: { backgroundColor: '#E0F2FE', color: '#0369A1', border: '1px solid #7DD3FC' }
+      });
       return;
     }
     

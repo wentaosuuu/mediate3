@@ -26,7 +26,9 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
     
     if (!currentUser || !currentUser.id) {
       logger.error("更新用户失败: 当前用户ID不存在");
-      toast.error("更新失败：无法获取用户ID");
+      toast.error("更新失败：无法获取用户ID", {
+        style: { backgroundColor: '#FEE2E2', color: '#B91C1C', border: '1px solid #F87171' }
+      });
       return false;
     }
     
@@ -35,7 +37,9 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
     // 防止重复提交
     if (isLoading) {
       logger.info("更新操作正在进行中，忽略重复请求");
-      toast.info("操作正在处理中，请稍候...");
+      toast.info("操作正在处理中，请稍候...", {
+        style: { backgroundColor: '#E0F2FE', color: '#0369A1', border: '1px solid #7DD3FC' }
+      });
       return false;
     }
     
@@ -74,25 +78,22 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
         // 记录但继续执行，不中断流程
       }
       
-      // 显示成功提示
-      toast.success(`用户 ${values.name || values.username} 更新成功`, { id: toastId });
-      uiToast({
-        title: "用户更新成功",
-        description: `已成功更新用户: ${values.name || values.username}`,
+      // 显示成功提示 - 使用绿色背景
+      toast.success(`用户 ${values.name || values.username} 更新成功`, { 
+        id: toastId,
+        style: { backgroundColor: '#DCFCE7', color: '#166534', border: '1px solid #86EFAC' } 
       });
       
-      // 刷新用户列表
+      // 静默刷新用户列表
       await fetchUsers();
       
       logger.info("更新用户流程完成，返回成功状态");
       return true;
     } catch (error) {
       logger.error('更新用户失败:', error);
-      toast.error(`更新失败：${(error as Error).message}`, { id: toastId });
-      uiToast({
-        title: "用户更新失败",
-        description: `更新失败：${(error as Error).message}`,
-        variant: "destructive",
+      toast.error(`更新失败：${(error as Error).message}`, { 
+        id: toastId,
+        style: { backgroundColor: '#FEE2E2', color: '#B91C1C', border: '1px solid #F87171' } 
       });
       return false;
     } finally {

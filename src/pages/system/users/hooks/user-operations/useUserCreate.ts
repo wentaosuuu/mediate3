@@ -38,21 +38,11 @@ export const useUserCreate = (refreshUsers: () => Promise<void>) => {
       
       if (userError) {
         console.error("创建用户基本信息失败:", userError);
-        uiToast({
-          title: "创建用户失败",
-          description: userError.message,
-          variant: "destructive",
-        });
         throw new Error(`创建用户失败: ${userError.message}`);
       }
       
       if (!userResult) {
         console.error("创建用户后未返回用户数据");
-        uiToast({
-          title: "创建用户失败",
-          description: "未返回用户数据",
-          variant: "destructive",
-        });
         throw new Error("创建用户后未返回用户数据");
       }
       
@@ -73,11 +63,6 @@ export const useUserCreate = (refreshUsers: () => Promise<void>) => {
         if (deptError) {
           console.error("创建用户-部门关联失败:", deptError);
           // 记录错误但继续执行
-          uiToast({
-            title: "设置用户部门失败",
-            description: deptError.message,
-            variant: "destructive",
-          });
         } else {
           console.log("用户-部门关联创建成功");
         }
@@ -96,11 +81,6 @@ export const useUserCreate = (refreshUsers: () => Promise<void>) => {
         if (roleError) {
           console.error("创建用户-角色关联失败:", roleError);
           // 记录错误但继续执行
-          uiToast({
-            title: "设置用户角色失败",
-            description: roleError.message,
-            variant: "destructive",
-          });
         } else {
           console.log("用户-角色关联创建成功");
         }
@@ -108,28 +88,22 @@ export const useUserCreate = (refreshUsers: () => Promise<void>) => {
       
       console.log("用户创建成功，用户ID:", userId);
       
-      // 刷新用户列表
+      // 静默刷新用户列表
       await refreshUsers();
       
-      uiToast({
-        title: "用户创建成功",
-        description: `已成功创建用户: ${userData.username}`,
+      // 成功提示 - 使用绿色背景
+      toast.success(`已成功创建用户: ${userData.username}`, {
+        style: { backgroundColor: '#DCFCE7', color: '#166534', border: '1px solid #86EFAC' }
       });
-      
-      // 使用 sonner 的 toast
-      toast.success(`已成功创建用户: ${userData.username}`);
       
       return true;
     } catch (error) {
       console.error("创建用户过程中出错:", error);
-      uiToast({
-        title: "创建用户失败",
-        description: (error as Error).message,
-        variant: "destructive",
-      });
       
-      // 使用 sonner 的 toast
-      toast.error(`创建用户失败: ${(error as Error).message}`);
+      // 错误提示 - 使用红色背景
+      toast.error(`创建用户失败: ${(error as Error).message}`, {
+        style: { backgroundColor: '#FEE2E2', color: '#B91C1C', border: '1px solid #F87171' }
+      });
       
       return false;
     } finally {

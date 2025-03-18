@@ -63,19 +63,28 @@ export const useUserOperations = (fetchUsers: () => Promise<void>) => {
       
       // 根据操作结果更新提示
       if (success) {
-        toast.success(`用户${currentUser ? "更新" : "创建"}成功`, { id: toastId });
+        toast.success(`用户${currentUser ? "更新" : "创建"}成功`, { 
+          id: toastId,
+          style: { backgroundColor: '#DCFCE7', color: '#166534', border: '1px solid #86EFAC' } 
+        });
         console.log("操作成功，返回true");
-        // 刷新用户列表
+        // 静默刷新用户列表
         await fetchUsers();
         return true;
       } else {
         console.error("操作返回失败状态");
-        toast.error(`用户${currentUser ? "更新" : "创建"}失败`, { id: toastId });
+        toast.error(`用户${currentUser ? "更新" : "创建"}失败`, { 
+          id: toastId,
+          style: { backgroundColor: '#FEE2E2', color: '#B91C1C', border: '1px solid #F87171' } 
+        });
         return false;
       }
     } catch (error) {
       console.error("表单提交过程中出错:", error);
-      toast.error(`发生错误: ${(error as Error).message}`, { id: toastId });
+      toast.error(`发生错误: ${(error as Error).message}`, { 
+        id: toastId,
+        style: { backgroundColor: '#FEE2E2', color: '#B91C1C', border: '1px solid #F87171' } 
+      });
       return false;
     }
   };

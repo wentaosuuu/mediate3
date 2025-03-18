@@ -49,21 +49,21 @@ const UsersContainer = () => {
     console.log("对话框状态变化:", open);
     setIsDialogOpen(open);
     
-    // 关闭对话框后，刷新一次数据
+    // 关闭对话框后，静默刷新数据（不显示加载提示）
     if (!open && !isRefreshing.current) {
       console.log("对话框关闭，刷新用户数据");
       isRefreshing.current = true;
       
-      const toastId = `refresh-${Date.now()}`;
-      toast.loading("正在刷新用户数据...", { id: toastId });
-      
+      // 不再显示刷新提示
       refreshAllData().then(() => {
         console.log("对话框关闭后数据刷新完成");
-        toast.success("用户数据已更新", { id: toastId });
         isRefreshing.current = false;
       }).catch(error => {
         console.error("对话框关闭后数据刷新失败:", error);
-        toast.error(`数据刷新失败: ${(error as Error).message}`, { id: toastId });
+        // 只有刷新失败时才显示错误提示
+        toast.error(`数据刷新失败: ${(error as Error).message}`, {
+          style: { backgroundColor: '#FEE2E2', color: '#B91C1C', border: '1px solid #F87171' }
+        });
         isRefreshing.current = false;
       });
     }
@@ -76,16 +76,16 @@ const UsersContainer = () => {
         console.log("初始加载用户数据");
         isRefreshing.current = true;
         
-        const toastId = `initial-load-${Date.now()}`;
-        toast.loading("加载用户数据...", { id: toastId });
-        
         try {
+          // 静默加载，不显示提示
           await refreshAllData();
           console.log("初始用户数据加载完成");
-          toast.success("用户数据加载完成", { id: toastId });
         } catch (error) {
           console.error("初始用户数据加载失败:", error);
-          toast.error(`数据加载失败: ${(error as Error).message}`, { id: toastId });
+          // 只有初始加载失败时才显示错误提示
+          toast.error(`数据加载失败: ${(error as Error).message}`, {
+            style: { backgroundColor: '#FEE2E2', color: '#B91C1C', border: '1px solid #F87171' }
+          });
         } finally {
           isRefreshing.current = false;
         }
