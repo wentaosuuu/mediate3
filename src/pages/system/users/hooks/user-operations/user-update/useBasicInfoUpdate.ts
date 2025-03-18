@@ -35,7 +35,7 @@ export const updateUserBasicInfo = async (userId: string, values: UserFormValues
       .update(updateData)
       .eq('id', userId)
       .select('id, username, name, email, phone')
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error('更新用户基本信息失败:', error);

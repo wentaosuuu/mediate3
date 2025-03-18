@@ -37,12 +37,14 @@ const UserFormDialog = ({
       // 防止重复提交
       if (isSubmitting.current) {
         console.log("表单正在提交中，忽略重复请求");
+        toast.info("正在处理，请稍候...");
         return false;
       }
       
       console.log("UserFormDialog - 提交表单开始", values);
       isSubmitting.current = true;
       setLocalLoading(true);
+      toast.loading("正在保存...");
       
       try {
         // 提交表单
@@ -84,6 +86,7 @@ const UserFormDialog = ({
     // 如果正在提交，阻止关闭
     if (isSubmitting.current && open === false) {
       console.log("表单正在提交中，阻止关闭对话框");
+      toast.info("表单正在提交中，请稍候...");
       return;
     }
     
@@ -99,6 +102,7 @@ const UserFormDialog = ({
   const handleCancel = () => {
     if (isSubmitting.current) {
       console.log("表单正在提交中，阻止取消操作");
+      toast.info("正在处理，请稍候...");
       return;
     }
     

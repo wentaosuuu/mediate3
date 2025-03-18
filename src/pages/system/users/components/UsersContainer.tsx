@@ -6,6 +6,7 @@ import UserFormDialog from './UserFormDialog';
 import { useUserData } from '../hooks/useUserData';
 import { useUserOperations } from '../hooks/useUserOperations';
 import { useUserSearch } from '../hooks/useUserSearch';
+import { toast } from "sonner";
 
 /**
  * 用户管理容器组件
@@ -48,9 +49,14 @@ const UsersContainer = () => {
     if (!isInitialized.current && !isRefreshing.current) {
       console.log("UsersContainer组件挂载，初始化数据");
       isRefreshing.current = true;
-      refreshAllData().finally(() => {
-        isRefreshing.current = false;
+      refreshAllData().then(() => {
+        console.log("初始数据加载完成");
         isInitialized.current = true;
+        isRefreshing.current = false;
+      }).catch(error => {
+        console.error("初始数据加载失败:", error);
+        toast.error("加载数据失败，请刷新页面重试");
+        isRefreshing.current = false;
       });
     }
   }, [refreshAllData]);
@@ -60,8 +66,13 @@ const UsersContainer = () => {
     setIsDialogOpen(open);
     // 关闭对话框后，刷新一次数据
     if (!open && isInitialized.current && !isRefreshing.current) {
+      console.log("对话框关闭，刷新用户数据");
       isRefreshing.current = true;
-      refreshAllData().finally(() => {
+      refreshAllData().then(() => {
+        console.log("对话框关闭后数据刷新完成");
+        isRefreshing.current = false;
+      }).catch(error => {
+        console.error("对话框关闭后数据刷新失败:", error);
         isRefreshing.current = false;
       });
     }

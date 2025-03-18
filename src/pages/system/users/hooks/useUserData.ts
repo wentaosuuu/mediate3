@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useFetchUsers } from './user-data/useFetchUsers';
 import { useFetchDepartments } from './user-data/useFetchDepartments';
 import { useFetchRoles } from './user-data/useFetchRoles';
+import { toast } from "sonner";
 
 // 整合用户数据钩子
 export const useUserData = () => {
@@ -54,6 +55,7 @@ export const useUserData = () => {
       console.log("所有用户相关数据加载完成！");
     } catch (error) {
       console.error("加载数据过程中发生错误:", error);
+      toast.error("加载数据失败：" + (error instanceof Error ? error.message : "未知错误"));
     } finally {
       isRefreshing.current = false;
       setIsLoading(false); // 恢复外部加载状态

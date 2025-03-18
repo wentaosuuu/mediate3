@@ -5,6 +5,7 @@ import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { MainContent } from '@/components/dashboard/MainContent';
 import UsersManagement from './users/UsersManagement';
+import { Toaster } from 'sonner';
 
 const Users = () => {
   const navigate = useNavigate();
@@ -42,6 +43,9 @@ const Users = () => {
           <UsersManagement />
         </MainContent>
       </div>
+      
+      {/* 添加Sonner提示组件 */}
+      <Toaster position="top-right" expand={true} richColors />
     </div>
   );
 };
