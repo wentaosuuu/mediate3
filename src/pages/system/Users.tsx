@@ -52,7 +52,13 @@ const Users = () => {
         closeButton 
         toastOptions={{
           duration: 3000,
-          style: { fontSize: '14px' }
+          className: "text-sm font-medium",
+          style: { 
+            fontSize: '14px',
+            background: 'var(--background)',
+            color: 'var(--foreground)',
+            border: '1px solid var(--border)'
+          }
         }}
       />
     </div>

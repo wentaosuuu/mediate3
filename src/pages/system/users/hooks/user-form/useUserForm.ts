@@ -42,7 +42,10 @@ export const useUserForm = (
       return;
     }
     
+    // 设置加载状态
     setLocalLoading(true);
+    console.log("表单提交 - 设置加载状态为true");
+    
     try {
       console.log("调用onSubmit处理表单数据");
       const result = await onSubmit(values);
@@ -53,7 +56,11 @@ export const useUserForm = (
       console.error("表单提交出错:", error);
       toast.error(`操作失败: ${(error as Error).message}`);
     } finally {
-      setLocalLoading(false);
+      // 设置加载状态为false，延迟执行以确保UI有足够时间显示加载状态
+      console.log("表单提交 - 设置加载状态为false");
+      setTimeout(() => {
+        setLocalLoading(false);
+      }, 500);
     }
   });
 

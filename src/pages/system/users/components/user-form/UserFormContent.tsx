@@ -33,6 +33,12 @@ const UserFormContent = ({
   // 添加处理表单提交的函数，确保事件正确触发
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault(); // 阻止默认提交行为
+    
+    if (isLoading) {
+      console.log("表单处于加载状态，忽略提交请求");
+      return;
+    }
+    
     console.log("表单提交被触发，准备处理数据");
     // 打印表单值，检查数据是否正确
     console.log("表单数据:", form.getValues());

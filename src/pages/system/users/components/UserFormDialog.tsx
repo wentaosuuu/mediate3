@@ -69,9 +69,7 @@ const UserFormDialog = ({
           
           // 关闭对话框
           console.log("UserFormDialog - 关闭对话框");
-          setTimeout(() => {
-            onOpenChange(false);
-          }, 500);
+          onOpenChange(false);
           
           return true;
         } else {
@@ -84,7 +82,7 @@ const UserFormDialog = ({
         toast.error(`操作失败: ${(error as Error).message}`, { id: "user-save" });
         return false;
       } finally {
-        // 无论成功还是失败，都重置提交状态和加载状态
+        // 重要：清理提交状态
         setTimeout(() => {
           isSubmitting.current = false;
           setIsSubmittingState(false);
@@ -132,15 +130,17 @@ const UserFormDialog = ({
   // 综合加载状态
   const combinedLoading = externalLoading || isLocalLoading || isSubmitting.current || isSubmittingState;
 
-  // 监听表单变化，调试用
+  // 调试日志
   useEffect(() => {
-    console.log("表单内容变化:", form.getValues());
+    if (combinedLoading) {
+      console.log("表单当前处于加载状态，禁用提交和取消按钮");
+    }
     
     // 监听isOpen状态变化
     if (isOpen) {
       console.log("对话框已打开，当前用户:", currentUser);
     }
-  }, [form, isOpen, currentUser]);
+  }, [combinedLoading, isOpen, currentUser]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
