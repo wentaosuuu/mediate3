@@ -46,19 +46,24 @@ const UsersContainer = () => {
 
   // 对话框打开状态变化时的处理
   const handleDialogOpenChange = (open: boolean) => {
+    console.log("对话框状态变化:", open);
     setIsDialogOpen(open);
+    
     // 关闭对话框后，刷新一次数据
     if (!open && !isRefreshing.current) {
       console.log("对话框关闭，刷新用户数据");
       isRefreshing.current = true;
-      toast.loading("正在刷新用户数据...");
+      
+      const toastId = `refresh-${Date.now()}`;
+      toast.loading("正在刷新用户数据...", { id: toastId });
+      
       refreshAllData().then(() => {
         console.log("对话框关闭后数据刷新完成");
-        toast.success("用户数据已更新");
+        toast.success("用户数据已更新", { id: toastId });
         isRefreshing.current = false;
       }).catch(error => {
         console.error("对话框关闭后数据刷新失败:", error);
-        toast.error(`数据刷新失败: ${(error as Error).message}`);
+        toast.error(`数据刷新失败: ${(error as Error).message}`, { id: toastId });
         isRefreshing.current = false;
       });
     }
@@ -67,14 +72,20 @@ const UsersContainer = () => {
   // 确保页面加载时获取最新数据
   useEffect(() => {
     const loadInitialData = async () => {
-      if (users.length === 0 && !isRefreshing.current) {
+      if (!isRefreshing.current) {
         console.log("初始加载用户数据");
         isRefreshing.current = true;
+        
+        const toastId = `initial-load-${Date.now()}`;
+        toast.loading("加载用户数据...", { id: toastId });
+        
         try {
           await refreshAllData();
           console.log("初始用户数据加载完成");
+          toast.success("用户数据加载完成", { id: toastId });
         } catch (error) {
           console.error("初始用户数据加载失败:", error);
+          toast.error(`数据加载失败: ${(error as Error).message}`, { id: toastId });
         } finally {
           isRefreshing.current = false;
         }
@@ -82,17 +93,15 @@ const UsersContainer = () => {
     };
     
     loadInitialData();
-  }, [users.length, refreshAllData]);
+  }, [refreshAllData]);
 
   return (
     <>
-      {/* 用户搜索组件 */}
       <UserSearch 
         searchQuery={searchQuery} 
         setSearchQuery={setSearchQuery} 
       />
 
-      {/* 用户表格组件 */}
       <UsersTable
         users={filteredUsers}
         isLoading={isLoading}
@@ -101,7 +110,6 @@ const UsersContainer = () => {
         onDeleteUser={deleteUser}
       />
 
-      {/* 用户表单对话框 */}
       <UserFormDialog
         isOpen={isDialogOpen}
         onOpenChange={handleDialogOpenChange}

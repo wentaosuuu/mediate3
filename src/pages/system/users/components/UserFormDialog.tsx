@@ -43,8 +43,8 @@ const UserFormDialog = ({
         return false;
       }
       
+      // 记录表单提交开始
       console.log("UserFormDialog - 提交表单开始，数据:", values);
-      console.log("当前用户信息:", currentUser);
       
       // 设置提交状态
       isSubmitting.current = true;
@@ -52,10 +52,11 @@ const UserFormDialog = ({
       setLocalLoading(true);
       
       try {
-        // 显示加载提示
-        toast.loading("正在保存用户数据...", { id: "user-save" });
+        // 显示提交中的提示
+        const toastId = `user-submit-${Date.now()}`;
+        toast.loading("正在保存用户数据...", { id: toastId });
         
-        // 确保department_id和role_id有有效值
+        // 确保department_id和role_id有有效值（转换"none"为空字符串）
         const processedValues = {
           ...values,
           department_id: values.department_id === "none" ? "" : values.department_id,
@@ -64,42 +65,39 @@ const UserFormDialog = ({
         
         console.log("处理后的提交数据:", processedValues);
         
-        // 调用onSubmit函数处理表单数据
-        console.log("调用onSubmit函数处理表单数据");
+        // 调用外部onSubmit函数处理表单数据
         const result = await onSubmit(processedValues);
         console.log("UserFormDialog - 提交表单结果:", result);
         
         if (result) {
           // 提交成功，显示成功消息
-          toast.success(`用户${currentUser ? '更新' : '创建'}成功`, { id: "user-save" });
+          toast.success(`用户${currentUser ? '更新' : '创建'}成功`, { id: toastId });
           
           // 重置表单
-          console.log("UserFormDialog - 提交成功，重置表单");
           resetForm();
           
-          // 关闭对话框
-          console.log("UserFormDialog - 关闭对话框");
+          // 关闭对话框（延迟以便用户看到成功消息）
           setTimeout(() => {
             onOpenChange(false);
-          }, 500); // 延迟关闭对话框，让用户看到成功消息
+          }, 500);
           
           return true;
         } else {
           console.log("UserFormDialog - 提交失败");
-          toast.error(`用户${currentUser ? '更新' : '创建'}失败`, { id: "user-save" });
+          toast.error(`用户${currentUser ? '更新' : '创建'}失败`, { id: toastId });
           return false;
         }
       } catch (error) {
         console.error("UserFormDialog - 提交表单出错:", error);
-        toast.error(`操作失败: ${(error as Error).message}`, { id: "user-save" });
+        toast.error(`操作失败: ${(error as Error).message}`);
         return false;
       } finally {
-        // 重要：清理提交状态
+        // 延迟清理提交状态
         setTimeout(() => {
           isSubmitting.current = false;
           setIsSubmittingState(false);
           setLocalLoading(false);
-        }, 800); // 延长状态清除时间，防止快速重复点击
+        }, 800);
       }
     }, 
     () => onOpenChange(false), 
@@ -146,7 +144,7 @@ const UserFormDialog = ({
   useEffect(() => {
     if (isOpen && currentUser) {
       console.log("对话框已打开，当前用户:", currentUser);
-      // 确保表单数据正确设置 - 处理none值
+      // 处理表单数据 - 特别注意none值的处理
       form.reset({
         username: currentUser.username || "",
         email: currentUser.email || "",

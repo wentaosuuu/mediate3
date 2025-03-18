@@ -30,7 +30,7 @@ const UserFormContent = ({
   departments,
   roles
 }: UserFormContentProps) => {
-  // 添加处理表单提交的函数，确保事件正确触发
+  // 添加表单提交处理函数
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault(); // 阻止默认提交行为
     
@@ -40,9 +40,8 @@ const UserFormContent = ({
     }
     
     console.log("表单提交被触发，准备处理数据");
-    // 打印表单值，检查数据是否正确
     console.log("表单数据:", form.getValues());
-    onSubmit(); // 调用传入的onSubmit函数
+    onSubmit(); // 调用传入的onSubmit函数处理表单
   };
 
   return (
@@ -58,22 +57,9 @@ const UserFormContent = ({
       
       <Form {...form}>
         <form onSubmit={handleFormSubmit} className="space-y-5">
-          {/* 基本信息组件 */}
           <UserBasicInfo isLoading={isLoading} currentUser={currentUser} />
-          
-          {/* 部门和角色关联组件 */}
-          <UserAssociation 
-            isLoading={isLoading} 
-            departments={departments} 
-            roles={roles} 
-          />
-          
-          {/* 表单操作按钮组件 */}
-          <UserFormActions 
-            isLoading={isLoading} 
-            currentUser={currentUser} 
-            onCancel={onCancel} 
-          />
+          <UserAssociation isLoading={isLoading} departments={departments} roles={roles} />
+          <UserFormActions isLoading={isLoading} currentUser={currentUser} onCancel={onCancel} />
         </form>
       </Form>
     </>
