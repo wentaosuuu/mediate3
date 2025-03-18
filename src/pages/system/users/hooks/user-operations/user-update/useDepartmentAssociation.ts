@@ -58,6 +58,7 @@ const departmentAssociationModule = {
         }
         
         console.log(`成功更新用户(${userId})的部门为(${departmentId})，结果:`, updateData);
+        return;
       } else {
         // 用户没有部门，创建新关联
         console.log(`用户没有现有部门关联，将创建新关联，用户ID:${userId}, 部门ID:${departmentId}`);
@@ -77,6 +78,7 @@ const departmentAssociationModule = {
         }
         
         console.log(`成功创建用户(${userId})与部门(${departmentId})的关联，结果:`, insertData);
+        return;
       }
     } catch (error) {
       console.error("处理用户-部门关联过程中发生错误:", error);
@@ -117,7 +119,7 @@ const departmentAssociationModule = {
       console.log(`发现用户(${userId})的部门关联，准备移除...`);
       
       // 移除用户的部门关联
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('user_departments')
         .delete()
         .eq('user_id', userId);

@@ -33,6 +33,14 @@ export const useUserForm = (
     }
   });
 
+  // 监控表单内容变化
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      console.log("表单内容变化:", value);
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
+
   // 表单提交处理
   const handleSubmit = form.handleSubmit(async (values) => {
     console.log("表单提交开始，数据:", values);

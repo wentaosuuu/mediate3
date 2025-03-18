@@ -48,7 +48,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       const updatedUserInfo = await updateUserBasicInfo(userId, values);
       console.log("基本信息更新成功:", updatedUserInfo);
       
-      // 2. 处理部门关联
+      // 2. 处理部门关联 - 无论是否有值都进行处理
       console.log("开始处理部门关联，部门ID:", departmentId);
       try {
         if (departmentId) {
@@ -65,7 +65,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
         // 继续处理其他更新，不中断整个流程
       }
       
-      // 3. 处理角色关联
+      // 3. 处理角色关联 - 无论是否有值都进行处理
       console.log("开始处理角色关联，角色ID:", roleId);
       try {
         if (roleId) {

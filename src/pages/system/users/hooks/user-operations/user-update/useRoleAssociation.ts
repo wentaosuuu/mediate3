@@ -58,6 +58,7 @@ const roleAssociationModule = {
         }
         
         console.log(`成功更新用户(${userId})的角色为(${roleId})，结果:`, updateData);
+        return;
       } else {
         // 用户没有角色，创建新关联
         console.log(`用户没有现有角色关联，将创建新关联，用户ID:${userId}, 角色ID:${roleId}`);
@@ -77,6 +78,7 @@ const roleAssociationModule = {
         }
         
         console.log(`成功创建用户(${userId})与角色(${roleId})的关联，结果:`, insertData);
+        return;
       }
     } catch (error) {
       console.error("处理用户-角色关联过程中发生错误:", error);
@@ -117,7 +119,7 @@ const roleAssociationModule = {
       console.log(`发现用户(${userId})的角色关联，准备移除...`);
       
       // 移除用户的角色关联
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('user_roles')
         .delete()
         .eq('user_id', userId);
