@@ -1,6 +1,5 @@
 
 import React, { useEffect, useRef } from 'react';
-import UserHeader from './UserHeader';
 import UserSearch from './UserSearch';
 import UsersTable from './UsersTable';
 import UserFormDialog from './UserFormDialog';
@@ -19,8 +18,7 @@ const UsersContainer = () => {
     departments, 
     roles, 
     isLoading: dataLoading, 
-    refreshAllData,
-    fetchUsers
+    refreshAllData
   } = useUserData();
 
   // 使用自定义钩子处理用户操作
@@ -30,7 +28,6 @@ const UsersContainer = () => {
     isLoading: operationLoading,
     setIsDialogOpen,
     handleSubmit,
-    openCreateDialog,
     openEditDialog,
     toggleUserStatus,
     deleteUser
@@ -44,15 +41,31 @@ const UsersContainer = () => {
   
   // 使用 ref 防止无限循环
   const isInitialized = useRef(false);
+  const isRefreshing = useRef(false);
 
   // 首次加载数据，使用 useRef 确保只执行一次
   useEffect(() => {
-    if (!isInitialized.current) {
+    if (!isInitialized.current && !isRefreshing.current) {
       console.log("UsersContainer组件挂载，初始化数据");
-      refreshAllData();
-      isInitialized.current = true;
+      isRefreshing.current = true;
+      refreshAllData().finally(() => {
+        isRefreshing.current = false;
+        isInitialized.current = true;
+      });
     }
   }, [refreshAllData]);
+
+  // 对话框打开状态变化时的处理
+  const handleDialogOpenChange = (open: boolean) => {
+    setIsDialogOpen(open);
+    // 关闭对话框后，刷新一次数据
+    if (!open && isInitialized.current && !isRefreshing.current) {
+      isRefreshing.current = true;
+      refreshAllData().finally(() => {
+        isRefreshing.current = false;
+      });
+    }
+  };
 
   return (
     <>
@@ -74,13 +87,12 @@ const UsersContainer = () => {
       {/* 用户表单对话框 */}
       <UserFormDialog
         isOpen={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        onOpenChange={handleDialogOpenChange}
         onSubmit={handleSubmit}
         currentUser={currentUser}
         isLoading={isLoading}
         departments={departments}
         roles={roles}
-        onRefreshData={refreshAllData}
       />
     </>
   );

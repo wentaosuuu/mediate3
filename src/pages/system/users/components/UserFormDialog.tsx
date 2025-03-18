@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import UserFormContent from './user-form/UserFormContent';
 import { UserFormValues } from './user-form/UserFormSchema';
@@ -16,7 +16,6 @@ interface UserFormDialogProps {
   isLoading: boolean;
   departments: Department[];
   roles: Role[];
-  onRefreshData?: () => void; // 添加刷新数据的回调
 }
 
 const UserFormDialog = ({
@@ -26,8 +25,7 @@ const UserFormDialog = ({
   currentUser,
   isLoading,
   departments,
-  roles,
-  onRefreshData
+  roles
 }: UserFormDialogProps) => {
   // 使用ref标记表单是否已提交，防止重复提交
   const isSubmitting = useRef(false);
@@ -55,12 +53,6 @@ const UserFormDialog = ({
           // 提交成功，重置表单
           console.log("UserFormDialog - 提交成功，重置表单");
           resetForm();
-          
-          // 刷新数据
-          if (onRefreshData) {
-            console.log("UserFormDialog - 刷新数据");
-            await onRefreshData();
-          }
           
           // 关闭对话框
           console.log("UserFormDialog - 关闭对话框");
@@ -113,14 +105,6 @@ const UserFormDialog = ({
     resetForm();
     onOpenChange(false);
   };
-
-  // 对话框打开时刷新数据，确保数据最新
-  useEffect(() => {
-    if (isOpen && onRefreshData) {
-      console.log("对话框打开，刷新数据");
-      onRefreshData();
-    }
-  }, [isOpen, onRefreshData]);
 
   // 综合加载状态
   const combinedLoading = isLoading || isLocalLoading || isSubmitting.current;

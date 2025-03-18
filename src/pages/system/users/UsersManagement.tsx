@@ -10,7 +10,7 @@ import { useUserData } from './hooks/useUserData';
  * 整合了用户管理的所有功能
  */
 const UsersManagement = () => {
-  // 使用自定义钩子获取用户数据，仅用于刷新功能
+  // 使用自定义钩子获取用户数据方法
   const { refreshAllData } = useUserData();
   
   // 使用自定义钩子处理用户操作，仅获取创建用户方法
@@ -21,7 +21,7 @@ const UsersManagement = () => {
       {/* 用户管理头部 */}
       <UserHeader onCreateUser={openCreateDialog} />
 
-      {/* 用户管理容器组件 */}
+      {/* 用户管理容器组件 - 已包含表格和弹窗 */}
       <UsersContainer />
     </div>
   );

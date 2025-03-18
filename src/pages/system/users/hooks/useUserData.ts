@@ -52,8 +52,10 @@ export const useUserData = () => {
       await fetchRoles();
       await fetchUsers();
       console.log("所有用户相关数据加载完成！");
+      return true;
     } catch (error) {
       console.error("加载数据过程中发生错误:", error);
+      return false;
     } finally {
       isRefreshing.current = false;
       setIsLoading(false); // 恢复外部加载状态
