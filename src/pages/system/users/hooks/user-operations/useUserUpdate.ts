@@ -44,6 +44,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       console.log(`处理后的部门ID: "${departmentId}", 角色ID: "${roleId}"`);
       
       // 1. 更新用户基本信息
+      console.log("开始更新用户基本信息...");
       const updatedUserInfo = await updateUserBasicInfo(userId, values);
       console.log("基本信息更新成功:", updatedUserInfo);
       

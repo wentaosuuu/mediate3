@@ -1,7 +1,9 @@
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { userFormSchema, UserFormValues } from "../../components/user-form/UserFormSchema";
+import { toast } from "sonner";
 
 interface UseUserFormProps {
   currentUser: any | null;
@@ -43,12 +45,24 @@ export const useUserForm = (
     console.log("表单提交开始，数据:", values);
     if (isLocalLoading || isLoading) {
       console.log("已处于加载状态，跳过重复提交");
+      toast.info("正在处理，请稍候...");
       return;
     }
     
     setLocalLoading(true);
     try {
-      await onSubmit(values);
+      console.log("调用onSubmit处理表单数据");
+      const result = await onSubmit(values);
+      console.log("表单提交结果:", result);
+      
+      if (result) {
+        toast.success("操作成功");
+      } else {
+        toast.error("操作失败");
+      }
+    } catch (error) {
+      console.error("表单提交出错:", error);
+      toast.error(`操作失败: ${(error as Error).message}`);
     } finally {
       setLocalLoading(false);
     }

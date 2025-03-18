@@ -1,5 +1,5 @@
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import UserFormContent from './user-form/UserFormContent';
 import { UserFormValues } from './user-form/UserFormSchema';
@@ -50,7 +50,8 @@ const UserFormDialog = ({
       toast.loading("正在保存用户数据...");
       
       try {
-        // 提交表单
+        // 确保onSubmit函数被调用并等待结果
+        console.log("调用onSubmit函数处理表单数据");
         const result = await onSubmit(values);
         console.log("UserFormDialog - 提交表单结果:", result);
         
@@ -124,6 +125,16 @@ const UserFormDialog = ({
 
   // 综合加载状态
   const combinedLoading = isLoading || isLocalLoading || isSubmitting.current || isSubmittingState;
+
+  // 监听表单变化，调试用
+  useEffect(() => {
+    console.log("表单内容变化:", form.getValues());
+    
+    // 监听isOpen状态变化
+    if (isOpen) {
+      console.log("对话框已打开，当前用户:", currentUser);
+    }
+  }, [form, isOpen, currentUser]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>

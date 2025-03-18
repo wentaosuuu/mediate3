@@ -30,6 +30,13 @@ const UserFormContent = ({
   departments,
   roles
 }: UserFormContentProps) => {
+  // 添加处理表单提交的函数，确保事件正确触发
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault(); // 阻止默认提交行为
+    console.log("表单提交被触发");
+    onSubmit(); // 调用传入的onSubmit函数
+  };
+
   return (
     <>
       <DialogHeader>
@@ -42,7 +49,7 @@ const UserFormContent = ({
       </DialogHeader>
       
       <Form {...form}>
-        <form onSubmit={onSubmit} className="space-y-5">
+        <form onSubmit={handleFormSubmit} className="space-y-5">
           {/* 基本信息组件 */}
           <UserBasicInfo isLoading={isLoading} currentUser={currentUser} />
           
