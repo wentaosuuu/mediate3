@@ -6,6 +6,7 @@ import { updateUserBasicInfo } from './user-update/useBasicInfoUpdate';
 import { departmentAssociationModule } from './user-update/useDepartmentAssociation';
 import { roleAssociationModule } from './user-update/useRoleAssociation';
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client"; // 添加缺少的导入
 
 /**
  * 处理用户更新的钩子
