@@ -5,13 +5,6 @@ import { useEffect, useState } from "react";
 import { userFormSchema, UserFormValues } from "../../components/user-form/UserFormSchema";
 import { toast } from "sonner";
 
-interface UseUserFormProps {
-  currentUser: any | null;
-  onSubmit: (values: UserFormValues) => Promise<boolean>;
-  onCancel: () => void;
-  isLoading: boolean;
-}
-
 /**
  * 用户表单自定义钩子
  * 处理表单初始化、验证和提交

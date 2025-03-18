@@ -38,22 +38,25 @@ export const useUserSubmit = ({
       if (currentUser) {
         // 更新现有用户
         console.log("更新用户流程开始，用户ID:", currentUser.id);
+        toast.loading("正在更新用户...");
         success = await updateUser(processedValues, currentUser);
         console.log("更新用户流程结束，结果:", success);
       } else {
         // 创建新用户
         console.log("创建用户流程开始");
+        toast.loading("正在创建用户...");
         success = await createUser(processedValues);
         console.log("创建用户流程结束，结果:", success);
       }
       
       // 如果操作成功，返回结果
       if (success) {
+        toast.success(`用户${currentUser ? "更新" : "创建"}成功`);
         console.log("操作成功，返回true");
         return true;
       } else {
         console.error("操作返回失败状态");
-        toast.error("操作失败，请检查日志获取详细信息");
+        toast.error(`用户${currentUser ? "更新" : "创建"}失败`);
         return false;
       }
     } catch (error) {
