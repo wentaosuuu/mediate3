@@ -40,32 +40,14 @@ const UsersContainer = () => {
   // 合并加载状态
   const isLoading = dataLoading || operationLoading;
   
-  // 使用 ref 防止无限循环
-  const isInitialized = useRef(false);
+  // 防止无限刷新的标记
   const isRefreshing = useRef(false);
-
-  // 首次加载数据，使用 useRef 确保只执行一次
-  useEffect(() => {
-    if (!isInitialized.current && !isRefreshing.current) {
-      console.log("UsersContainer组件挂载，初始化数据");
-      isRefreshing.current = true;
-      refreshAllData().then(() => {
-        console.log("初始数据加载完成");
-        isInitialized.current = true;
-        isRefreshing.current = false;
-      }).catch(error => {
-        console.error("初始数据加载失败:", error);
-        toast.error("加载数据失败，请刷新页面重试");
-        isRefreshing.current = false;
-      });
-    }
-  }, [refreshAllData]);
 
   // 对话框打开状态变化时的处理
   const handleDialogOpenChange = (open: boolean) => {
     setIsDialogOpen(open);
     // 关闭对话框后，刷新一次数据
-    if (!open && isInitialized.current && !isRefreshing.current) {
+    if (!open && !isRefreshing.current) {
       console.log("对话框关闭，刷新用户数据");
       isRefreshing.current = true;
       refreshAllData().then(() => {

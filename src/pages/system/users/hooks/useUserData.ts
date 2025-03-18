@@ -34,6 +34,8 @@ export const useUserData = () => {
   
   // 防止无限循环的锁
   const isRefreshing = useRef(false);
+  // 记录组件是否已挂载
+  const isMounted = useRef(false);
   
   // 包装刷新函数，避免重复创建函数实例导致useEffect无限循环
   const refreshAllData = useCallback(async (): Promise<void> => {
@@ -71,10 +73,21 @@ export const useUserData = () => {
     }
   }, [fetchDepartments, fetchRoles, fetchUsers]);
 
-  // 确保在组件挂载时刷新数据一次
+  // 仅在组件首次挂载时执行一次数据刷新
   useEffect(() => {
-    refreshAllData();
-  }, [refreshAllData]);
+    // 确保只在组件首次挂载时执行一次
+    if (!isMounted.current) {
+      isMounted.current = true;
+      console.log("组件首次挂载，执行数据初始化");
+      refreshAllData();
+    }
+    
+    // 清理函数 - 组件卸载时重置状态
+    return () => {
+      console.log("组件卸载，重置状态");
+      isMounted.current = false;
+    };
+  }, []); // 空依赖数组确保只执行一次
 
   return {
     users,
