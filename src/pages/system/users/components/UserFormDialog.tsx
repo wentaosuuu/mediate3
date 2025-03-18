@@ -31,11 +31,12 @@ const UserFormDialog = ({
   const didInitialRefresh = useRef(false);
   
   // 使用表单钩子
-  const { form, handleSubmit, resetForm } = useUserForm(
+  const { form, handleSubmit, resetForm, isLocalLoading } = useUserForm(
     currentUser, 
     async (values) => {
       console.log("UserFormDialog - 提交表单开始", values);
       try {
+        // 提交前禁用关闭
         const result = await onSubmit(values);
         console.log("UserFormDialog - 提交表单结果:", result);
         
@@ -43,6 +44,13 @@ const UserFormDialog = ({
           // 如果提交成功，关闭对话框
           console.log("UserFormDialog - 提交成功，准备关闭对话框");
           resetForm(); // 先重置表单
+          
+          // 刷新数据后再关闭对话框
+          if (onRefreshData) {
+            console.log("UserFormDialog - 刷新数据");
+            await onRefreshData();
+          }
+          
           onOpenChange(false); // 然后关闭对话框
           return true;
         }
@@ -75,7 +83,7 @@ const UserFormDialog = ({
   // 处理对话框关闭
   const handleOpenChange = (open: boolean) => {
     // 如果不在加载状态，才允许关闭对话框
-    if (!isLoading || !open) {
+    if ((!isLoading && !isLocalLoading) || !open) {
       if (!open) {
         resetForm(); // 关闭对话框时重置表单
       }
@@ -85,11 +93,14 @@ const UserFormDialog = ({
 
   // 处理取消按钮点击
   const handleCancel = () => {
-    if (!isLoading) {
+    if (!isLoading && !isLocalLoading) {
       resetForm(); // 取消时重置表单
       onOpenChange(false);
     }
   };
+
+  // 综合加载状态
+  const combinedLoading = isLoading || isLocalLoading;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
@@ -99,7 +110,7 @@ const UserFormDialog = ({
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           currentUser={currentUser}
-          isLoading={isLoading}
+          isLoading={combinedLoading}
           departments={departments}
           roles={roles}
         />

@@ -76,7 +76,7 @@ export const useUserForm = (
     if (isLoading || localIsLoading || isSubmitting.current) {
       console.log("系统正在处理中，请稍候");
       toast.info("系统正在处理中，请稍候");
-      return; // 防止重复提交
+      return false; // 防止重复提交
     }
     
     try {
@@ -93,7 +93,6 @@ export const useUserForm = (
       
       if (success) {
         console.log("表单提交成功");
-        form.reset(); // 重置表单
         
         toast.success(currentUser ? "更新用户成功" : "创建用户成功");
         uiToast({
@@ -101,7 +100,7 @@ export const useUserForm = (
           description: `操作已完成`,
         });
         
-        return success;
+        return true;
       } else {
         console.error("表单提交返回失败");
         toast.error("操作失败，请检查输入并重试");

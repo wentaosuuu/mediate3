@@ -16,7 +16,7 @@ export const departmentAssociationModule = {
     console.log("处理用户部门关联，用户ID:", userId, "部门ID:", departmentId);
     
     if (!departmentId || departmentId === "none") {
-      console.log("部门ID无效，调用移除方法");
+      console.log("部门ID无效或为'none'，调用移除方法");
       return this.remove(userId);
     }
     
@@ -85,7 +85,7 @@ export const departmentAssociationModule = {
         throw new Error(`移除部门关联失败: ${error.message}`);
       }
       
-      console.log("部门关联已成功移除");
+      console.log("部门关联已成功移除或不存在");
     } catch (error) {
       console.error("移除部门关联失败:", error);
       toast.error(`移除部门关联失败：${(error as Error).message}`);

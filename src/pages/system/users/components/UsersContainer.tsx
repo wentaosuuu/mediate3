@@ -46,7 +46,7 @@ const UsersContainer = () => {
   useEffect(() => {
     console.log("UsersContainer组件挂载，初始化数据");
     refreshAllData();
-  }, []);
+  }, [refreshAllData]);
 
   return (
     <>

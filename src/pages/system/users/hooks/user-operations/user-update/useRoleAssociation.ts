@@ -15,6 +15,11 @@ export const roleAssociationModule = {
   async handle(userId: string, roleId: string): Promise<void> {
     console.log("处理用户角色关联，用户ID:", userId, "角色ID:", roleId);
     
+    if (!roleId || roleId === "none") {
+      console.log("角色ID无效或为'none'，调用移除方法");
+      return this.remove(userId);
+    }
+    
     try {
       // 检查是否已存在关联
       const { data: existingAssoc, error: checkError } = await supabase
@@ -75,12 +80,12 @@ export const roleAssociationModule = {
         .delete()
         .eq('user_id', userId);
       
-      if (error) {
+      if (error && error.code !== 'PGRST116') {  // 忽略"没有行"的错误
         console.error("移除用户角色关联失败:", error);
         throw new Error(`移除角色关联失败: ${error.message}`);
       }
       
-      console.log("角色关联已成功移除");
+      console.log("角色关联已成功移除或不存在");
     } catch (error) {
       console.error("移除角色关联失败:", error);
       toast.error(`移除角色关联失败：${(error as Error).message}`);
