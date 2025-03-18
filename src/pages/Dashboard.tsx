@@ -60,8 +60,8 @@ const Dashboard = () => {
         // 出错时使用默认值
         setUserInfo({
           username: '张三', // 默认用户名
-          department: '技术部',
-          role: '管理员'
+          department: '云宝宝',
+          role: '云宝人员'
         });
       }
     };
@@ -69,11 +69,11 @@ const Dashboard = () => {
     // 由于目前可能没有真实用户认证，我们直接使用模拟数据
     // fetchUserInfo(); // 实际项目中取消注释此行
     
-    // 使用模拟数据
+    // 使用模拟数据 - 已更新为正确的部门和角色
     setUserInfo({
       username: '张三',
-      department: '技术部',
-      role: '管理员'
+      department: '云宝宝',
+      role: '云宝人员'
     });
     
   }, []);

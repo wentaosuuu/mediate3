@@ -9,11 +9,11 @@ import { QuotaStatistics } from '@/components/quota/statistics/QuotaStatistics';
 const Statistics = () => {
   const navigate = useNavigate();
 
-  // Mock user data - 实际项目中应该从认证系统获取
+  // Mock user data - 更新为正确的用户信息
   const mockUser = {
     username: '张三',
-    department: '技术部',
-    role: '管理员'
+    department: '云宝宝',
+    role: '云宝人员'
   };
 
   const handleLogout = () => {
