@@ -65,13 +65,13 @@ const Dashboard = () => {
           .maybeSingle();
           
         setUserInfo({
-          username: userData?.username || userData?.name || '用户',
+          username: userData?.name || userData?.username || '用户', // 优先使用姓名字段
           department: userDept?.departments?.name || '无部门',
           role: userRole?.roles?.name || '无角色'
         });
         
         console.log("已加载用户信息:", {
-          username: userData?.username || userData?.name,
+          username: userData?.name || userData?.username,
           department: userDept?.departments?.name,
           role: userRole?.roles?.name
         });
