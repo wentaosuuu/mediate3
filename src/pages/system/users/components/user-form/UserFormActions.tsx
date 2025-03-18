@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { DialogFooter } from "@/components/ui/dialog";
 import { Loader2 } from 'lucide-react';
@@ -14,6 +14,7 @@ const UserFormActions = ({
   currentUser: any | null, 
   onCancel: () => void 
 }) => {
+  // 添加组件级别的日志记录
   console.log("渲染表单操作按钮，加载状态:", isLoading);
   
   return (
