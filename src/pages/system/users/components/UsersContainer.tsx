@@ -6,7 +6,6 @@ import UserFormDialog from './UserFormDialog';
 import { useUserData } from '../hooks/useUserData';
 import { useUserOperations } from '../hooks/useUserOperations';
 import { useUserSearch } from '../hooks/useUserSearch';
-import { toast } from "sonner";
 
 /**
  * 用户管理容器组件
@@ -29,6 +28,7 @@ const UsersContainer = () => {
     isLoading: operationLoading,
     setIsDialogOpen,
     handleSubmit,
+    openCreateDialog,
     openEditDialog,
     toggleUserStatus,
     deleteUser

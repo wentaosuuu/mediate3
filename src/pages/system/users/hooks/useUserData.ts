@@ -51,15 +51,12 @@ export const useUserData = () => {
     
     try {
       // 依次请求数据，避免并发请求可能导致的问题
-      console.log("开始获取部门数据");
       await fetchDepartments();
       console.log("部门数据获取完成");
       
-      console.log("开始获取角色数据");
       await fetchRoles();
       console.log("角色数据获取完成");
       
-      console.log("开始获取用户数据");
       await fetchUsers();
       console.log("用户数据获取完成");
       
@@ -87,7 +84,7 @@ export const useUserData = () => {
       console.log("组件卸载，重置状态");
       isMounted.current = false;
     };
-  }, []); // 空依赖数组确保只执行一次
+  }, [refreshAllData]); // 依赖refreshAllData确保只执行一次
 
   return {
     users,

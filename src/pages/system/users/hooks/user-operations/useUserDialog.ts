@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 /**
  * 用户表单对话框状态管理钩子
@@ -10,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 export const useUserDialog = (setCurrentUser: (user: any | null) => void) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
 
   // 打开创建用户对话框
   const openCreateDialog = () => {
@@ -38,6 +39,7 @@ export const useUserDialog = (setCurrentUser: (user: any | null) => void) => {
       
       if (deptError && deptError.code !== 'PGRST116') {
         console.error("获取用户部门信息失败:", deptError);
+        toast.error(`获取用户部门失败: ${deptError.message}`);
         throw new Error(`获取用户部门失败: ${deptError.message}`);
       }
       
@@ -52,6 +54,7 @@ export const useUserDialog = (setCurrentUser: (user: any | null) => void) => {
       
       if (roleError && roleError.code !== 'PGRST116') {
         console.error("获取用户角色信息失败:", roleError);
+        toast.error(`获取用户角色失败: ${roleError.message}`);
         throw new Error(`获取用户角色失败: ${roleError.message}`);
       }
       
@@ -60,10 +63,10 @@ export const useUserDialog = (setCurrentUser: (user: any | null) => void) => {
       // 合并用户信息
       const enrichedUser = {
         ...user,
-        department_id: deptData?.department_id || "",
-        department_name: deptData?.departments?.name || "-",
-        role_id: roleData?.role_id || "",
-        role_name: roleData?.roles?.name || "-"
+        department_id: deptData?.department_id || "none",
+        department_name: deptData?.departments?.name || "无部门",
+        role_id: roleData?.role_id || "none",
+        role_name: roleData?.roles?.name || "无角色"
       };
       
       console.log("完整的用户信息:", enrichedUser);
@@ -73,11 +76,7 @@ export const useUserDialog = (setCurrentUser: (user: any | null) => void) => {
       setIsDialogOpen(true);
     } catch (error) {
       console.error("打开编辑对话框失败:", error);
-      toast({
-        title: "获取用户详情失败",
-        description: (error as Error).message,
-        variant: "destructive",
-      });
+      toast.error(`获取用户详情失败: ${(error as Error).message}`);
     } finally {
       setIsLoading(false);
     }

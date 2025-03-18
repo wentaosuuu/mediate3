@@ -30,12 +30,14 @@ export const useFetchUsers = () => {
         
       if (userError) {
         console.error("获取用户数据失败:", userError);
+        toast.error(`获取用户数据失败: ${userError.message}`);
         throw userError;
       }
       
-      if (!userData) {
+      if (!userData || userData.length === 0) {
         console.log("未获取到用户数据");
         setUsers([]);
+        setIsLoading(false);
         return;
       }
       
@@ -83,13 +85,6 @@ export const useFetchUsers = () => {
           role_id: userRole[0]?.role_id || "",
           role_name: userRole[0]?.roles?.name || "无角色",
         };
-        
-        console.log(`用户 ${user.username} (${user.id}) 关联信息:`, {
-          部门ID: enhancedUser.department_id,
-          部门名称: enhancedUser.department_name,
-          角色ID: enhancedUser.role_id,
-          角色名称: enhancedUser.role_name
-        });
         
         return enhancedUser;
       });

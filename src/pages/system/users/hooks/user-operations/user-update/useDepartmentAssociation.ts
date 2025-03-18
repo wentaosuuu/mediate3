@@ -120,8 +120,7 @@ const departmentAssociationModule = {
       const { data, error } = await supabase
         .from('user_departments')
         .delete()
-        .eq('user_id', userId)
-        .select();
+        .eq('user_id', userId);
       
       if (error) {
         console.error("移除用户部门关联失败:", error);
@@ -129,7 +128,7 @@ const departmentAssociationModule = {
         throw error;
       }
       
-      console.log(`成功移除用户(${userId})的部门关联，结果:`, data);
+      console.log(`成功移除用户(${userId})的部门关联`);
     } catch (error) {
       console.error("移除用户-部门关联过程中发生错误:", error);
       throw error;

@@ -60,11 +60,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
         }
       } catch (deptError) {
         console.error("部门关联处理失败:", deptError);
-        uiToast({
-          title: "部门关联处理失败",
-          description: (deptError as Error).message,
-          variant: "destructive",
-        });
+        toast.error(`部门关联处理失败: ${(deptError as Error).message}`);
         // 继续处理其他更新，不中断整个流程
       }
       
@@ -81,41 +77,22 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
         }
       } catch (roleError) {
         console.error("角色关联处理失败:", roleError);
-        uiToast({
-          title: "角色关联处理失败",
-          description: (roleError as Error).message,
-          variant: "destructive",
-        });
+        toast.error(`角色关联处理失败: ${(roleError as Error).message}`);
         // 继续处理，不中断整个流程
       }
       
       // 显示成功提示
-      uiToast({
-        title: "用户更新成功",
-        description: `用户 ${values.name || values.username} 已更新`,
-      });
       toast.success(`用户 ${values.name || values.username} 更新成功`);
       
-      // 刷新用户列表
-      console.log("即将刷新用户列表以显示更新结果");
-      setTimeout(async () => {
-        try {
-          await fetchUsers();
-          console.log("用户列表已刷新");
-        } catch (refreshError) {
-          console.error("刷新用户列表失败:", refreshError);
-        }
-      }, 500);
+      // 立即刷新用户列表
+      console.log("立即刷新用户列表以显示更新结果");
+      await fetchUsers();
+      console.log("用户列表已刷新");
       
       console.log("更新用户流程完成，返回成功状态");
       return true;
     } catch (error) {
       console.error('更新用户失败:', error);
-      uiToast({
-        title: "更新用户失败",
-        description: (error as Error).message,
-        variant: "destructive",
-      });
       toast.error(`更新失败：${(error as Error).message}`);
       return false;
     } finally {
