@@ -14,6 +14,16 @@ const departmentAssociationModule = {
   handle: async (userId: string, departmentId: string): Promise<void> => {
     console.log(`处理用户(${userId})与部门(${departmentId})的关联`);
     
+    if (!userId) {
+      console.error("处理部门关联失败: 用户ID为空");
+      throw new Error("用户ID不能为空");
+    }
+    
+    if (!departmentId) {
+      console.error("处理部门关联失败: 部门ID为空");
+      throw new Error("部门ID不能为空");
+    }
+    
     try {
       // 首先检查用户是否已经有部门关联
       const { data: existingDepts, error: checkError } = await supabase
@@ -34,10 +44,11 @@ const departmentAssociationModule = {
         const existingDeptId = existingDepts[0].id;
         console.log(`用户已有部门关联(ID:${existingDeptId})，将更新为部门ID:${departmentId}`);
         
-        const { error: updateError } = await supabase
+        const { data: updateData, error: updateError } = await supabase
           .from('user_departments')
           .update({ department_id: departmentId })
-          .eq('id', existingDeptId);
+          .eq('id', existingDeptId)
+          .select();
         
         if (updateError) {
           console.error("更新用户部门关联失败:", updateError);
@@ -45,17 +56,18 @@ const departmentAssociationModule = {
           throw updateError;
         }
         
-        console.log(`成功更新用户(${userId})的部门为(${departmentId})`);
+        console.log(`成功更新用户(${userId})的部门为(${departmentId})，结果:`, updateData);
       } else {
         // 用户没有部门，创建新关联
         console.log(`用户没有现有部门关联，将创建新关联，用户ID:${userId}, 部门ID:${departmentId}`);
         
-        const { error: insertError } = await supabase
+        const { data: insertData, error: insertError } = await supabase
           .from('user_departments')
           .insert({
             user_id: userId,
             department_id: departmentId
-          });
+          })
+          .select();
         
         if (insertError) {
           console.error("创建用户部门关联失败:", insertError);
@@ -63,7 +75,7 @@ const departmentAssociationModule = {
           throw insertError;
         }
         
-        console.log(`成功创建用户(${userId})与部门(${departmentId})的关联`);
+        console.log(`成功创建用户(${userId})与部门(${departmentId})的关联，结果:`, insertData);
       }
     } catch (error) {
       console.error("处理用户-部门关联过程中发生错误:", error);
@@ -78,11 +90,17 @@ const departmentAssociationModule = {
   remove: async (userId: string): Promise<void> => {
     console.log(`移除用户(${userId})的部门关联`);
     
+    if (!userId) {
+      console.error("移除部门关联失败: 用户ID为空");
+      throw new Error("用户ID不能为空");
+    }
+    
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('user_departments')
         .delete()
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .select();
       
       if (error) {
         console.error("移除用户部门关联失败:", error);
@@ -90,7 +108,7 @@ const departmentAssociationModule = {
         throw error;
       }
       
-      console.log(`成功移除用户(${userId})的部门关联`);
+      console.log(`成功移除用户(${userId})的部门关联，结果:`, data);
     } catch (error) {
       console.error("移除用户-部门关联过程中发生错误:", error);
       throw error;

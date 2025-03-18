@@ -38,36 +38,55 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       console.log("开始用户更新流程，用户ID:", userId);
       
       // 处理特殊值"none"，将其转换为空字符串
-      const processedValues = {
-        ...values,
-        department_id: values.department_id === "none" ? "" : values.department_id,
-        role_id: values.role_id === "none" ? "" : values.role_id
-      };
+      const departmentId = values.department_id === "none" ? "" : values.department_id;
+      const roleId = values.role_id === "none" ? "" : values.role_id;
+      
+      console.log(`处理后的部门ID: "${departmentId}", 角色ID: "${roleId}"`);
       
       // 1. 更新用户基本信息
-      const updatedUserInfo = await updateUserBasicInfo(userId, processedValues);
+      const updatedUserInfo = await updateUserBasicInfo(userId, values);
       console.log("基本信息更新成功:", updatedUserInfo);
       
       // 2. 处理部门关联
-      console.log("开始处理部门关联，部门ID:", processedValues.department_id);
-      if (processedValues.department_id) {
-        await departmentAssociationModule.handle(userId, processedValues.department_id);
-        console.log("部门关联处理成功");
-      } else {
-        // 如果部门ID为空，移除关联
-        await departmentAssociationModule.remove(userId);
-        console.log("部门关联已移除");
+      console.log("开始处理部门关联，部门ID:", departmentId);
+      try {
+        if (departmentId) {
+          await departmentAssociationModule.handle(userId, departmentId);
+          console.log("部门关联处理成功");
+        } else {
+          // 如果部门ID为空，移除关联
+          await departmentAssociationModule.remove(userId);
+          console.log("部门关联已移除");
+        }
+      } catch (deptError) {
+        console.error("部门关联处理失败:", deptError);
+        uiToast({
+          title: "部门关联处理失败",
+          description: (deptError as Error).message,
+          variant: "destructive",
+        });
+        // 继续处理其他更新，不中断整个流程
       }
       
       // 3. 处理角色关联
-      console.log("开始处理角色关联，角色ID:", processedValues.role_id);
-      if (processedValues.role_id) {
-        await roleAssociationModule.handle(userId, processedValues.role_id);
-        console.log("角色关联处理成功");
-      } else {
-        // 如果角色ID为空，移除关联
-        await roleAssociationModule.remove(userId);
-        console.log("角色关联已移除");
+      console.log("开始处理角色关联，角色ID:", roleId);
+      try {
+        if (roleId) {
+          await roleAssociationModule.handle(userId, roleId);
+          console.log("角色关联处理成功");
+        } else {
+          // 如果角色ID为空，移除关联
+          await roleAssociationModule.remove(userId);
+          console.log("角色关联已移除");
+        }
+      } catch (roleError) {
+        console.error("角色关联处理失败:", roleError);
+        uiToast({
+          title: "角色关联处理失败",
+          description: (roleError as Error).message,
+          variant: "destructive",
+        });
+        // 继续处理，不中断整个流程
       }
       
       // 显示成功提示
@@ -79,7 +98,14 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       
       // 刷新用户列表
       console.log("即将刷新用户列表以显示更新结果");
-      await fetchUsers();
+      setTimeout(async () => {
+        try {
+          await fetchUsers();
+          console.log("用户列表已刷新");
+        } catch (refreshError) {
+          console.error("刷新用户列表失败:", refreshError);
+        }
+      }, 500);
       
       console.log("更新用户流程完成，返回成功状态");
       return true;

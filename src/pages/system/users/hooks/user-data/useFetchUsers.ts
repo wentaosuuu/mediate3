@@ -29,6 +29,7 @@ export const useFetchUsers = () => {
         .order('created_at', { ascending: false });
         
       if (userError) {
+        console.error("获取用户数据失败:", userError);
         throw userError;
       }
       
@@ -50,6 +51,8 @@ export const useFetchUsers = () => {
         toast.error(`获取部门关联信息失败: ${deptError.message}`);
       }
       
+      console.log("用户-部门关联数据:", userDepartments);
+      
       // 获取用户-角色关联
       const { data: userRoles, error: roleError } = await supabase
         .from('user_roles')
@@ -60,6 +63,8 @@ export const useFetchUsers = () => {
         toast.error(`获取角色关联信息失败: ${roleError.message}`);
       }
       
+      console.log("用户-角色关联数据:", userRoles);
+      
       // 合并用户数据、部门和角色信息
       const enhancedUsers = userData.map(user => {
         // 查找用户对应的部门信息
@@ -67,7 +72,7 @@ export const useFetchUsers = () => {
         // 查找用户对应的角色信息
         const userRole = userRoles?.filter(r => r.user_id === user.id) || [];
         
-        return {
+        const enhancedUser = {
           ...user,
           // 添加部门相关字段
           department_id: userDept[0]?.department_id || "",
@@ -76,6 +81,15 @@ export const useFetchUsers = () => {
           role_id: userRole[0]?.role_id || "",
           role_name: userRole[0]?.roles?.name || "无角色",
         };
+        
+        console.log(`用户 ${user.username} (${user.id}) 关联信息:`, {
+          部门ID: enhancedUser.department_id,
+          部门名称: enhancedUser.department_name,
+          角色ID: enhancedUser.role_id,
+          角色名称: enhancedUser.role_name
+        });
+        
+        return enhancedUser;
       });
       
       console.log("已合并用户、部门和角色数据:", enhancedUsers);
