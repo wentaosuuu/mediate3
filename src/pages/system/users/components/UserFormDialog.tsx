@@ -1,5 +1,5 @@
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import UserFormContent from './user-form/UserFormContent';
 import { UserFormValues } from './user-form/UserFormSchema';
@@ -7,6 +7,10 @@ import { Department } from '../hooks/user-data/useFetchDepartments';
 import { Role } from '../hooks/user-data/useFetchRoles';
 import { useUserForm } from '../hooks/user-form/useUserForm';
 import { toast } from "sonner";
+import { Logger } from "@/utils/logger";
+
+// 创建专用日志记录器
+const logger = new Logger("UserFormDialog");
 
 interface UserFormDialogProps {
   isOpen: boolean;
@@ -29,24 +33,21 @@ const UserFormDialog = ({
 }: UserFormDialogProps) => {
   // 使用ref标记表单是否已提交，防止重复提交
   const isSubmitting = useRef(false);
-  // 本地状态跟踪表单提交状态
-  const [isSubmittingState, setIsSubmittingState] = useState(false);
   
   // 使用表单钩子
   const { form, handleSubmit, resetForm, isLocalLoading, setLocalLoading } = useUserForm(
     currentUser, 
     async (values) => {
       // 防止重复提交 - 如果已经在提交中，直接返回
-      if (isSubmitting.current || isSubmittingState) {
-        console.log("表单正在提交中，忽略重复请求");
+      if (isSubmitting.current) {
+        logger.info("表单正在提交中，忽略重复请求");
         toast.info("正在处理，请稍候...");
         return false;
       }
       
       // 记录表单提交开始，并设置提交状态
-      console.log("UserFormDialog - 开始提交表单，数据:", values);      
+      logger.info("UserFormDialog - 开始提交表单，数据:", values);      
       isSubmitting.current = true;
-      setIsSubmittingState(true);
       setLocalLoading(true);
       
       try {
@@ -61,11 +62,11 @@ const UserFormDialog = ({
           role_id: values.role_id === "none" ? "" : values.role_id,
         };
         
-        console.log("处理后的提交数据:", processedValues);
+        logger.info("处理后的提交数据:", processedValues);
         
         // 调用外部onSubmit函数处理表单数据
         const result = await onSubmit(processedValues);
-        console.log("UserFormDialog - 提交表单结果:", result);
+        logger.info("UserFormDialog - 提交表单结果:", result);
         
         if (result) {
           // 提交成功
@@ -79,19 +80,18 @@ const UserFormDialog = ({
           
           return true;
         } else {
-          console.log("UserFormDialog - 提交失败");
+          logger.warn("UserFormDialog - 提交失败");
           toast.error(`用户${currentUser ? '更新' : '创建'}失败`, { id: toastId });
           return false;
         }
       } catch (error) {
-        console.error("UserFormDialog - 提交表单出错:", error);
+        logger.error("UserFormDialog - 提交表单出错:", error);
         toast.error(`操作失败: ${(error as Error).message}`);
         return false;
       } finally {
         // 延迟清理提交状态以防止快速点击导致的重复提交
         setTimeout(() => {
           isSubmitting.current = false;
-          setIsSubmittingState(false);
           setLocalLoading(false);
         }, 800);
       }
@@ -103,17 +103,16 @@ const UserFormDialog = ({
   // 处理对话框关闭
   const handleOpenChange = (open: boolean) => {
     // 如果正在提交，阻止关闭
-    if ((isSubmitting.current || isSubmittingState) && open === false) {
-      console.log("表单正在提交中，阻止关闭对话框");
+    if (isSubmitting.current && open === false) {
+      logger.info("表单正在提交中，阻止关闭对话框");
       toast.info("表单正在提交中，请稍候...");
       return;
     }
     
     if (!open) {
-      console.log("对话框关闭，重置表单");
+      logger.info("对话框关闭，重置表单");
       // 清除提交状态
       isSubmitting.current = false;
-      setIsSubmittingState(false);
       // 重置表单
       resetForm();
     }
@@ -123,8 +122,8 @@ const UserFormDialog = ({
 
   // 处理取消按钮点击
   const handleCancel = () => {
-    if (isSubmitting.current || isSubmittingState) {
-      console.log("表单正在提交中，阻止取消操作");
+    if (isSubmitting.current) {
+      logger.info("表单正在提交中，阻止取消操作");
       toast.info("正在处理，请稍候...");
       return;
     }
@@ -134,12 +133,12 @@ const UserFormDialog = ({
   };
 
   // 综合加载状态
-  const combinedLoading = externalLoading || isLocalLoading || isSubmitting.current || isSubmittingState;
+  const combinedLoading = externalLoading || isLocalLoading || isSubmitting.current;
 
   // 每次打开对话框时，确保表单数据正确
   useEffect(() => {
     if (isOpen && currentUser) {
-      console.log("对话框已打开，当前用户:", currentUser);
+      logger.info("对话框已打开，当前用户:", currentUser);
       // 处理表单数据 - 特别注意none值的处理
       form.reset({
         username: currentUser.username || "",
