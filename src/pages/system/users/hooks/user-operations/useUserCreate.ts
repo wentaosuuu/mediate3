@@ -8,7 +8,7 @@ import { toast } from "sonner";
 // 用户创建钩子
 export const useUserCreate = (refreshUsers: () => Promise<void>) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
 
   // 创建新用户
   const createUser = async (values: UserFormValues): Promise<boolean> => {
@@ -38,13 +38,21 @@ export const useUserCreate = (refreshUsers: () => Promise<void>) => {
       
       if (userError) {
         console.error("创建用户基本信息失败:", userError);
-        toast.error(`创建用户失败: ${userError.message}`);
+        uiToast({
+          title: "创建用户失败",
+          description: userError.message,
+          variant: "destructive",
+        });
         throw new Error(`创建用户失败: ${userError.message}`);
       }
       
       if (!userResult) {
         console.error("创建用户后未返回用户数据");
-        toast.error("创建用户失败: 未返回用户数据");
+        uiToast({
+          title: "创建用户失败",
+          description: "未返回用户数据",
+          variant: "destructive",
+        });
         throw new Error("创建用户后未返回用户数据");
       }
       
@@ -65,7 +73,11 @@ export const useUserCreate = (refreshUsers: () => Promise<void>) => {
         if (deptError) {
           console.error("创建用户-部门关联失败:", deptError);
           // 记录错误但继续执行
-          toast.error(`设置用户部门失败: ${deptError.message}`);
+          uiToast({
+            title: "设置用户部门失败",
+            description: deptError.message,
+            variant: "destructive",
+          });
         } else {
           console.log("用户-部门关联创建成功");
         }
@@ -84,7 +96,11 @@ export const useUserCreate = (refreshUsers: () => Promise<void>) => {
         if (roleError) {
           console.error("创建用户-角色关联失败:", roleError);
           // 记录错误但继续执行
-          toast.error(`设置用户角色失败: ${roleError.message}`);
+          uiToast({
+            title: "设置用户角色失败",
+            description: roleError.message,
+            variant: "destructive",
+          });
         } else {
           console.log("用户-角色关联创建成功");
         }
@@ -95,12 +111,26 @@ export const useUserCreate = (refreshUsers: () => Promise<void>) => {
       // 刷新用户列表
       await refreshUsers();
       
+      uiToast({
+        title: "用户创建成功",
+        description: `已成功创建用户: ${userData.username}`,
+      });
+      
+      // 使用 sonner 的 toast
       toast.success(`已成功创建用户: ${userData.username}`);
       
       return true;
     } catch (error) {
       console.error("创建用户过程中出错:", error);
+      uiToast({
+        title: "创建用户失败",
+        description: (error as Error).message,
+        variant: "destructive",
+      });
+      
+      // 使用 sonner 的 toast
       toast.error(`创建用户失败: ${(error as Error).message}`);
+      
       return false;
     } finally {
       setIsLoading(false);
