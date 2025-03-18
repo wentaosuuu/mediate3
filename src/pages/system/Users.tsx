@@ -10,11 +10,11 @@ import { Toaster } from 'sonner';
 const Users = () => {
   const navigate = useNavigate();
 
-  // 使用正确的用户信息，姓名作为显示名称
+  // 使用正确的用户信息，与Dashboard.tsx保持一致
   const mockUser = {
-    username: '张三', // 姓名
-    department: '技术部',
-    role: '管理员'
+    username: '张三',
+    department: '云宝宝',
+    role: '云宝人员'
   };
 
   const handleLogout = () => {
