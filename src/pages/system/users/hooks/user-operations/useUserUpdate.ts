@@ -6,7 +6,7 @@ import { updateUserBasicInfo } from './user-update/useBasicInfoUpdate';
 import { departmentAssociationModule } from './user-update/useDepartmentAssociation';
 import { roleAssociationModule } from './user-update/useRoleAssociation';
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client"; // 添加缺少的导入
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * 处理用户更新的钩子
@@ -54,6 +54,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       try {
         if (departmentId) {
           // 使用RPC函数处理部门关联
+          console.log(`调用upsert_user_department函数，用户ID: ${userId}, 部门ID: ${departmentId}`);
           const { error: deptError } = await supabase.rpc(
             'upsert_user_department',
             { 
@@ -70,6 +71,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
           }
         } else {
           // 如果部门ID为空，移除关联
+          console.log("部门ID为空，移除关联");
           await departmentAssociationModule.remove(userId);
           console.log("部门关联已移除");
         }
@@ -84,6 +86,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       try {
         if (roleId) {
           // 直接使用插入或更新操作处理角色关联
+          console.log(`处理角色关联，用户ID: ${userId}, 角色ID: ${roleId}`);
           const { error: roleError } = await supabase
             .from('user_roles')
             .upsert(
@@ -99,6 +102,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
           }
         } else {
           // 如果角色ID为空，移除关联
+          console.log("角色ID为空，移除关联");
           await roleAssociationModule.remove(userId);
           console.log("角色关联已移除");
         }

@@ -23,6 +23,7 @@ export const departmentAssociationModule = {
     
     try {
       // 使用RPC函数处理部门关联
+      console.log("调用RPC函数upsert_user_department");
       const { error } = await supabase.rpc(
         'upsert_user_department',
         { 
@@ -60,6 +61,7 @@ export const departmentAssociationModule = {
     
     try {
       // 检查是否有现有关联
+      console.log(`检查用户(${userId})是否有部门关联`);
       const { data, error: checkError } = await supabase
         .from('user_departments')
         .select('id')

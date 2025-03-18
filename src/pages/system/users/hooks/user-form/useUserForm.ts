@@ -80,8 +80,8 @@ export const useUserForm = (
       email: "",
       name: "",
       phone: "",
-      department_id: "",
-      role_id: "",
+      department_id: "none",
+      role_id: "none",
       tenant_id: "",
       __isEditMode: false
     });
@@ -96,8 +96,8 @@ export const useUserForm = (
         email: currentUser.email || "",
         name: currentUser.name || "",
         phone: currentUser.phone || "",
-        department_id: currentUser.department_id || "",
-        role_id: currentUser.role_id || "",
+        department_id: currentUser.department_id === "" ? "none" : currentUser.department_id,
+        role_id: currentUser.role_id === "" ? "none" : currentUser.role_id,
         tenant_id: currentUser.tenant_id || "",
         __isEditMode: true
       });

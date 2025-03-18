@@ -55,9 +55,18 @@ const UserFormDialog = ({
         // 显示加载提示
         toast.loading("正在保存用户数据...", { id: "user-save" });
         
+        // 确保department_id和role_id有有效值
+        const processedValues = {
+          ...values,
+          department_id: values.department_id === "none" ? "" : values.department_id,
+          role_id: values.role_id === "none" ? "" : values.role_id,
+        };
+        
+        console.log("处理后的提交数据:", processedValues);
+        
         // 调用onSubmit函数处理表单数据
         console.log("调用onSubmit函数处理表单数据");
-        const result = await onSubmit(values);
+        const result = await onSubmit(processedValues);
         console.log("UserFormDialog - 提交表单结果:", result);
         
         if (result) {
@@ -137,14 +146,14 @@ const UserFormDialog = ({
   useEffect(() => {
     if (isOpen && currentUser) {
       console.log("对话框已打开，当前用户:", currentUser);
-      // 确保表单数据正确设置
+      // 确保表单数据正确设置 - 处理none值
       form.reset({
         username: currentUser.username || "",
         email: currentUser.email || "",
         name: currentUser.name || "",
         phone: currentUser.phone || "",
-        department_id: currentUser.department_id || "",
-        role_id: currentUser.role_id || "",
+        department_id: currentUser.department_id === "" ? "none" : currentUser.department_id,
+        role_id: currentUser.role_id === "" ? "none" : currentUser.role_id,
         tenant_id: currentUser.tenant_id || "",
         __isEditMode: true
       });

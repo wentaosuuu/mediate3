@@ -22,20 +22,8 @@ export const roleAssociationModule = {
     }
     
     try {
-      // 检查是否有现有关联
-      const { data, error: checkError } = await supabase
-        .from('user_roles')
-        .select('id')
-        .eq('user_id', userId)
-        .maybeSingle();
-      
-      if (checkError) {
-        console.error("检查用户-角色关联时出错:", checkError);
-        toast.error(`检查角色关联失败: ${checkError.message}`);
-        throw checkError;
-      }
-      
       // 使用upsert操作 - 如果存在则更新，否则插入
+      console.log(`使用upsert处理用户(${userId})与角色(${roleId})的关联`);
       const { error } = await supabase
         .from('user_roles')
         .upsert(
@@ -72,6 +60,7 @@ export const roleAssociationModule = {
     
     try {
       // 检查是否有现有关联
+      console.log(`检查用户(${userId})是否有角色关联`);
       const { data, error: checkError } = await supabase
         .from('user_roles')
         .select('id')
