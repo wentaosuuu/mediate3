@@ -35,8 +35,8 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       console.log("开始用户更新流程，用户ID:", userId);
       
       // 处理特殊值"none"，将其转换为空字符串
-      const departmentId = values.department_id === "none" ? "" : values.department_id;
-      const roleId = values.role_id === "none" ? "" : values.role_id;
+      const departmentId = values.department_id === "none" ? null : values.department_id;
+      const roleId = values.role_id === "none" ? null : values.role_id;
       
       console.log(`处理后的部门ID: "${departmentId}", 角色ID: "${roleId}"`);
       
@@ -77,31 +77,46 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       // 2. 处理部门关联
       console.log("开始处理部门关联，部门ID:", departmentId);
       try {
-        if (departmentId) {
-          // 更新或创建部门关联
-          console.log(`处理部门关联，用户ID: ${userId}, 部门ID: ${departmentId}`);
-          const { error: deptError } = await supabase.rpc(
-            'upsert_user_department',
-            { 
-              p_user_id: userId, 
-              p_department_id: departmentId 
-            }
-          );
+        // 先检查是否存在部门关联
+        const { data: existingDept } = await supabase
+          .from('user_departments')
+          .select('id')
+          .eq('user_id', userId)
+          .maybeSingle();
           
-          if (deptError) {
-            console.error("部门关联处理失败:", deptError);
-            toast.error(`部门关联处理失败: ${deptError.message}`, { id: toastId });
-            uiToast({
-              title: "部门关联处理失败",
-              description: deptError.message,
-              variant: "destructive",
-            });
+        if (departmentId) {
+          // 部门ID存在，需要创建或更新关联
+          if (existingDept) {
+            // 更新现有关联
+            console.log(`更新部门关联，用户ID: ${userId}, 部门ID: ${departmentId}`);
+            const { error: updateError } = await supabase
+              .from('user_departments')
+              .update({ department_id: departmentId })
+              .eq('user_id', userId);
+              
+            if (updateError) {
+              console.error("更新部门关联失败:", updateError);
+              toast.error(`更新部门关联失败: ${updateError.message}`, { id: toastId });
+            } else {
+              console.log("部门关联已更新");
+            }
           } else {
-            console.log("部门关联处理成功");
+            // 创建新关联
+            console.log(`创建部门关联，用户ID: ${userId}, 部门ID: ${departmentId}`);
+            const { error: insertError } = await supabase
+              .from('user_departments')
+              .insert({ user_id: userId, department_id: departmentId });
+              
+            if (insertError) {
+              console.error("创建部门关联失败:", insertError);
+              toast.error(`创建部门关联失败: ${insertError.message}`, { id: toastId });
+            } else {
+              console.log("部门关联已创建");
+            }
           }
-        } else {
-          // 删除部门关联
-          console.log("部门ID为空，移除关联");
+        } else if (existingDept) {
+          // 部门ID为空且存在关联，需要删除关联
+          console.log("部门ID为空，移除现有关联");
           const { error: deleteError } = await supabase
             .from('user_departments')
             .delete()
@@ -110,14 +125,11 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
           if (deleteError) {
             console.error("移除部门关联失败:", deleteError);
             toast.error(`移除部门关联失败: ${deleteError.message}`, { id: toastId });
-            uiToast({
-              title: "移除部门关联失败",
-              description: deleteError.message,
-              variant: "destructive",
-            });
           } else {
             console.log("部门关联已移除");
           }
+        } else {
+          console.log("用户无部门关联，无需操作");
         }
       } catch (deptError) {
         console.error("部门关联处理失败:", deptError);
@@ -127,19 +139,18 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       // 3. 处理角色关联
       console.log("开始处理角色关联，角色ID:", roleId);
       try {
+        // 先检查是否存在角色关联
+        const { data: existingRole } = await supabase
+          .from('user_roles')
+          .select('id')
+          .eq('user_id', userId)
+          .maybeSingle();
+          
         if (roleId) {
-          // 处理角色关联
-          console.log(`处理角色关联，用户ID: ${userId}, 角色ID: ${roleId}`);
-          
-          // 首先检查是否已存在角色关联
-          const { data: existingRole } = await supabase
-            .from('user_roles')
-            .select('id')
-            .eq('user_id', userId)
-            .maybeSingle();
-          
+          // 角色ID存在，需要创建或更新关联
           if (existingRole) {
             // 更新现有关联
+            console.log(`更新角色关联，用户ID: ${userId}, 角色ID: ${roleId}`);
             const { error: updateError } = await supabase
               .from('user_roles')
               .update({ role_id: roleId })
@@ -148,16 +159,12 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
             if (updateError) {
               console.error("更新角色关联失败:", updateError);
               toast.error(`更新角色关联失败: ${updateError.message}`, { id: toastId });
-              uiToast({
-                title: "更新角色关联失败",
-                description: updateError.message,
-                variant: "destructive",
-              });
             } else {
               console.log("角色关联已更新");
             }
           } else {
             // 创建新关联
+            console.log(`创建角色关联，用户ID: ${userId}, 角色ID: ${roleId}`);
             const { error: insertError } = await supabase
               .from('user_roles')
               .insert({ user_id: userId, role_id: roleId });
@@ -165,18 +172,13 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
             if (insertError) {
               console.error("创建角色关联失败:", insertError);
               toast.error(`创建角色关联失败: ${insertError.message}`, { id: toastId });
-              uiToast({
-                title: "创建角色关联失败",
-                description: insertError.message,
-                variant: "destructive",
-              });
             } else {
               console.log("角色关联已创建");
             }
           }
-        } else {
-          // 删除角色关联
-          console.log("角色ID为空，移除关联");
+        } else if (existingRole) {
+          // 角色ID为空且存在关联，需要删除关联
+          console.log("角色ID为空，移除现有关联");
           const { error: deleteError } = await supabase
             .from('user_roles')
             .delete()
@@ -185,14 +187,11 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
           if (deleteError) {
             console.error("移除角色关联失败:", deleteError);
             toast.error(`移除角色关联失败: ${deleteError.message}`, { id: toastId });
-            uiToast({
-              title: "移除角色关联失败",
-              description: deleteError.message,
-              variant: "destructive",
-            });
           } else {
             console.log("角色关联已移除");
           }
+        } else {
+          console.log("用户无角色关联，无需操作");
         }
       } catch (roleError) {
         console.error("角色关联处理失败:", roleError);

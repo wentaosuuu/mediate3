@@ -30,32 +30,29 @@ const UserFormContent = ({
   departments,
   roles
 }: UserFormContentProps) => {
-  // 添加一个阻止重复提交的标记
-  const submitting = React.useRef(false);
-  
   // 添加表单提交处理函数
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault(); // 阻止默认提交行为
     
-    // 如果正在加载或已经提交中，阻止提交
-    if (isLoading || submitting.current) {
-      console.log("表单处于加载状态或已提交，忽略提交请求");
+    // 如果正在加载，阻止提交
+    if (isLoading) {
+      console.log("表单处于加载状态，忽略提交请求");
       return;
     }
     
-    // 设置提交中状态
-    submitting.current = true;
+    console.log("表单提交被触发，准备处理数据");
+    const formValues = form.getValues();
+    console.log("表单数据:", formValues);
     
-    try {
-      console.log("表单提交被触发，准备处理数据");
-      console.log("表单数据:", form.getValues());
-      onSubmit(); // 调用传入的onSubmit函数处理表单
-    } finally {
-      // 设置一个延迟重置提交状态，防止在短时间内重复提交
-      setTimeout(() => {
-        submitting.current = false;
-      }, 800);
+    // 确保下拉菜单值正确
+    if (formValues.department_id === undefined) {
+      form.setValue('department_id', 'none');
     }
+    if (formValues.role_id === undefined) {
+      form.setValue('role_id', 'none');
+    }
+    
+    onSubmit(); // 调用传入的onSubmit函数处理表单
   };
 
   return (

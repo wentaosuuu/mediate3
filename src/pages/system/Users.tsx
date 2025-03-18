@@ -51,7 +51,7 @@ const Users = () => {
         richColors 
         closeButton 
         toastOptions={{
-          duration: 3000, // 适当缩短提示显示时间
+          duration: 5000, // 延长提示显示时间，方便用户看清
           className: "text-sm font-medium",
           style: { 
             fontSize: '14px',
