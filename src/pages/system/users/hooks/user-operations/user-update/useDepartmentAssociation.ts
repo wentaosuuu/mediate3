@@ -3,85 +3,44 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 /**
- * 处理用户-部门关联的模块
+ * 用户-部门关联模块
+ * 处理用户与部门之间的关联关系
  */
-const departmentAssociationModule = {
+export const departmentAssociationModule = {
   /**
-   * 处理用户部门关联
+   * 处理用户与部门的关联
    * @param userId 用户ID
    * @param departmentId 部门ID
    */
-  handle: async (userId: string, departmentId: string): Promise<void> => {
-    console.log(`处理用户(${userId})与部门(${departmentId})的关联，开始处理...`);
+  async handle(userId: string, departmentId: string): Promise<void> {
+    console.log(`开始处理用户(${userId})与部门(${departmentId})的关联`);
     
-    if (!userId) {
-      console.error("处理部门关联失败: 用户ID为空");
-      throw new Error("用户ID不能为空");
-    }
-    
-    // 如果部门ID为"none"或者空字符串，则移除部门关联
-    if (!departmentId || departmentId === "none") {
-      console.log(`部门ID为空或"none"，将移除用户(${userId})的部门关联`);
-      return await departmentAssociationModule.remove(userId);
+    if (!userId || !departmentId) {
+      console.error("处理用户-部门关联失败: 用户ID或部门ID为空");
+      toast.error("关联失败：用户ID或部门ID不能为空");
+      throw new Error("用户ID和部门ID不能为空");
     }
     
     try {
-      // 首先检查用户是否已经有部门关联
-      const { data: existingDepts, error: checkError } = await supabase
-        .from('user_departments')
-        .select('id, department_id')
-        .eq('user_id', userId);
+      // 使用RPC函数处理部门关联
+      const { error } = await supabase.rpc(
+        'upsert_user_department',
+        { 
+          p_user_id: userId, 
+          p_department_id: departmentId 
+        }
+      );
       
-      if (checkError) {
-        console.error("检查用户部门关联失败:", checkError);
-        toast.error(`检查部门关联失败: ${checkError.message}`);
-        throw checkError;
+      if (error) {
+        console.error("部门关联处理失败:", error);
+        toast.error(`部门关联处理失败: ${error.message}`);
+        throw error;
       }
       
-      console.log("查询到的现有部门关联:", existingDepts);
-      
-      if (existingDepts && existingDepts.length > 0) {
-        // 用户已有部门，更新现有关联
-        const existingDeptId = existingDepts[0].id;
-        console.log(`用户已有部门关联(ID:${existingDeptId})，将更新为部门ID:${departmentId}`);
-        
-        const { data: updateData, error: updateError } = await supabase
-          .from('user_departments')
-          .update({ department_id: departmentId })
-          .eq('id', existingDeptId)
-          .select();
-        
-        if (updateError) {
-          console.error("更新用户部门关联失败:", updateError);
-          toast.error(`更新部门关联失败: ${updateError.message}`);
-          throw updateError;
-        }
-        
-        console.log(`成功更新用户(${userId})的部门为(${departmentId})，结果:`, updateData);
-        return;
-      } else {
-        // 用户没有部门，创建新关联
-        console.log(`用户没有现有部门关联，将创建新关联，用户ID:${userId}, 部门ID:${departmentId}`);
-        
-        const { data: insertData, error: insertError } = await supabase
-          .from('user_departments')
-          .insert({
-            user_id: userId,
-            department_id: departmentId
-          })
-          .select();
-        
-        if (insertError) {
-          console.error("创建用户部门关联失败:", insertError);
-          toast.error(`创建部门关联失败: ${insertError.message}`);
-          throw insertError;
-        }
-        
-        console.log(`成功创建用户(${userId})与部门(${departmentId})的关联，结果:`, insertData);
-        return;
-      }
+      console.log(`成功处理用户(${userId})与部门(${departmentId})的关联`);
     } catch (error) {
       console.error("处理用户-部门关联过程中发生错误:", error);
+      toast.error(`部门关联失败: ${(error as Error).message}`);
       throw error;
     }
   },
@@ -90,28 +49,30 @@ const departmentAssociationModule = {
    * 移除用户的部门关联
    * @param userId 用户ID
    */
-  remove: async (userId: string): Promise<void> => {
-    console.log(`移除用户(${userId})的部门关联，开始处理...`);
+  async remove(userId: string): Promise<void> {
+    console.log(`开始移除用户(${userId})的部门关联`);
     
     if (!userId) {
-      console.error("移除部门关联失败: 用户ID为空");
+      console.error("移除用户-部门关联失败: 用户ID为空");
+      toast.error("移除关联失败：用户ID不能为空");
       throw new Error("用户ID不能为空");
     }
     
     try {
-      // 检查用户是否有部门关联
-      const { data: existingDepts, error: checkError } = await supabase
+      // 检查是否有现有关联
+      const { data, error: checkError } = await supabase
         .from('user_departments')
         .select('id')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .maybeSingle();
       
       if (checkError) {
-        console.error("检查用户部门关联失败:", checkError);
+        console.error("检查用户-部门关联时出错:", checkError);
+        toast.error(`检查部门关联失败: ${checkError.message}`);
         throw checkError;
       }
       
-      // 如果用户没有部门关联，直接返回
-      if (!existingDepts || existingDepts.length === 0) {
+      if (!data) {
         console.log(`用户(${userId})没有部门关联，无需移除`);
         return;
       }
@@ -125,7 +86,7 @@ const departmentAssociationModule = {
         .eq('user_id', userId);
       
       if (error) {
-        console.error("移除用户部门关联失败:", error);
+        console.error("移除用户-部门关联失败:", error);
         toast.error(`移除部门关联失败: ${error.message}`);
         throw error;
       }
@@ -133,9 +94,8 @@ const departmentAssociationModule = {
       console.log(`成功移除用户(${userId})的部门关联`);
     } catch (error) {
       console.error("移除用户-部门关联过程中发生错误:", error);
+      toast.error(`移除部门关联失败: ${(error as Error).message}`);
       throw error;
     }
   }
 };
-
-export { departmentAssociationModule };

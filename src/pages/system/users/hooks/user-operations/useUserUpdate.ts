@@ -52,8 +52,21 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       console.log("开始处理部门关联，部门ID:", departmentId);
       try {
         if (departmentId) {
-          await departmentAssociationModule.handle(userId, departmentId);
-          console.log("部门关联处理成功");
+          // 使用RPC函数处理部门关联
+          const { error: deptError } = await supabase.rpc(
+            'upsert_user_department',
+            { 
+              p_user_id: userId, 
+              p_department_id: departmentId 
+            }
+          );
+          
+          if (deptError) {
+            console.error("部门关联处理失败:", deptError);
+            toast.error(`部门关联处理失败: ${deptError.message}`);
+          } else {
+            console.log("部门关联处理成功");
+          }
         } else {
           // 如果部门ID为空，移除关联
           await departmentAssociationModule.remove(userId);
@@ -69,8 +82,20 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       console.log("开始处理角色关联，角色ID:", roleId);
       try {
         if (roleId) {
-          await roleAssociationModule.handle(userId, roleId);
-          console.log("角色关联处理成功");
+          // 直接使用插入或更新操作处理角色关联
+          const { error: roleError } = await supabase
+            .from('user_roles')
+            .upsert(
+              { user_id: userId, role_id: roleId },
+              { onConflict: 'user_id' }
+            );
+          
+          if (roleError) {
+            console.error("角色关联处理失败:", roleError);
+            toast.error(`角色关联处理失败: ${roleError.message}`);
+          } else {
+            console.log("角色关联处理成功");
+          }
         } else {
           // 如果角色ID为空，移除关联
           await roleAssociationModule.remove(userId);

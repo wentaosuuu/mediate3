@@ -44,6 +44,7 @@ const UserFormDialog = ({
       }
       
       console.log("UserFormDialog - 提交表单开始，数据:", values);
+      console.log("当前用户信息:", currentUser);
       
       // 设置提交状态
       isSubmitting.current = true;
@@ -69,7 +70,9 @@ const UserFormDialog = ({
           
           // 关闭对话框
           console.log("UserFormDialog - 关闭对话框");
-          onOpenChange(false);
+          setTimeout(() => {
+            onOpenChange(false);
+          }, 500); // 延迟关闭对话框，让用户看到成功消息
           
           return true;
         } else {
@@ -87,7 +90,7 @@ const UserFormDialog = ({
           isSubmitting.current = false;
           setIsSubmittingState(false);
           setLocalLoading(false);
-        }, 500);
+        }, 800); // 延长状态清除时间，防止快速重复点击
       }
     }, 
     () => onOpenChange(false), 
@@ -130,17 +133,23 @@ const UserFormDialog = ({
   // 综合加载状态
   const combinedLoading = externalLoading || isLocalLoading || isSubmitting.current || isSubmittingState;
 
-  // 调试日志
+  // 每次打开对话框时，确保表单数据正确
   useEffect(() => {
-    if (combinedLoading) {
-      console.log("表单当前处于加载状态，禁用提交和取消按钮");
-    }
-    
-    // 监听isOpen状态变化
-    if (isOpen) {
+    if (isOpen && currentUser) {
       console.log("对话框已打开，当前用户:", currentUser);
+      // 确保表单数据正确设置
+      form.reset({
+        username: currentUser.username || "",
+        email: currentUser.email || "",
+        name: currentUser.name || "",
+        phone: currentUser.phone || "",
+        department_id: currentUser.department_id || "",
+        role_id: currentUser.role_id || "",
+        tenant_id: currentUser.tenant_id || "",
+        __isEditMode: true
+      });
     }
-  }, [combinedLoading, isOpen, currentUser]);
+  }, [isOpen, currentUser, form]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>

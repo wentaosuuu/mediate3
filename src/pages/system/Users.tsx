@@ -44,20 +44,21 @@ const Users = () => {
         </MainContent>
       </div>
       
-      {/* 添加Sonner提示组件，设置更好的位置和样式 */}
+      {/* 添加Sonner提示组件，设置更合适的位置和样式 */}
       <Toaster 
         position="top-center" 
         expand={true} 
         richColors 
         closeButton 
         toastOptions={{
-          duration: 3000,
+          duration: 4000, // 增加显示时间
           className: "text-sm font-medium",
           style: { 
             fontSize: '14px',
             background: 'var(--background)',
             color: 'var(--foreground)',
-            border: '1px solid var(--border)'
+            border: '1px solid var(--border)',
+            zIndex: 9999, // 确保提示在最顶层显示
           }
         }}
       />

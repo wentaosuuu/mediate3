@@ -22,7 +22,7 @@ export const useFetchUsers = () => {
     setIsLoading(true);
     
     try {
-      // 获取用户
+      // 获取用户基本信息
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('id, username, name, email, phone, tenant_id, created_at')
@@ -46,8 +46,7 @@ export const useFetchUsers = () => {
       // 获取用户-部门关联
       const { data: userDepartments, error: deptError } = await supabase
         .from('user_departments')
-        .select('user_id, department_id, departments:department_id(id, name)')
-        .returns<any[]>();
+        .select('user_id, department_id, departments:department_id(id, name)');
       
       if (deptError) {
         console.error("获取用户-部门关联失败:", deptError);
@@ -59,8 +58,7 @@ export const useFetchUsers = () => {
       // 获取用户-角色关联
       const { data: userRoles, error: roleError } = await supabase
         .from('user_roles')
-        .select('user_id, role_id, roles:role_id(id, name)')
-        .returns<any[]>();
+        .select('user_id, role_id, roles:role_id(id, name)');
       
       if (roleError) {
         console.error("获取用户-角色关联失败:", roleError);
@@ -72,21 +70,19 @@ export const useFetchUsers = () => {
       // 合并用户数据、部门和角色信息
       const enhancedUsers = userData.map(user => {
         // 查找用户对应的部门信息
-        const userDept = userDepartments?.filter(d => d.user_id === user.id) || [];
+        const userDept = userDepartments?.find(d => d.user_id === user.id);
         // 查找用户对应的角色信息
-        const userRole = userRoles?.filter(r => r.user_id === user.id) || [];
+        const userRole = userRoles?.find(r => r.user_id === user.id);
         
-        const enhancedUser = {
+        return {
           ...user,
           // 添加部门相关字段
-          department_id: userDept[0]?.department_id || "",
-          department_name: userDept[0]?.departments?.name || "无部门",
+          department_id: userDept?.department_id || "",
+          department_name: userDept?.departments?.name || "无部门",
           // 添加角色相关字段
-          role_id: userRole[0]?.role_id || "",
-          role_name: userRole[0]?.roles?.name || "无角色",
+          role_id: userRole?.role_id || "",
+          role_name: userRole?.roles?.name || "无角色",
         };
-        
-        return enhancedUser;
       });
       
       console.log("已合并用户、部门和角色数据:", enhancedUsers);
