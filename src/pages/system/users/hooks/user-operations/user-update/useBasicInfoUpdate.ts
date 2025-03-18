@@ -7,13 +7,15 @@ import { toast } from "sonner";
  * 更新用户基本信息
  * @param userId 用户ID
  * @param values 表单值
+ * @param toastId 可选的toast通知ID，用于更新现有通知
+ * @returns 更新后的用户数据
  */
-export const updateUserBasicInfo = async (userId: string, values: UserFormValues) => {
-  console.log("更新用户基本信息，用户ID:", userId, "数据:", values);
+export const updateUserBasicInfo = async (userId: string, values: UserFormValues, toastId?: string) => {
+  console.log("更新用户基本信息，用户ID:", userId);
   
   if (!userId) {
     console.error("更新用户基本信息失败: 用户ID为空");
-    toast.error("保存失败：用户ID不能为空");
+    toast.error("保存失败：用户ID不能为空", { id: toastId });
     throw new Error("用户ID不能为空");
   }
   
@@ -27,7 +29,7 @@ export const updateUserBasicInfo = async (userId: string, values: UserFormValues
       updated_at: new Date().toISOString()
     };
     
-    console.log("准备更新用户基本信息，更新数据:", updateData);
+    console.log("准备更新用户基本信息:", updateData);
     
     // 执行更新操作
     const { data, error } = await supabase
@@ -38,34 +40,15 @@ export const updateUserBasicInfo = async (userId: string, values: UserFormValues
 
     if (error) {
       console.error('更新用户基本信息失败:', error);
-      toast.error(`保存失败：${error.message || '数据库更新错误'}`);
+      toast.error(`保存失败：${error.message || '数据库更新错误'}`, { id: toastId });
       throw error;
     }
     
-    if (!data || data.length === 0) {
-      console.warn('更新成功但未返回用户数据');
-      // 使用select查询获取更新后的用户数据
-      const { data: userData, error: fetchError } = await supabase
-        .from('users')
-        .select('id, username, name, email, phone')
-        .eq('id', userId)
-        .single();
-        
-      if (fetchError) {
-        console.error('获取更新后的用户数据失败:', fetchError);
-      } else {
-        console.log('手动获取更新后的用户数据:', userData);
-        toast.success("用户信息保存成功");
-        return userData;
-      }
-    } else {
-      console.log('用户基本信息更新成功，返回数据:', data);
-      toast.success("用户信息保存成功");
-      return data[0];
-    }
+    console.log('用户基本信息更新成功:', data);
+    return data?.[0] || null;
   } catch (error) {
     console.error('更新用户基本信息过程中发生错误:', error);
-    toast.error(`保存失败：${error instanceof Error ? error.message : '未知错误'}`);
+    toast.error(`保存失败：${(error as Error).message}`, { id: toastId });
     throw error;
   }
 };

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Form } from "@/components/ui/form";
 import { DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import UserBasicInfo from './UserBasicInfo';
@@ -30,15 +30,21 @@ const UserFormContent = ({
   departments,
   roles
 }: UserFormContentProps) => {
+  // 本地提交状态，避免多次点击提交按钮
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   // 添加表单提交处理函数
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault(); // 阻止默认提交行为
     
-    // 如果正在加载，阻止提交
-    if (isLoading) {
-      console.log("表单处于加载状态，忽略提交请求");
+    // 如果正在加载或已经在提交中，阻止重复提交
+    if (isLoading || isSubmitting) {
+      console.log("表单处于加载或提交状态，忽略重复提交请求");
       return;
     }
+    
+    // 设置本地提交状态
+    setIsSubmitting(true);
     
     console.log("表单提交被触发，准备处理数据");
     const formValues = form.getValues();
@@ -46,13 +52,22 @@ const UserFormContent = ({
     
     // 确保下拉菜单值正确
     if (formValues.department_id === undefined) {
+      console.log("部门ID未定义，设置为'none'");
       form.setValue('department_id', 'none');
     }
     if (formValues.role_id === undefined) {
+      console.log("角色ID未定义，设置为'none'");
       form.setValue('role_id', 'none');
     }
     
-    onSubmit(); // 调用传入的onSubmit函数处理表单
+    console.log("调用onSubmit处理表单提交");
+    // 调用传入的onSubmit函数处理表单
+    onSubmit();
+    
+    // 延迟重置提交状态，避免快速重复点击
+    setTimeout(() => {
+      setIsSubmitting(false);
+    }, 1000);
   };
 
   return (
@@ -68,9 +83,9 @@ const UserFormContent = ({
       
       <Form {...form}>
         <form onSubmit={handleFormSubmit} className="space-y-5">
-          <UserBasicInfo isLoading={isLoading} currentUser={currentUser} />
-          <UserAssociation isLoading={isLoading} departments={departments} roles={roles} />
-          <UserFormActions isLoading={isLoading} currentUser={currentUser} onCancel={onCancel} />
+          <UserBasicInfo isLoading={isLoading || isSubmitting} currentUser={currentUser} />
+          <UserAssociation isLoading={isLoading || isSubmitting} departments={departments} roles={roles} />
+          <UserFormActions isLoading={isLoading || isSubmitting} currentUser={currentUser} onCancel={onCancel} />
         </form>
       </Form>
     </>
