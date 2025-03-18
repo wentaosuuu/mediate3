@@ -73,8 +73,12 @@ const UserFormDialog = ({
         toast.error(`操作失败: ${(error as Error).message}`);
         return false;
       } finally {
-        isSubmitting.current = false;
-        setLocalLoading(false);
+        // 无论成功还是失败，都重置提交状态和加载状态
+        setTimeout(() => {
+          isSubmitting.current = false;
+          setLocalLoading(false);
+          toast.dismiss(); // 清除所有toast
+        }, 500); // 稍微延迟，确保UI更新
       }
     }, 
     () => onOpenChange(false), 
@@ -92,6 +96,9 @@ const UserFormDialog = ({
     
     if (!open) {
       console.log("对话框关闭，重置表单");
+      // 清除提交状态
+      isSubmitting.current = false;
+      // 重置表单
       resetForm();
     }
     

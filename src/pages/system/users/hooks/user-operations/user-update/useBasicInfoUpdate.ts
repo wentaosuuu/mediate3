@@ -34,8 +34,7 @@ export const updateUserBasicInfo = async (userId: string, values: UserFormValues
       .from('users')
       .update(updateData)
       .eq('id', userId)
-      .select('id, username, name, email, phone')
-      .maybeSingle();
+      .select('id, username, name, email, phone');
 
     if (error) {
       console.error('更新用户基本信息失败:', error);
@@ -43,7 +42,10 @@ export const updateUserBasicInfo = async (userId: string, values: UserFormValues
       throw error;
     } else {
       console.log('用户基本信息更新成功，返回数据:', data);
-      return data;
+      if (!data || data.length === 0) {
+        console.warn('更新成功但未返回用户数据');
+      }
+      return data?.[0] || null;
     }
   } catch (error) {
     console.error('更新用户基本信息过程中发生错误:', error);
