@@ -40,13 +40,28 @@ export const updateUserBasicInfo = async (userId: string, values: UserFormValues
       console.error('更新用户基本信息失败:', error);
       toast.error(`保存失败：${error.message || '数据库更新错误'}`);
       throw error;
+    }
+    
+    if (!data || data.length === 0) {
+      console.warn('更新成功但未返回用户数据');
+      // 使用select查询获取更新后的用户数据
+      const { data: userData, error: fetchError } = await supabase
+        .from('users')
+        .select('id, username, name, email, phone')
+        .eq('id', userId)
+        .single();
+        
+      if (fetchError) {
+        console.error('获取更新后的用户数据失败:', fetchError);
+      } else {
+        console.log('手动获取更新后的用户数据:', userData);
+        toast.success("用户信息保存成功");
+        return userData;
+      }
     } else {
       console.log('用户基本信息更新成功，返回数据:', data);
       toast.success("用户信息保存成功");
-      if (!data || data.length === 0) {
-        console.warn('更新成功但未返回用户数据');
-      }
-      return data?.[0] || null;
+      return data[0];
     }
   } catch (error) {
     console.error('更新用户基本信息过程中发生错误:', error);

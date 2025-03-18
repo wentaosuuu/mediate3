@@ -45,7 +45,16 @@ const Users = () => {
       </div>
       
       {/* 添加Sonner提示组件 */}
-      <Toaster position="top-right" expand={true} richColors closeButton />
+      <Toaster 
+        position="top-right" 
+        expand={true} 
+        richColors 
+        closeButton 
+        toastOptions={{
+          duration: 3000,
+          style: { fontSize: '14px' }
+        }}
+      />
     </div>
   );
 };

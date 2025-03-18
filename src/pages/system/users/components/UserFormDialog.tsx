@@ -44,7 +44,7 @@ const UserFormDialog = ({
       console.log("UserFormDialog - 提交表单开始", values);
       isSubmitting.current = true;
       setLocalLoading(true);
-      toast.loading("正在保存...");
+      toast.loading("正在保存用户数据...");
       
       try {
         // 提交表单
@@ -77,8 +77,8 @@ const UserFormDialog = ({
         setTimeout(() => {
           isSubmitting.current = false;
           setLocalLoading(false);
-          toast.dismiss(); // 清除所有toast
-        }, 1000); // 延迟1秒，确保UI更新
+          toast.dismiss(); // 清除所有loading toast
+        }, 500);
       }
     }, 
     () => onOpenChange(false), 

@@ -71,6 +71,11 @@ export const useUserData = () => {
     }
   }, [fetchDepartments, fetchRoles, fetchUsers]);
 
+  // 确保在组件挂载时刷新数据一次
+  useEffect(() => {
+    refreshAllData();
+  }, [refreshAllData]);
+
   return {
     users,
     departments,
