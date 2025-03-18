@@ -42,6 +42,7 @@ export const updateUserBasicInfo = async (userId: string, values: UserFormValues
       throw error;
     } else {
       console.log('用户基本信息更新成功，返回数据:', data);
+      toast.success("用户信息保存成功");
       if (!data || data.length === 0) {
         console.warn('更新成功但未返回用户数据');
       }

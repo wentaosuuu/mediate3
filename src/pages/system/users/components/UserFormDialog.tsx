@@ -78,7 +78,7 @@ const UserFormDialog = ({
           isSubmitting.current = false;
           setLocalLoading(false);
           toast.dismiss(); // 清除所有toast
-        }, 500); // 稍微延迟，确保UI更新
+        }, 1000); // 延迟1秒，确保UI更新
       }
     }, 
     () => onOpenChange(false), 

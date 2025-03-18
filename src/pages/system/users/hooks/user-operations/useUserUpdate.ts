@@ -37,14 +37,21 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
     try {
       console.log("开始用户更新流程，用户ID:", userId);
       
+      // 处理特殊值"none"，将其转换为空字符串
+      const processedValues = {
+        ...values,
+        department_id: values.department_id === "none" ? "" : values.department_id,
+        role_id: values.role_id === "none" ? "" : values.role_id
+      };
+      
       // 1. 更新用户基本信息
-      const updatedUserInfo = await updateUserBasicInfo(userId, values);
+      const updatedUserInfo = await updateUserBasicInfo(userId, processedValues);
       console.log("基本信息更新成功:", updatedUserInfo);
       
       // 2. 处理部门关联
-      console.log("开始处理部门关联，部门ID:", values.department_id);
-      if (values.department_id) {
-        await departmentAssociationModule.handle(userId, values.department_id);
+      console.log("开始处理部门关联，部门ID:", processedValues.department_id);
+      if (processedValues.department_id) {
+        await departmentAssociationModule.handle(userId, processedValues.department_id);
         console.log("部门关联处理成功");
       } else {
         // 如果部门ID为空，移除关联
@@ -53,9 +60,9 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       }
       
       // 3. 处理角色关联
-      console.log("开始处理角色关联，角色ID:", values.role_id);
-      if (values.role_id) {
-        await roleAssociationModule.handle(userId, values.role_id);
+      console.log("开始处理角色关联，角色ID:", processedValues.role_id);
+      if (processedValues.role_id) {
+        await roleAssociationModule.handle(userId, processedValues.role_id);
         console.log("角色关联处理成功");
       } else {
         // 如果角色ID为空，移除关联

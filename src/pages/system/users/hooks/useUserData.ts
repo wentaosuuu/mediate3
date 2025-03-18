@@ -49,9 +49,18 @@ export const useUserData = () => {
     
     try {
       // 依次请求数据，避免并发请求可能导致的问题
+      console.log("开始获取部门数据");
       await fetchDepartments();
+      console.log("部门数据获取完成");
+      
+      console.log("开始获取角色数据");
       await fetchRoles();
+      console.log("角色数据获取完成");
+      
+      console.log("开始获取用户数据");
       await fetchUsers();
+      console.log("用户数据获取完成");
+      
       console.log("所有用户相关数据加载完成！");
     } catch (error) {
       console.error("加载数据过程中发生错误:", error);
