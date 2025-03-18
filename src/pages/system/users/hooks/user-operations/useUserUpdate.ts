@@ -27,6 +27,10 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
     const userId = currentUser.id;
     setIsLoading(true);
     
+    // 添加唯一的toast ID以便后续更新
+    const toastId = `update-user-${Date.now()}`;
+    toast.loading("正在更新用户信息...", { id: toastId });
+    
     try {
       console.log("开始用户更新流程，用户ID:", userId);
       
@@ -59,7 +63,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
 
       if (error) {
         console.error('更新用户基本信息失败:', error);
-        toast.error(`保存失败：${error.message || '数据库更新错误'}`);
+        toast.error(`保存失败：${error.message || '数据库更新错误'}`, { id: toastId });
         uiToast({
           title: "更新用户信息失败",
           description: error.message,
@@ -86,7 +90,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
           
           if (deptError) {
             console.error("部门关联处理失败:", deptError);
-            toast.error(`部门关联处理失败: ${deptError.message}`);
+            toast.error(`部门关联处理失败: ${deptError.message}`, { id: toastId });
             uiToast({
               title: "部门关联处理失败",
               description: deptError.message,
@@ -105,6 +109,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
           
           if (deleteError) {
             console.error("移除部门关联失败:", deleteError);
+            toast.error(`移除部门关联失败: ${deleteError.message}`, { id: toastId });
             uiToast({
               title: "移除部门关联失败",
               description: deleteError.message,
@@ -116,7 +121,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
         }
       } catch (deptError) {
         console.error("部门关联处理失败:", deptError);
-        // 继续处理其他更新
+        // 继续处理其他更新，不抛出错误中断更新流程
       }
       
       // 3. 处理角色关联
@@ -142,6 +147,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
               
             if (updateError) {
               console.error("更新角色关联失败:", updateError);
+              toast.error(`更新角色关联失败: ${updateError.message}`, { id: toastId });
               uiToast({
                 title: "更新角色关联失败",
                 description: updateError.message,
@@ -158,6 +164,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
               
             if (insertError) {
               console.error("创建角色关联失败:", insertError);
+              toast.error(`创建角色关联失败: ${insertError.message}`, { id: toastId });
               uiToast({
                 title: "创建角色关联失败",
                 description: insertError.message,
@@ -177,6 +184,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
           
           if (deleteError) {
             console.error("移除角色关联失败:", deleteError);
+            toast.error(`移除角色关联失败: ${deleteError.message}`, { id: toastId });
             uiToast({
               title: "移除角色关联失败",
               description: deleteError.message,
@@ -192,7 +200,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       }
       
       // 显示成功提示
-      toast.success(`用户 ${values.name || values.username} 更新成功`);
+      toast.success(`用户 ${values.name || values.username} 更新成功`, { id: toastId });
       uiToast({
         title: "用户更新成功",
         description: `已成功更新用户: ${values.name || values.username}`,
@@ -205,7 +213,7 @@ export const useUserUpdate = (fetchUsers: () => Promise<void>) => {
       return true;
     } catch (error) {
       console.error('更新用户失败:', error);
-      toast.error(`更新失败：${(error as Error).message}`);
+      toast.error(`更新失败：${(error as Error).message}`, { id: toastId });
       return false;
     } finally {
       setIsLoading(false);

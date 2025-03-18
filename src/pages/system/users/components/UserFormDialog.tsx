@@ -36,17 +36,15 @@ const UserFormDialog = ({
   const { form, handleSubmit, resetForm, isLocalLoading, setLocalLoading } = useUserForm(
     currentUser, 
     async (values) => {
-      // 防止重复提交
+      // 防止重复提交 - 如果已经在提交中，直接返回
       if (isSubmitting.current || isSubmittingState) {
         console.log("表单正在提交中，忽略重复请求");
         toast.info("正在处理，请稍候...");
         return false;
       }
       
-      // 记录表单提交开始
-      console.log("UserFormDialog - 提交表单开始，数据:", values);
-      
-      // 设置提交状态
+      // 记录表单提交开始，并设置提交状态
+      console.log("UserFormDialog - 开始提交表单，数据:", values);      
       isSubmitting.current = true;
       setIsSubmittingState(true);
       setLocalLoading(true);
@@ -70,14 +68,12 @@ const UserFormDialog = ({
         console.log("UserFormDialog - 提交表单结果:", result);
         
         if (result) {
-          // 提交成功，显示成功消息
+          // 提交成功
           toast.success(`用户${currentUser ? '更新' : '创建'}成功`, { id: toastId });
           
-          // 重置表单
-          resetForm();
-          
-          // 关闭对话框（延迟以便用户看到成功消息）
+          // 重置表单并关闭对话框（添加延迟以便用户看到成功消息）
           setTimeout(() => {
+            resetForm();
             onOpenChange(false);
           }, 500);
           
@@ -92,7 +88,7 @@ const UserFormDialog = ({
         toast.error(`操作失败: ${(error as Error).message}`);
         return false;
       } finally {
-        // 延迟清理提交状态
+        // 延迟清理提交状态以防止快速点击导致的重复提交
         setTimeout(() => {
           isSubmitting.current = false;
           setIsSubmittingState(false);
