@@ -15,6 +15,7 @@ export const roleAssociationModule = {
   async handle(userId: string, roleId: string): Promise<void> {
     console.log("处理用户角色关联，用户ID:", userId, "角色ID:", roleId);
     
+    // 检查是否为"none"或空值，这种情况应该移除关联
     if (!roleId || roleId === "none") {
       console.log("角色ID无效或为'none'，调用移除方法");
       return this.remove(userId);

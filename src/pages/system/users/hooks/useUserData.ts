@@ -31,8 +31,7 @@ export const useUserData = () => {
   // 设置加载状态（提供给外部使用）
   const [loadingState, setIsLoading] = useState(false);
   
-  // 使用 ref 来防止重复加载
-  const initialLoadDone = useRef(false);
+  // 防止无限循环的锁
   const isRefreshing = useRef(false);
   
   // 包装刷新函数，避免重复创建函数实例导致useEffect无限循环
@@ -60,15 +59,6 @@ export const useUserData = () => {
       setIsLoading(false); // 恢复外部加载状态
     }
   }, [fetchDepartments, fetchRoles, fetchUsers]);
-
-  // 初始加载 - 使用 useRef 确保只加载一次
-  useEffect(() => {
-    if (!initialLoadDone.current) {
-      console.log("首次加载所有用户相关数据...");
-      refreshAllData();
-      initialLoadDone.current = true;
-    }
-  }, [refreshAllData]);
 
   return {
     users,

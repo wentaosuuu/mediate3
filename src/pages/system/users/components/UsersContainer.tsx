@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import UserHeader from './UserHeader';
 import UserSearch from './UserSearch';
 import UsersTable from './UsersTable';
@@ -41,11 +41,17 @@ const UsersContainer = () => {
 
   // 合并加载状态
   const isLoading = dataLoading || operationLoading;
+  
+  // 使用 ref 防止无限循环
+  const isInitialized = useRef(false);
 
-  // 首次加载数据
+  // 首次加载数据，使用 useRef 确保只执行一次
   useEffect(() => {
-    console.log("UsersContainer组件挂载，初始化数据");
-    refreshAllData();
+    if (!isInitialized.current) {
+      console.log("UsersContainer组件挂载，初始化数据");
+      refreshAllData();
+      isInitialized.current = true;
+    }
   }, [refreshAllData]);
 
   return (

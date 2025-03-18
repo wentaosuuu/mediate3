@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React from 'react';
 import UserHeader from './components/UserHeader';
 import UsersContainer from './components/UsersContainer';
 import { useUserOperations } from './hooks/useUserOperations';
@@ -15,14 +15,6 @@ const UsersManagement = () => {
   
   // 使用自定义钩子处理用户操作，仅获取创建用户方法
   const { openCreateDialog } = useUserOperations(refreshAllData);
-
-  // 防止组件销毁后的状态更新
-  const isMounted = useRef(true);
-  React.useEffect(() => {
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
 
   return (
     <div className="p-6">

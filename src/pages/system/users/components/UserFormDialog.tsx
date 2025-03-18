@@ -6,6 +6,7 @@ import { UserFormValues } from './user-form/UserFormSchema';
 import { Department } from '../hooks/user-data/useFetchDepartments';
 import { Role } from '../hooks/user-data/useFetchRoles';
 import { useUserForm } from '../hooks/user-form/useUserForm';
+import { toast } from "sonner";
 
 interface UserFormDialogProps {
   isOpen: boolean;
@@ -28,79 +29,101 @@ const UserFormDialog = ({
   roles,
   onRefreshData
 }: UserFormDialogProps) => {
-  const didInitialRefresh = useRef(false);
+  // 使用ref标记表单是否已提交，防止重复提交
+  const isSubmitting = useRef(false);
   
   // 使用表单钩子
-  const { form, handleSubmit, resetForm, isLocalLoading } = useUserForm(
+  const { form, handleSubmit, resetForm, isLocalLoading, setLocalLoading } = useUserForm(
     currentUser, 
     async (values) => {
+      // 防止重复提交
+      if (isSubmitting.current) {
+        console.log("表单正在提交中，忽略重复请求");
+        return false;
+      }
+      
       console.log("UserFormDialog - 提交表单开始", values);
+      isSubmitting.current = true;
+      setLocalLoading(true);
+      
       try {
-        // 提交前禁用关闭
+        // 提交表单
         const result = await onSubmit(values);
         console.log("UserFormDialog - 提交表单结果:", result);
         
         if (result) {
-          // 如果提交成功，关闭对话框
-          console.log("UserFormDialog - 提交成功，准备关闭对话框");
-          resetForm(); // 先重置表单
+          // 提交成功，重置表单
+          console.log("UserFormDialog - 提交成功，重置表单");
+          resetForm();
           
-          // 刷新数据后再关闭对话框
+          // 刷新数据
           if (onRefreshData) {
             console.log("UserFormDialog - 刷新数据");
             await onRefreshData();
           }
           
-          onOpenChange(false); // 然后关闭对话框
+          // 关闭对话框
+          console.log("UserFormDialog - 关闭对话框");
+          onOpenChange(false);
+          
+          // 显示成功消息
+          toast.success(`用户${currentUser ? '更新' : '创建'}成功`);
           return true;
+        } else {
+          console.log("UserFormDialog - 提交失败");
+          toast.error(`用户${currentUser ? '更新' : '创建'}失败`);
+          return false;
         }
-        return false;
       } catch (error) {
         console.error("UserFormDialog - 提交表单出错:", error);
+        toast.error(`操作失败: ${(error as Error).message}`);
         return false;
+      } finally {
+        isSubmitting.current = false;
+        setLocalLoading(false);
       }
     }, 
     () => onOpenChange(false), 
     isLoading
   );
 
-  // 当对话框打开时，仅执行一次刷新数据，避免无限循环
-  useEffect(() => {
-    // 只有当对话框首次打开且刷新函数存在时才刷新数据
-    if (isOpen && onRefreshData && !didInitialRefresh.current) {
-      console.log("对话框首次打开，刷新数据");
-      onRefreshData();
-      didInitialRefresh.current = true;
-    }
-    
-    // 当对话框关闭时，重置刷新标志
-    if (!isOpen) {
-      didInitialRefresh.current = false;
-      console.log("对话框关闭，重置标志");
-    }
-  }, [isOpen, onRefreshData]);
-
   // 处理对话框关闭
   const handleOpenChange = (open: boolean) => {
-    // 如果不在加载状态，才允许关闭对话框
-    if ((!isLoading && !isLocalLoading) || !open) {
-      if (!open) {
-        resetForm(); // 关闭对话框时重置表单
-      }
-      onOpenChange(open);
+    // 如果正在提交，阻止关闭
+    if (isSubmitting.current && open === false) {
+      console.log("表单正在提交中，阻止关闭对话框");
+      return;
     }
+    
+    if (!open) {
+      console.log("对话框关闭，重置表单");
+      resetForm();
+    }
+    
+    onOpenChange(open);
   };
 
   // 处理取消按钮点击
   const handleCancel = () => {
-    if (!isLoading && !isLocalLoading) {
-      resetForm(); // 取消时重置表单
-      onOpenChange(false);
+    if (isSubmitting.current) {
+      console.log("表单正在提交中，阻止取消操作");
+      return;
     }
+    
+    resetForm();
+    onOpenChange(false);
   };
 
+  // 对话框打开时刷新数据，确保数据最新
+  useEffect(() => {
+    if (isOpen && onRefreshData) {
+      console.log("对话框打开，刷新数据");
+      onRefreshData();
+    }
+  }, [isOpen, onRefreshData]);
+
   // 综合加载状态
-  const combinedLoading = isLoading || isLocalLoading;
+  const combinedLoading = isLoading || isLocalLoading || isSubmitting.current;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>

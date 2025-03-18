@@ -1,141 +1,101 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef, useState } from 'react';
-import { useToast } from "@/hooks/use-toast";
-import { userFormSchema, UserFormValues } from '../../components/user-form/UserFormSchema';
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import { UserFormSchema, UserFormValues } from "../../components/user-form/UserFormSchema";
 
-// 处理用户表单的钩子
+interface UseUserFormProps {
+  currentUser: any | null;
+  onSubmit: (values: UserFormValues) => Promise<boolean>;
+  onCancel: () => void;
+  isLoading: boolean;
+}
+
+/**
+ * 用户表单自定义钩子
+ * 处理表单初始化、验证和提交
+ */
 export const useUserForm = (
   currentUser: any | null,
   onSubmit: (values: UserFormValues) => Promise<boolean>,
-  onCloseDialog: () => void,
+  onCancel: () => void,
   isLoading: boolean
 ) => {
-  const { toast: uiToast } = useToast();
-  const isSubmitting = useRef(false);
-  const [localIsLoading, setLocalIsLoading] = useState(false);
+  // 本地加载状态
+  const [isLocalLoading, setLocalLoading] = useState(false);
 
-  // 表单初始化
+  // 初始化表单
   const form = useForm<UserFormValues>({
-    resolver: zodResolver(userFormSchema),
+    resolver: zodResolver(UserFormSchema),
     defaultValues: {
       username: "",
-      name: "",
       email: "",
+      name: "",
       phone: "",
-      department_id: "none",
-      role_id: "none",
-      password: "",
-      tenant_id: "default", // 在实际应用中应该从系统或登录用户获取
-      __isEditMode: false // 默认为创建模式
+      department_id: "",
+      role_id: "",
+      tenant_id: "",
+      __isEditMode: false
     }
   });
 
-  // 当currentUser改变时重置表单
-  useEffect(() => {
-    if (currentUser === null) {
-      console.log("重置表单为创建模式");
-      form.reset({
-        username: "",
-        name: "",
-        email: "",
-        phone: "",
-        department_id: "none",
-        role_id: "none",
-        password: "",
-        tenant_id: "default",
-        __isEditMode: false
-      });
-    } else {
-      console.log("重置表单为编辑模式:", currentUser);
-      
-      // 确保从currentUser中获取正确的部门ID和角色ID
-      // 如果值为空，设置为"none"
-      form.reset({
-        username: currentUser.username || "",
-        name: currentUser.name || "",
-        email: currentUser.email || "",
-        phone: currentUser.phone || "",
-        department_id: currentUser.department_id || "none",
-        role_id: currentUser.role_id || "none",
-        password: "",  // 编辑模式不需要密码
-        tenant_id: currentUser.tenant_id || "default",
-        __isEditMode: true // 标记为编辑模式
-      });
-
-      // 调试数据
-      console.log("设置表单值后，form.getValues():", form.getValues());
-    }
-  }, [currentUser, form]);
-
-  // 处理表单提交
+  // 表单提交处理
   const handleSubmit = form.handleSubmit(async (values) => {
-    console.log("提交表单数据:", values);
-    if (isLoading || localIsLoading || isSubmitting.current) {
-      console.log("系统正在处理中，请稍候");
-      toast.info("系统正在处理中，请稍候");
-      return false; // 防止重复提交
+    console.log("表单提交开始，数据:", values);
+    if (isLocalLoading || isLoading) {
+      console.log("已处于加载状态，跳过重复提交");
+      return;
     }
     
+    setLocalLoading(true);
     try {
-      console.log("开始提交表单");
-      isSubmitting.current = true;
-      setLocalIsLoading(true);
-      toast.loading("正在处理...");
-      
-      // 移除临时标记字段，不需要提交到服务器
-      const { __isEditMode, ...submitValues } = values;
-      
-      console.log("处理的表单数据:", submitValues, "当前用户:", currentUser);
-      const success = await onSubmit(submitValues);
-      
-      if (success) {
-        console.log("表单提交成功");
-        
-        toast.success(currentUser ? "更新用户成功" : "创建用户成功");
-        uiToast({
-          title: currentUser ? "更新用户成功" : "创建用户成功",
-          description: `操作已完成`,
-        });
-        
-        return true;
-      } else {
-        console.error("表单提交返回失败");
-        toast.error("操作失败，请检查输入并重试");
-        uiToast({
-          title: "操作失败",
-          description: "请检查输入并重试",
-          variant: "destructive",
-        });
-        return false;
-      }
-    } catch (error) {
-      console.error("表单提交失败:", error);
-      toast.error(`操作失败: ${(error as Error).message}`);
-      uiToast({
-        title: "操作失败",
-        description: `${(error as Error).message}`,
-        variant: "destructive",
-      });
-      return false;
+      await onSubmit(values);
     } finally {
-      isSubmitting.current = false;
-      setLocalIsLoading(false);
+      setLocalLoading(false);
     }
   });
 
-  // 重置表单
+  // 重置表单函数
   const resetForm = () => {
-    console.log("执行表单重置");
-    form.reset();
+    console.log("重置表单");
+    form.reset({
+      username: "",
+      email: "",
+      name: "",
+      phone: "",
+      department_id: "",
+      role_id: "",
+      tenant_id: "",
+      __isEditMode: false
+    });
   };
+
+  // 编辑模式下，设置表单初始值
+  useEffect(() => {
+    if (currentUser) {
+      console.log("设置表单初始值，当前用户:", currentUser);
+      form.reset({
+        username: currentUser.username || "",
+        email: currentUser.email || "",
+        name: currentUser.name || "",
+        phone: currentUser.phone || "",
+        department_id: currentUser.department_id || "",
+        role_id: currentUser.role_id || "",
+        tenant_id: currentUser.tenant_id || "",
+        __isEditMode: true
+      });
+    } else {
+      // 新建模式下重置表单
+      console.log("新建模式，重置表单");
+      resetForm();
+    }
+  }, [currentUser, form]);
 
   return {
     form,
     handleSubmit,
     resetForm,
-    isLocalLoading: localIsLoading
+    isLocalLoading,
+    setLocalLoading
   };
 };
