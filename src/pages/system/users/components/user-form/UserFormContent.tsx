@@ -10,10 +10,14 @@ import { Role } from '../../hooks/user-data/useFetchRoles';
 import { UseFormReturn } from "react-hook-form";
 import { UserFormValues } from './UserFormSchema';
 import { useFormSubmitHandler } from '../../hooks/user-form/useFormSubmitHandler';
+import { Logger } from "@/utils/logger";
+
+// 创建专用日志记录器
+const logger = new Logger("UserFormContent");
 
 interface UserFormContentProps {
   form: UseFormReturn<UserFormValues>;
-  onSubmit: () => void;
+  onSubmit: (values: UserFormValues) => Promise<boolean>;
   onCancel: () => void;
   currentUser: any | null;
   isLoading: boolean;
@@ -36,6 +40,8 @@ const UserFormContent = ({
   
   // 计算最终的加载状态
   const combinedLoading = isLoading || isSubmitting;
+  
+  logger.info("渲染表单，当前用户:", currentUser);
 
   return (
     <>

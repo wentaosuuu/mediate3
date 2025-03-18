@@ -14,14 +14,14 @@ const logger = new Logger("FormSubmitHandler");
  */
 export const useFormSubmitHandler = (
   form: UseFormReturn<UserFormValues>,
-  onSubmit: () => void,
+  onSubmit: (values: UserFormValues) => Promise<boolean>,
   isLoading: boolean
 ) => {
   // 本地提交状态，避免多次点击提交按钮
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // 表单提交处理函数
-  const handleFormSubmit = useCallback((e: React.FormEvent) => {
+  const handleFormSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault(); // 阻止默认提交行为
     
     // 如果正在加载或已经在提交中，阻止重复提交
@@ -30,32 +30,48 @@ export const useFormSubmitHandler = (
       toast.info("正在处理，请稍候...");
       return;
     }
-    
-    // 设置本地提交状态
-    setIsSubmitting(true);
-    
-    logger.info("表单提交被触发，准备处理数据");
-    const formValues = form.getValues();
-    logger.info("表单数据:", formValues);
-    
-    // 确保下拉菜单值正确处理
-    if (formValues.department_id === undefined) {
-      logger.info("部门ID未定义，设置为'none'");
-      form.setValue('department_id', 'none');
+
+    try {
+      // 获取表单数据
+      const formValues = form.getValues();
+      logger.info("开始表单提交流程");
+      logger.info("表单数据:", formValues);
+
+      // 设置本地提交状态
+      setIsSubmitting(true);
+      
+      // 确保特殊值处理
+      const processedValues = {
+        ...formValues,
+        department_id: formValues.department_id === "none" ? "" : formValues.department_id,
+        role_id: formValues.role_id === "none" ? "" : formValues.role_id,
+      };
+      
+      logger.info("处理后的提交数据:", processedValues);
+      
+      // 调用外部提交函数
+      const success = await onSubmit(processedValues);
+      logger.info("表单提交结果:", success);
+      
+      if (success) {
+        // 提交成功，显示成功提示
+        toast.success("保存成功");
+        return true;
+      } else {
+        // 提交失败，显示错误提示
+        toast.error("保存失败，请重试");
+        return false;
+      }
+    } catch (error) {
+      logger.error("表单提交过程中出错:", error);
+      toast.error(`提交失败: ${(error as Error).message}`);
+      return false;
+    } finally {
+      // 延迟重置提交状态，避免快速重复点击
+      setTimeout(() => {
+        setIsSubmitting(false);
+      }, 800);
     }
-    if (formValues.role_id === undefined) {
-      logger.info("角色ID未定义，设置为'none'");
-      form.setValue('role_id', 'none');
-    }
-    
-    logger.info("调用onSubmit处理表单提交");
-    // 调用传入的onSubmit函数处理表单
-    onSubmit();
-    
-    // 延迟重置提交状态，避免快速重复点击
-    setTimeout(() => {
-      setIsSubmitting(false);
-    }, 1000);
   }, [form, onSubmit, isLoading, isSubmitting]);
 
   return {
