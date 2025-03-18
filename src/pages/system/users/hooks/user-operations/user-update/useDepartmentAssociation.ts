@@ -12,16 +12,17 @@ const departmentAssociationModule = {
    * @param departmentId 部门ID
    */
   handle: async (userId: string, departmentId: string): Promise<void> => {
-    console.log(`处理用户(${userId})与部门(${departmentId})的关联`);
+    console.log(`处理用户(${userId})与部门(${departmentId})的关联，开始处理...`);
     
     if (!userId) {
       console.error("处理部门关联失败: 用户ID为空");
       throw new Error("用户ID不能为空");
     }
     
-    if (!departmentId) {
-      console.error("处理部门关联失败: 部门ID为空");
-      throw new Error("部门ID不能为空");
+    // 如果部门ID为"none"或者空字符串，则移除部门关联
+    if (!departmentId || departmentId === "none") {
+      console.log(`部门ID为空或"none"，将移除用户(${userId})的部门关联`);
+      return await departmentAssociationModule.remove(userId);
     }
     
     try {
@@ -88,7 +89,7 @@ const departmentAssociationModule = {
    * @param userId 用户ID
    */
   remove: async (userId: string): Promise<void> => {
-    console.log(`移除用户(${userId})的部门关联`);
+    console.log(`移除用户(${userId})的部门关联，开始处理...`);
     
     if (!userId) {
       console.error("移除部门关联失败: 用户ID为空");
@@ -96,6 +97,26 @@ const departmentAssociationModule = {
     }
     
     try {
+      // 检查用户是否有部门关联
+      const { data: existingDepts, error: checkError } = await supabase
+        .from('user_departments')
+        .select('id')
+        .eq('user_id', userId);
+      
+      if (checkError) {
+        console.error("检查用户部门关联失败:", checkError);
+        throw checkError;
+      }
+      
+      // 如果用户没有部门关联，直接返回
+      if (!existingDepts || existingDepts.length === 0) {
+        console.log(`用户(${userId})没有部门关联，无需移除`);
+        return;
+      }
+      
+      console.log(`发现用户(${userId})的部门关联，准备移除...`);
+      
+      // 移除用户的部门关联
       const { data, error } = await supabase
         .from('user_departments')
         .delete()

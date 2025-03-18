@@ -44,7 +44,8 @@ export const useFetchUsers = () => {
       // 获取用户-部门关联
       const { data: userDepartments, error: deptError } = await supabase
         .from('user_departments')
-        .select('user_id, department_id, departments:department_id(id, name)');
+        .select('user_id, department_id, departments:department_id(id, name)')
+        .returns<any[]>();
       
       if (deptError) {
         console.error("获取用户-部门关联失败:", deptError);
@@ -56,7 +57,8 @@ export const useFetchUsers = () => {
       // 获取用户-角色关联
       const { data: userRoles, error: roleError } = await supabase
         .from('user_roles')
-        .select('user_id, role_id, roles:role_id(id, name)');
+        .select('user_id, role_id, roles:role_id(id, name)')
+        .returns<any[]>();
       
       if (roleError) {
         console.error("获取用户-角色关联失败:", roleError);

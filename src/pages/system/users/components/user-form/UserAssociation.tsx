@@ -28,7 +28,7 @@ const UserAssociation = ({
             <Select
               disabled={isLoading}
               onValueChange={field.onChange}
-              value={field.value}
+              value={field.value || "none"}
             >
               <FormControl>
                 <SelectTrigger className="bg-white">
@@ -58,7 +58,7 @@ const UserAssociation = ({
             <Select
               disabled={isLoading}
               onValueChange={field.onChange}
-              value={field.value}
+              value={field.value || "none"}
             >
               <FormControl>
                 <SelectTrigger className="bg-white">

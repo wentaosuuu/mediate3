@@ -12,16 +12,17 @@ const roleAssociationModule = {
    * @param roleId 角色ID
    */
   handle: async (userId: string, roleId: string): Promise<void> => {
-    console.log(`处理用户(${userId})与角色(${roleId})的关联`);
+    console.log(`处理用户(${userId})与角色(${roleId})的关联，开始处理...`);
     
     if (!userId) {
       console.error("处理角色关联失败: 用户ID为空");
       throw new Error("用户ID不能为空");
     }
     
-    if (!roleId) {
-      console.error("处理角色关联失败: 角色ID为空");
-      throw new Error("角色ID不能为空");
+    // 如果角色ID为"none"或者空字符串，则移除角色关联
+    if (!roleId || roleId === "none") {
+      console.log(`角色ID为空或"none"，将移除用户(${userId})的角色关联`);
+      return await roleAssociationModule.remove(userId);
     }
     
     try {
@@ -88,7 +89,7 @@ const roleAssociationModule = {
    * @param userId 用户ID
    */
   remove: async (userId: string): Promise<void> => {
-    console.log(`移除用户(${userId})的角色关联`);
+    console.log(`移除用户(${userId})的角色关联，开始处理...`);
     
     if (!userId) {
       console.error("移除角色关联失败: 用户ID为空");
@@ -96,6 +97,26 @@ const roleAssociationModule = {
     }
     
     try {
+      // 检查用户是否有角色关联
+      const { data: existingRoles, error: checkError } = await supabase
+        .from('user_roles')
+        .select('id')
+        .eq('user_id', userId);
+      
+      if (checkError) {
+        console.error("检查用户角色关联失败:", checkError);
+        throw checkError;
+      }
+      
+      // 如果用户没有角色关联，直接返回
+      if (!existingRoles || existingRoles.length === 0) {
+        console.log(`用户(${userId})没有角色关联，无需移除`);
+        return;
+      }
+      
+      console.log(`发现用户(${userId})的角色关联，准备移除...`);
+      
+      // 移除用户的角色关联
       const { data, error } = await supabase
         .from('user_roles')
         .delete()

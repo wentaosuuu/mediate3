@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import UserFormContent from './user-form/UserFormContent';
 import { UserFormValues } from './user-form/UserFormSchema';
@@ -29,13 +29,15 @@ const UserFormDialog = ({
 }: UserFormDialogProps) => {
   // 使用ref标记表单是否已提交，防止重复提交
   const isSubmitting = useRef(false);
+  // 本地状态跟踪表单提交状态
+  const [isSubmittingState, setIsSubmittingState] = useState(false);
   
   // 使用表单钩子
   const { form, handleSubmit, resetForm, isLocalLoading, setLocalLoading } = useUserForm(
     currentUser, 
     async (values) => {
       // 防止重复提交
-      if (isSubmitting.current) {
+      if (isSubmitting.current || isSubmittingState) {
         console.log("表单正在提交中，忽略重复请求");
         toast.info("正在处理，请稍候...");
         return false;
@@ -43,6 +45,7 @@ const UserFormDialog = ({
       
       console.log("UserFormDialog - 提交表单开始", values);
       isSubmitting.current = true;
+      setIsSubmittingState(true);
       setLocalLoading(true);
       toast.loading("正在保存用户数据...");
       
@@ -76,6 +79,7 @@ const UserFormDialog = ({
         // 无论成功还是失败，都重置提交状态和加载状态
         setTimeout(() => {
           isSubmitting.current = false;
+          setIsSubmittingState(false);
           setLocalLoading(false);
           toast.dismiss(); // 清除所有loading toast
         }, 500);
@@ -88,7 +92,7 @@ const UserFormDialog = ({
   // 处理对话框关闭
   const handleOpenChange = (open: boolean) => {
     // 如果正在提交，阻止关闭
-    if (isSubmitting.current && open === false) {
+    if ((isSubmitting.current || isSubmittingState) && open === false) {
       console.log("表单正在提交中，阻止关闭对话框");
       toast.info("表单正在提交中，请稍候...");
       return;
@@ -98,6 +102,7 @@ const UserFormDialog = ({
       console.log("对话框关闭，重置表单");
       // 清除提交状态
       isSubmitting.current = false;
+      setIsSubmittingState(false);
       // 重置表单
       resetForm();
     }
@@ -107,7 +112,7 @@ const UserFormDialog = ({
 
   // 处理取消按钮点击
   const handleCancel = () => {
-    if (isSubmitting.current) {
+    if (isSubmitting.current || isSubmittingState) {
       console.log("表单正在提交中，阻止取消操作");
       toast.info("正在处理，请稍候...");
       return;
@@ -118,7 +123,7 @@ const UserFormDialog = ({
   };
 
   // 综合加载状态
-  const combinedLoading = isLoading || isLocalLoading || isSubmitting.current;
+  const combinedLoading = isLoading || isLocalLoading || isSubmitting.current || isSubmittingState;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
