@@ -34,11 +34,10 @@ const roleAssociationModule = {
         const existingRoleId = existingRoles[0].id;
         console.log(`用户已有角色关联(ID:${existingRoleId})，将更新为角色ID:${roleId}`);
         
-        const { data: updateData, error: updateError } = await supabase
+        const { error: updateError } = await supabase
           .from('user_roles')
           .update({ role_id: roleId })
-          .eq('id', existingRoleId)
-          .select();
+          .eq('id', existingRoleId);
         
         if (updateError) {
           console.error("更新用户角色关联失败:", updateError);
@@ -46,18 +45,17 @@ const roleAssociationModule = {
           throw updateError;
         }
         
-        console.log(`成功更新用户(${userId})的角色为(${roleId})`, updateData);
+        console.log(`成功更新用户(${userId})的角色为(${roleId})`);
       } else {
         // 用户没有角色，创建新关联
         console.log(`用户没有现有角色关联，将创建新关联，用户ID:${userId}, 角色ID:${roleId}`);
         
-        const { data: insertData, error: insertError } = await supabase
+        const { error: insertError } = await supabase
           .from('user_roles')
           .insert({
             user_id: userId,
             role_id: roleId
-          })
-          .select();
+          });
         
         if (insertError) {
           console.error("创建用户角色关联失败:", insertError);
@@ -65,7 +63,7 @@ const roleAssociationModule = {
           throw insertError;
         }
         
-        console.log(`成功创建用户(${userId})与角色(${roleId})的关联`, insertData);
+        console.log(`成功创建用户(${userId})与角色(${roleId})的关联`);
       }
     } catch (error) {
       console.error("处理用户-角色关联过程中发生错误:", error);
@@ -81,11 +79,10 @@ const roleAssociationModule = {
     console.log(`移除用户(${userId})的角色关联`);
     
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('user_roles')
         .delete()
-        .eq('user_id', userId)
-        .select();
+        .eq('user_id', userId);
       
       if (error) {
         console.error("移除用户角色关联失败:", error);
@@ -93,7 +90,7 @@ const roleAssociationModule = {
         throw error;
       }
       
-      console.log(`成功移除用户(${userId})的角色关联`, data);
+      console.log(`成功移除用户(${userId})的角色关联`);
     } catch (error) {
       console.error("移除用户-角色关联过程中发生错误:", error);
       throw error;

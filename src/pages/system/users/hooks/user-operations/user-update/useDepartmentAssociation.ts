@@ -34,11 +34,10 @@ const departmentAssociationModule = {
         const existingDeptId = existingDepts[0].id;
         console.log(`用户已有部门关联(ID:${existingDeptId})，将更新为部门ID:${departmentId}`);
         
-        const { data: updateData, error: updateError } = await supabase
+        const { error: updateError } = await supabase
           .from('user_departments')
           .update({ department_id: departmentId })
-          .eq('id', existingDeptId)
-          .select();
+          .eq('id', existingDeptId);
         
         if (updateError) {
           console.error("更新用户部门关联失败:", updateError);
@@ -46,18 +45,17 @@ const departmentAssociationModule = {
           throw updateError;
         }
         
-        console.log(`成功更新用户(${userId})的部门为(${departmentId})`, updateData);
+        console.log(`成功更新用户(${userId})的部门为(${departmentId})`);
       } else {
         // 用户没有部门，创建新关联
         console.log(`用户没有现有部门关联，将创建新关联，用户ID:${userId}, 部门ID:${departmentId}`);
         
-        const { data: insertData, error: insertError } = await supabase
+        const { error: insertError } = await supabase
           .from('user_departments')
           .insert({
             user_id: userId,
             department_id: departmentId
-          })
-          .select();
+          });
         
         if (insertError) {
           console.error("创建用户部门关联失败:", insertError);
@@ -65,7 +63,7 @@ const departmentAssociationModule = {
           throw insertError;
         }
         
-        console.log(`成功创建用户(${userId})与部门(${departmentId})的关联`, insertData);
+        console.log(`成功创建用户(${userId})与部门(${departmentId})的关联`);
       }
     } catch (error) {
       console.error("处理用户-部门关联过程中发生错误:", error);
@@ -81,11 +79,10 @@ const departmentAssociationModule = {
     console.log(`移除用户(${userId})的部门关联`);
     
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('user_departments')
         .delete()
-        .eq('user_id', userId)
-        .select();
+        .eq('user_id', userId);
       
       if (error) {
         console.error("移除用户部门关联失败:", error);
@@ -93,7 +90,7 @@ const departmentAssociationModule = {
         throw error;
       }
       
-      console.log(`成功移除用户(${userId})的部门关联`, data);
+      console.log(`成功移除用户(${userId})的部门关联`);
     } catch (error) {
       console.error("移除用户-部门关联过程中发生错误:", error);
       throw error;

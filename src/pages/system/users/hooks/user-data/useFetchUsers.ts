@@ -63,18 +63,18 @@ export const useFetchUsers = () => {
       // 合并用户数据、部门和角色信息
       const enhancedUsers = userData.map(user => {
         // 查找用户对应的部门信息
-        const userDept = userDepartments?.find(d => d.user_id === user.id);
+        const userDept = userDepartments?.filter(d => d.user_id === user.id) || [];
         // 查找用户对应的角色信息
-        const userRole = userRoles?.find(r => r.user_id === user.id);
+        const userRole = userRoles?.filter(r => r.user_id === user.id) || [];
         
         return {
           ...user,
           // 添加部门相关字段
-          department_id: userDept?.department_id || "",
-          department_name: userDept?.departments?.name || "无部门",
+          department_id: userDept[0]?.department_id || "",
+          department_name: userDept[0]?.departments?.name || "无部门",
           // 添加角色相关字段
-          role_id: userRole?.role_id || "",
-          role_name: userRole?.roles?.name || "无角色",
+          role_id: userRole[0]?.role_id || "",
+          role_name: userRole[0]?.roles?.name || "无角色",
         };
       });
       
