@@ -35,7 +35,7 @@ export const useUserData = () => {
   const isRefreshing = useRef(false);
   
   // 包装刷新函数，避免重复创建函数实例导致useEffect无限循环
-  const refreshAllData = useCallback(async () => {
+  const refreshAllData = useCallback(async (): Promise<void> => {
     // 使用 ref 避免并发刷新请求
     if (isRefreshing.current) {
       console.log("数据刷新已在进行中，跳过重复请求");
@@ -52,10 +52,8 @@ export const useUserData = () => {
       await fetchRoles();
       await fetchUsers();
       console.log("所有用户相关数据加载完成！");
-      return true;
     } catch (error) {
       console.error("加载数据过程中发生错误:", error);
-      return false;
     } finally {
       isRefreshing.current = false;
       setIsLoading(false); // 恢复外部加载状态
