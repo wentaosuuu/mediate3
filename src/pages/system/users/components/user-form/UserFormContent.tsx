@@ -33,7 +33,7 @@ const UserFormContent = ({
   // 添加处理表单提交的函数，确保事件正确触发
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault(); // 阻止默认提交行为
-    console.log("表单提交被触发");
+    console.log("表单提交被触发，准备处理数据");
     onSubmit(); // 调用传入的onSubmit函数
   };
 

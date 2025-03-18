@@ -46,7 +46,7 @@ const Users = () => {
       
       {/* 添加Sonner提示组件 */}
       <Toaster 
-        position="top-right" 
+        position="top-center" 
         expand={true} 
         richColors 
         closeButton 

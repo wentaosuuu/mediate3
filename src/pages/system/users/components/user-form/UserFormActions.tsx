@@ -23,7 +23,6 @@ const UserFormActions = ({
       <Button 
         type="submit" 
         disabled={isLoading}
-        onClick={() => console.log("保存按钮被点击")}
       >
         {isLoading ? "处理中..." : currentUser ? "保存" : "创建"}
       </Button>
