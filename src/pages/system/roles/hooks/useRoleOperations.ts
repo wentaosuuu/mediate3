@@ -49,7 +49,7 @@ export const useRoleOperations = (fetchRoles: () => Promise<void>) => {
   };
 
   // 处理角色创建或更新
-  const handleRoleSubmit = async (values: any, rolePermissions: string[], currentRole: any | null) => {
+  const handleRoleSubmit = async (values: any, rolePermissions: string[], currentRole: any | null): Promise<void> => {
     setIsLoading(true);
     try {
       if (currentRole) {
@@ -129,7 +129,7 @@ export const useRoleOperations = (fetchRoles: () => Promise<void>) => {
       
       // 刷新角色列表
       fetchRoles();
-      return true;
+      // 移除返回值 true
     } catch (error) {
       console.error('角色操作失败:', error);
       uiToast({
@@ -137,7 +137,7 @@ export const useRoleOperations = (fetchRoles: () => Promise<void>) => {
         description: (error as Error).message,
         variant: "destructive",
       });
-      return false;
+      // 移除返回值 false
     } finally {
       setIsLoading(false);
     }

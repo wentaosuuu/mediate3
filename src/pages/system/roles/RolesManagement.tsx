@@ -47,8 +47,8 @@ const RolesManagement = () => {
   const isLoading = dataLoading || operationsLoading;
   
   // 角色表单提交处理
-  const onRoleSubmit = (values: any, rolePermissions: string[]) => {
-    return handleRoleSubmit(values, rolePermissions, currentRole);
+  const onRoleSubmit = async (values: any, rolePermissions: string[]) => {
+    await handleRoleSubmit(values, rolePermissions, currentRole);
   };
 
   return (
