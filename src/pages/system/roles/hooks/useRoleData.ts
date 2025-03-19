@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -24,8 +25,7 @@ export const useRoleData = () => {
           description, 
           tenant_id, 
           created_at, 
-          updated_at,
-          data_permission_type
+          updated_at
         `);
 
       if (error) {
@@ -38,10 +38,14 @@ export const useRoleData = () => {
             variant: "destructive",
           });
         } else {
-          throw error;
+          uiToast({
+            title: "获取角色列表失败",
+            description: error.message,
+            variant: "destructive",
+          });
         }
         // 使用模拟数据
-        setRoles([
+        const mockData = [
           { 
             id: '1', 
             name: '管理员', 
@@ -56,8 +60,11 @@ export const useRoleData = () => {
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           }
-        ]);
+        ];
+        console.log("使用模拟角色数据:", mockData);
+        setRoles(mockData);
       } else {
+        console.log("成功获取角色数据:", data);
         setRoles(data || []);
       }
     } catch (error) {
@@ -67,6 +74,23 @@ export const useRoleData = () => {
         description: (error as Error).message,
         variant: "destructive",
       });
+      // 确保在发生异常时也设置一些默认数据
+      setRoles([
+        { 
+          id: '1', 
+          name: '管理员', 
+          description: '系统管理员，拥有所有权限', 
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        },
+        { 
+          id: '2', 
+          name: '普通用户', 
+          description: '普通用户，拥有基本操作权限', 
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+      ]);
     } finally {
       setIsLoading(false);
     }

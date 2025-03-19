@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import RolesSearch from './components/RolesSearch';
@@ -48,11 +48,17 @@ const RolesManagement = () => {
   
   // 合并加载状态
   const isLoading = dataLoading || operationsLoading;
-  
+
   // 角色表单提交处理
   const onRoleSubmit = async (values: any, rolePermissions: string[]) => {
     await handleRoleSubmit(values, rolePermissions, currentRole);
   };
+
+  // 用于调试
+  useEffect(() => {
+    console.log('当前角色列表数据:', roles);
+    console.log('过滤后的角色列表:', filteredRoles);
+  }, [roles, filteredRoles]);
 
   return (
     <div className="p-6">
