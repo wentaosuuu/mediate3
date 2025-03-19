@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,7 +8,7 @@ import RolesSearch from './components/RolesSearch';
 import RolesTable from './components/RolesTable';
 import RoleFormDialog from './components/RoleFormDialog';
 import DataPermissionDialog from './components/DataPermissionDialog';
-import { toast } from 'sonner';
+import { toast as sonnerToast } from 'sonner';
 
 // 角色管理组件
 const RolesManagement = () => {
@@ -301,13 +302,15 @@ const RolesManagement = () => {
         
       if (error) throw error;
       
-      uiToast.success('数据权限设置成功');
+      // 使用sonner的toast显示成功信息
+      sonnerToast.success('数据权限设置成功');
       
       // 刷新角色列表
       fetchRoles();
     } catch (error) {
       console.error('保存数据权限失败:', error);
-      uiToast.error('保存数据权限失败: ' + (error as Error).message);
+      // 使用sonner的toast显示错误信息
+      sonnerToast.error('保存数据权限失败: ' + (error as Error).message);
       throw error;
     }
   };
