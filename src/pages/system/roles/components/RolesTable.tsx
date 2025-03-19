@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Key } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -24,10 +24,11 @@ interface RolesTableProps {
   isLoading: boolean;
   onEdit: (role: Role) => void;
   onDelete: (roleId: string) => void;
+  onDataPermission: (role: Role) => void; // 新增数据权限处理函数
 }
 
 // 角色表格组件
-const RolesTable = ({ roles, isLoading, onEdit, onDelete }: RolesTableProps) => {
+const RolesTable = ({ roles, isLoading, onEdit, onDelete, onDataPermission }: RolesTableProps) => {
   return (
     <div className="rounded-md border">
       <Table>
@@ -61,10 +62,13 @@ const RolesTable = ({ roles, isLoading, onEdit, onDelete }: RolesTableProps) => 
                 <TableCell>{new Date(role.created_at).toLocaleString()}</TableCell>
                 <TableCell>{role.updated_at ? new Date(role.updated_at).toLocaleString() : '-'}</TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="sm" onClick={() => onEdit(role)}>
+                  <Button variant="ghost" size="sm" onClick={() => onDataPermission(role)} title="数据权限">
+                    <Key className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => onEdit(role)} title="编辑">
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => onDelete(role.id)}>
+                  <Button variant="ghost" size="sm" onClick={() => onDelete(role.id)} title="删除">
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </TableCell>

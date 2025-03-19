@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,8 @@ import { useToast } from "@/hooks/use-toast";
 import RolesSearch from './components/RolesSearch';
 import RolesTable from './components/RolesTable';
 import RoleFormDialog from './components/RoleFormDialog';
+import DataPermissionDialog from './components/DataPermissionDialog';
+import { toast } from 'sonner';
 
 // 角色管理组件
 const RolesManagement = () => {
@@ -16,7 +17,11 @@ const RolesManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentRole, setCurrentRole] = useState<any>(null);
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
+  
+  // 数据权限弹窗状态
+  const [isDataPermissionDialogOpen, setIsDataPermissionDialogOpen] = useState(false);
+  const [dataPermissionRole, setDataPermissionRole] = useState<any>(null);
 
   // 获取角色列表
   const fetchRoles = async () => {
@@ -37,7 +42,7 @@ const RolesManagement = () => {
         console.log("获取角色列表错误：", error);
         // 如果表不存在，显示提示信息
         if (error.code === "42P01") {
-          toast({
+          uiToast({
             title: "角色表不存在",
             description: "需要先创建角色表并配置相关权限",
             variant: "destructive",
@@ -67,7 +72,7 @@ const RolesManagement = () => {
       }
     } catch (error) {
       console.error('获取角色列表失败:', error);
-      toast({
+      uiToast({
         title: "获取角色列表失败",
         description: (error as Error).message,
         variant: "destructive",
@@ -140,6 +145,12 @@ const RolesManagement = () => {
     setCurrentRole(role);
     setIsDialogOpen(true);
   };
+  
+  // 打开数据权限对话框
+  const openDataPermissionDialog = (role: any) => {
+    setDataPermissionRole(role);
+    setIsDataPermissionDialogOpen(true);
+  };
 
   // 删除角色
   const deleteRole = async (roleId: string) => {
@@ -153,7 +164,7 @@ const RolesManagement = () => {
 
       if (error) {
         if (error.code === "42P01") {
-          toast({
+          uiToast({
             title: "角色表不存在",
             description: "需要先创建角色表",
             variant: "destructive",
@@ -162,14 +173,14 @@ const RolesManagement = () => {
           throw error;
         }
       } else {
-        toast({
+        uiToast({
           title: "角色删除成功",
         });
         fetchRoles();
       }
     } catch (error) {
       console.error('删除角色失败:', error);
-      toast({
+      uiToast({
         title: "删除角色失败",
         description: (error as Error).message,
         variant: "destructive",
@@ -216,7 +227,7 @@ const RolesManagement = () => {
           }
         }
         
-        toast({
+        uiToast({
           title: "角色更新成功",
           description: `角色 ${values.name} 已更新`,
         });
@@ -250,7 +261,7 @@ const RolesManagement = () => {
           }
         }
         
-        toast({
+        uiToast({
           title: "角色创建成功",
           description: `角色 ${values.name} 已创建`,
         });
@@ -261,13 +272,43 @@ const RolesManagement = () => {
       setIsDialogOpen(false);
     } catch (error) {
       console.error('角色操作失败:', error);
-      toast({
+      uiToast({
         title: "角色操作失败",
         description: (error as Error).message,
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // 保存数据权限
+  const handleSaveDataPermission = async (
+    roleId: string, 
+    permissionCode: string, 
+    permissionType: string
+  ) => {
+    try {
+      // 将数据权限保存到角色表中
+      const { error } = await supabase
+        .from('roles')
+        .update({
+          permission_code: permissionCode,
+          data_permission_type: permissionType,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', roleId);
+        
+      if (error) throw error;
+      
+      uiToast.success('数据权限设置成功');
+      
+      // 刷新角色列表
+      fetchRoles();
+    } catch (error) {
+      console.error('保存数据权限失败:', error);
+      uiToast.error('保存数据权限失败: ' + (error as Error).message);
+      throw error;
     }
   };
 
@@ -296,7 +337,8 @@ const RolesManagement = () => {
         roles={filteredRoles} 
         isLoading={isLoading} 
         onEdit={openEditDialog} 
-        onDelete={deleteRole} 
+        onDelete={deleteRole}
+        onDataPermission={openDataPermissionDialog}
       />
 
       <RoleFormDialog 
@@ -307,6 +349,13 @@ const RolesManagement = () => {
         fetchRolePermissions={fetchRolePermissions}
         onSubmit={handleRoleSubmit}
         isLoading={isLoading}
+      />
+      
+      <DataPermissionDialog
+        isOpen={isDataPermissionDialogOpen}
+        setIsOpen={setIsDataPermissionDialogOpen}
+        role={dataPermissionRole}
+        onSave={handleSaveDataPermission}
       />
     </div>
   );
