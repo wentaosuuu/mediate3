@@ -11,7 +11,10 @@ import { useRoleDialog } from './hooks/useRoleDialog';
 import { useRoleOperations } from './hooks/useRoleOperations';
 import { useRoleSearch } from './hooks/useRoleSearch';
 
-// 角色管理组件
+/**
+ * 角色管理组件
+ * 整合角色管理的各个功能模块
+ */
 const RolesManagement = () => {
   // 使用钩子获取数据和状态管理
   const { 
