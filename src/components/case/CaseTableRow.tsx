@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { Case } from '@/types/case';
 
@@ -51,16 +50,6 @@ export const CaseTableRow = ({ caseItem, visibleColumns = [] }: CaseTableRowProp
       {columnsToShow.map(column => (
         React.cloneElement(cellRenderers[column] as React.ReactElement, { key: column })
       ))}
-      <TableCell className="w-[120px]">
-        <div className="space-x-2">
-          <Button size="sm" variant="outline">
-            编辑
-          </Button>
-          <Button size="sm" variant="outline">
-            删除
-          </Button>
-        </div>
-      </TableCell>
     </TableRow>
   );
 };

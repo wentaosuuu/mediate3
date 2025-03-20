@@ -9,32 +9,65 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 export const CaseTable = ({ data, isLoading, visibleColumns = [] }: CaseTableProps) => {
   return (
     <div className="bg-white rounded-lg shadow-sm">
-      <ScrollArea className="w-full">
-        <div className="min-w-max">
-          <Table>
-            <CaseTableHeader visibleColumns={visibleColumns} />
-            <TableBody>
-              {isLoading ? (
+      {/* 使用相对定位包装外层容器 */}
+      <div className="relative">
+        {/* 表格可滚动区域 */}
+        <ScrollArea className="w-full">
+          <div className="min-w-max overflow-x-auto">
+            <Table>
+              <CaseTableHeader visibleColumns={visibleColumns} />
+              <TableBody>
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={visibleColumns.length + 1} className="text-center py-4">
+                      加载中...
+                    </td>
+                  </tr>
+                ) : data.length === 0 ? (
+                  <tr>
+                    <td colSpan={visibleColumns.length + 1} className="text-center py-4 text-gray-500">
+                      暂无数据
+                    </td>
+                  </tr>
+                ) : (
+                  data.map((caseItem) => (
+                    <CaseTableRow key={caseItem.id} caseItem={caseItem} visibleColumns={visibleColumns} />
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </ScrollArea>
+        
+        {/* 固定在右侧的操作列 - 只在有数据时显示 */}
+        {!isLoading && data.length > 0 && (
+          <div className="absolute top-0 right-0 h-full bg-white shadow-[-4px_0px_6px_-2px_rgba(0,0,0,0.05)]">
+            <table className="h-full">
+              <thead>
                 <tr>
-                  <td colSpan={visibleColumns.length + 1} className="text-center py-4">
-                    加载中...
-                  </td>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">操作</th>
                 </tr>
-              ) : data.length === 0 ? (
-                <tr>
-                  <td colSpan={visibleColumns.length + 1} className="text-center py-4 text-gray-500">
-                    暂无数据
-                  </td>
-                </tr>
-              ) : (
-                data.map((caseItem) => (
-                  <CaseTableRow key={caseItem.id} caseItem={caseItem} visibleColumns={visibleColumns} />
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </ScrollArea>
+              </thead>
+              <tbody>
+                {data.map((caseItem) => (
+                  <tr key={`action-${caseItem.id}`}>
+                    <td className="p-4 align-middle">
+                      <div className="space-x-2">
+                        <button className="px-2 py-1 text-xs rounded border border-gray-200 hover:bg-gray-50">
+                          编辑
+                        </button>
+                        <button className="px-2 py-1 text-xs rounded border border-gray-200 hover:bg-gray-50">
+                          删除
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

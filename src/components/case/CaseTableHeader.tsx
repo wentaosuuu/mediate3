@@ -43,7 +43,6 @@ export const CaseTableHeader = ({ visibleColumns = [] }: CaseTableHeaderProps) =
             {columnTitles[column]}
           </TableHead>
         ))}
-        <TableHead className="whitespace-nowrap min-w-[120px]">操作</TableHead>
       </TableRow>
     </TableHeader>
   );
