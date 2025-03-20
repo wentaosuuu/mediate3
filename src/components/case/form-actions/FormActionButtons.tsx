@@ -37,12 +37,8 @@ export const FormActionButtons: React.FC<FormActionButtonsProps> = ({
   onReset
 }) => {
   return (
-    <div className="mt-4 flex justify-between">
+    <div className="mt-4 flex flex-wrap justify-between">
       <div className="flex flex-wrap gap-2">
-        <ColumnSelector 
-          visibleColumns={visibleColumns} 
-          onChange={onColumnsChange} 
-        />
         <Button type="button" onClick={onAddCase}>
           <Plus className="mr-2 h-4 w-4" />
           新增
@@ -67,8 +63,12 @@ export const FormActionButtons: React.FC<FormActionButtonsProps> = ({
           <FileDown className="mr-2 h-4 w-4" />
           下载案件导入模板
         </Button>
+        <ColumnSelector 
+          visibleColumns={visibleColumns} 
+          onChange={onColumnsChange} 
+        />
       </div>
-      <div className="space-x-2">
+      <div className="flex gap-2 mt-2 md:mt-0">
         <Button variant="outline" type="button" onClick={onReset}>
           <Filter className="mr-2 h-4 w-4" />
           重置

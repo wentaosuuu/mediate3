@@ -36,11 +36,14 @@ export const CaseTableHeader = ({ visibleColumns = [] }: CaseTableHeaderProps) =
     <TableHeader>
       <TableRow>
         {columnsToShow.map(column => (
-          <TableHead key={column} className={`${column === 'customerName' ? 'w-[100px]' : 'w-[120px]'}`}>
+          <TableHead 
+            key={column} 
+            className="whitespace-nowrap min-w-[120px]"
+          >
             {columnTitles[column]}
           </TableHead>
         ))}
-        <TableHead className="w-[120px]">操作</TableHead>
+        <TableHead className="whitespace-nowrap min-w-[120px]">操作</TableHead>
       </TableRow>
     </TableHeader>
   );
