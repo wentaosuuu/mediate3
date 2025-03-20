@@ -6,11 +6,12 @@ import { TopBar } from '@/components/dashboard/TopBar';
 import { MainContent } from '@/components/dashboard/MainContent';
 import { CaseDistributionLayout } from '@/components/case/CaseDistributionLayout';
 import { useCaseDistribution } from '@/hooks/useCaseDistribution';
-import { supabase } from "@/integrations/supabase/client";
+import { useUserInfo } from '@/hooks/useUserInfo';
 import { Toaster } from 'sonner';
 
 const CaseDistribution = () => {
   const navigate = useNavigate();
+  const { handleLogout } = useUserInfo();
   const { 
     searchQuery,
     cases,
@@ -37,10 +38,11 @@ const CaseDistribution = () => {
     navigate(path);
   };
 
-  const handleLogout = async () => {
-    // 退出登录时清除supabase session
-    await supabase.auth.signOut();
-    navigate('/');
+  const onLogout = async () => {
+    const success = await handleLogout();
+    if (success) {
+      navigate('/');
+    }
   };
 
   return (
@@ -57,7 +59,7 @@ const CaseDistribution = () => {
           username={userInfo.username}
           department={userInfo.department}
           role={userInfo.role}
-          onLogout={handleLogout}
+          onLogout={onLogout}
           onSearch={handleSearch}
           searchQuery={searchQuery}
         />

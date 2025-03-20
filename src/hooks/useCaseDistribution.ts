@@ -1,9 +1,17 @@
 
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { Case } from '@/types/case';
 import { toast } from 'sonner';
 import { useUserInfo } from './useUserInfo';
+import { 
+  handleAddCase, 
+  handleImportCases, 
+  handleExportCases, 
+  handleSelectedDistribution, 
+  handleOneClickClose, 
+  handleDownloadTemplate,
+  handleColumnVisibilityChange
+} from '@/utils/caseManagementUtils';
 
 interface SearchParams {
   caseNumber?: string;
@@ -30,7 +38,7 @@ interface SearchParams {
 }
 
 export const useCaseDistribution = () => {
-  // 使用拆分后的用户信息钩子
+  // 使用useUserInfo钩子获取用户信息
   const { userInfo } = useUserInfo();
   
   // 搜索和筛选状态
@@ -69,40 +77,9 @@ export const useCaseDistribution = () => {
     setSearchParams({});
   };
 
-  // 处理添加案件
-  const handleAddCase = () => {
-    toast.info('添加案件功能即将上线');
-  };
-
-  // 处理导入案件
-  const handleImportCases = () => {
-    toast.info('导入案件功能即将上线');
-  };
-
-  // 处理导出案件
-  const handleExportCases = () => {
-    toast.info('导出案件功能即将上线');
-  };
-
-  // 处理列显示设置变更
-  const handleColumnVisibilityChange = (columns: string[]) => {
-    setVisibleColumns(columns);
-    toast.success('列显示设置已更新');
-  };
-
-  // 处理选中分案
-  const handleSelectedDistribution = () => {
-    toast.info('选中分案功能即将上线');
-  };
-
-  // 处理一键结案
-  const handleOneClickClose = () => {
-    toast.info('一键结案功能即将上线');
-  };
-
-  // 处理下载案件导入模板
-  const handleDownloadTemplate = () => {
-    toast.info('模板下载功能即将上线');
+  // 处理列显示设置的包装函数
+  const updateColumnVisibility = (columns: string[]) => {
+    handleColumnVisibilityChange(columns, setVisibleColumns);
   };
 
   return {
@@ -113,17 +90,17 @@ export const useCaseDistribution = () => {
     selectedDepartment,
     caseStatus,
     visibleColumns,
-    userInfo, // 直接从useUserInfo中获取的用户信息
+    userInfo,
     handleSearch,
     handleSearchCases,
     handleReset,
-    handleAddCase,
-    handleImportCases,
-    handleExportCases,
-    handleColumnVisibilityChange,
-    handleSelectedDistribution,
-    handleOneClickClose,
-    handleDownloadTemplate,
+    handleAddCase, // 直接从工具函数导出
+    handleImportCases, // 直接从工具函数导出
+    handleExportCases, // 直接从工具函数导出
+    handleColumnVisibilityChange: updateColumnVisibility, // 使用包装函数
+    handleSelectedDistribution, // 直接从工具函数导出
+    handleOneClickClose, // 直接从工具函数导出
+    handleDownloadTemplate, // 直接从工具函数导出
     setSelectedDepartment,
     setCaseStatus
   };
