@@ -127,6 +127,21 @@ const Roles = () => {
             border: '1px solid var(--border)',
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
             zIndex: 99999,
+          },
+          // 添加默认样式
+          success: {
+            style: {
+              backgroundColor: '#F2FCE2',  // 柔和的绿色背景
+              border: '1px solid #E6FACC',
+              color: '#2C7A15'  // 深绿色文字
+            }
+          },
+          error: {
+            style: {
+              backgroundColor: '#FFF0F0',  // 柔和的红色背景
+              border: '1px solid #FFCDD2',
+              color: '#ea384c'  // 红色文字
+            }
           }
         }}
       />

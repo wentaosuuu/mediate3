@@ -168,15 +168,27 @@ export const useRoleOperations = (fetchRoles: () => Promise<void>) => {
       
       console.log("数据权限保存成功:", data);
       
-      // 使用sonner的toast显示成功信息
-      sonnerToast.success('数据权限设置成功');
+      // 使用sonner的toast显示成功信息，添加绿色背景
+      sonnerToast.success('数据权限设置成功', {
+        style: { 
+          backgroundColor: '#F2FCE2',  // 柔和的绿色背景
+          border: '1px solid #E6FACC',
+          color: '#2C7A15'  // 深绿色文字
+        }
+      });
       
       // 刷新角色列表
       await fetchRoles();
     } catch (error) {
       console.error('保存数据权限失败:', error);
-      // 使用sonner的toast显示错误信息
-      sonnerToast.error('保存数据权限失败: ' + (error as Error).message);
+      // 使用sonner的toast显示错误信息，添加红色背景
+      sonnerToast.error('保存数据权限失败: ' + (error as Error).message, {
+        style: { 
+          backgroundColor: '#FFF0F0',  // 柔和的红色背景
+          border: '1px solid #FFCDD2',
+          color: '#ea384c'  // 红色文字
+        }
+      });
       throw error;
     }
   };
