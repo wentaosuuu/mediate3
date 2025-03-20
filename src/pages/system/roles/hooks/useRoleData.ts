@@ -25,7 +25,9 @@ export const useRoleData = () => {
           description, 
           tenant_id, 
           created_at, 
-          updated_at
+          updated_at,
+          permission_code,
+          data_permission_type
         `);
 
       if (error) {
@@ -51,14 +53,18 @@ export const useRoleData = () => {
             name: '管理员', 
             description: '系统管理员，拥有所有权限', 
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
+            permission_code: 'all',
+            data_permission_type: 'all'
           },
           { 
             id: '2', 
             name: '普通用户', 
             description: '普通用户，拥有基本操作权限', 
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
+            permission_code: 'dept',
+            data_permission_type: 'read'
           }
         ];
         console.log("使用模拟角色数据:", mockData);
@@ -81,14 +87,18 @@ export const useRoleData = () => {
           name: '管理员', 
           description: '系统管理员，拥有所有权限', 
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          permission_code: 'all',
+          data_permission_type: 'all'
         },
         { 
           id: '2', 
           name: '普通用户', 
           description: '普通用户，拥有基本操作权限', 
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          permission_code: 'dept',
+          data_permission_type: 'read'
         }
       ]);
     } finally {

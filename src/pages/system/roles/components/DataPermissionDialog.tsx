@@ -52,6 +52,7 @@ const DataPermissionDialog = ({ isOpen, setIsOpen, role, onSave }: DataPermissio
   // 当对话框打开时，重置表单状态
   React.useEffect(() => {
     if (isOpen && role) {
+      console.log("当前角色数据权限设置:", role);
       setPermissionCode(role.permission_code || 'all');
       setPermissionType(role.data_permission_type || 'all');
     }
@@ -62,6 +63,12 @@ const DataPermissionDialog = ({ isOpen, setIsOpen, role, onSave }: DataPermissio
     if (!role) return;
     
     try {
+      console.log("提交数据权限设置:", {
+        roleId: role.id,
+        permissionCode,
+        permissionType
+      });
+      
       setIsSubmitting(true);
       await onSave(role.id, permissionCode, permissionType);
       setIsOpen(false);
@@ -144,4 +151,3 @@ const DataPermissionDialog = ({ isOpen, setIsOpen, role, onSave }: DataPermissio
 };
 
 export default DataPermissionDialog;
-

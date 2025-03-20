@@ -422,25 +422,31 @@ export type Database = {
       roles: {
         Row: {
           created_at: string | null
+          data_permission_type: string | null
           description: string | null
           id: string
           name: string
+          permission_code: string | null
           tenant_id: string
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          data_permission_type?: string | null
           description?: string | null
           id?: string
           name: string
+          permission_code?: string | null
           tenant_id: string
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          data_permission_type?: string | null
           description?: string | null
           id?: string
           name?: string
+          permission_code?: string | null
           tenant_id?: string
           updated_at?: string | null
         }

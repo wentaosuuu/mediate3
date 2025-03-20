@@ -129,7 +129,6 @@ export const useRoleOperations = (fetchRoles: () => Promise<void>) => {
       
       // 刷新角色列表
       fetchRoles();
-      // 移除返回值 true
     } catch (error) {
       console.error('角色操作失败:', error);
       uiToast({
@@ -137,7 +136,6 @@ export const useRoleOperations = (fetchRoles: () => Promise<void>) => {
         description: (error as Error).message,
         variant: "destructive",
       });
-      // 移除返回值 false
     } finally {
       setIsLoading(false);
     }
@@ -150,23 +148,31 @@ export const useRoleOperations = (fetchRoles: () => Promise<void>) => {
     permissionType: string
   ) => {
     try {
+      console.log("保存数据权限", roleId, permissionCode, permissionType);
+      
       // 将数据权限保存到角色表中
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('roles')
         .update({
           permission_code: permissionCode,
           data_permission_type: permissionType,
           updated_at: new Date().toISOString()
         })
-        .eq('id', roleId);
+        .eq('id', roleId)
+        .select();
         
-      if (error) throw error;
+      if (error) {
+        console.error("数据权限保存错误:", error);
+        throw error;
+      }
+      
+      console.log("数据权限保存成功:", data);
       
       // 使用sonner的toast显示成功信息
       sonnerToast.success('数据权限设置成功');
       
       // 刷新角色列表
-      fetchRoles();
+      await fetchRoles();
     } catch (error) {
       console.error('保存数据权限失败:', error);
       // 使用sonner的toast显示错误信息
