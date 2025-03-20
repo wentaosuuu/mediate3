@@ -92,7 +92,7 @@ const DataPermissionDialog = ({ isOpen, setIsOpen, role, onSave }: DataPermissio
               <SelectTrigger id="permission-code">
                 <SelectValue placeholder="选择数据范围" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 {permissionCodes.map(code => (
                   <SelectItem key={code.value} value={code.value}>
                     {code.label}
@@ -112,7 +112,7 @@ const DataPermissionDialog = ({ isOpen, setIsOpen, role, onSave }: DataPermissio
               <SelectTrigger id="permission-type">
                 <SelectValue placeholder="选择权限类型" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 {permissionTypes.map(type => (
                   <SelectItem key={type.value} value={type.value}>
                     {type.label}
@@ -144,3 +144,4 @@ const DataPermissionDialog = ({ isOpen, setIsOpen, role, onSave }: DataPermissio
 };
 
 export default DataPermissionDialog;
+
