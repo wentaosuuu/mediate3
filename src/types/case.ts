@@ -1,3 +1,6 @@
+
+import { ReactNode } from "react";
+
 export interface Case {
   id: string;
   case_number: string;
@@ -21,4 +24,28 @@ export interface Case {
 export interface CaseTableProps {
   data: Case[];
   isLoading: boolean;
+  visibleColumns?: string[];
+}
+
+export interface CaseStatusTabsProps {
+  value: string;
+  onValueChange: (value: string) => void;
+}
+
+export interface DepartmentSidebarProps {
+  selectedDepartment: string;
+  onDepartmentSelect: (id: string) => void;
+}
+
+export interface CaseSearchFormProps {
+  onSearch: (values: any) => void;
+  onReset: () => void;
+  onAddCase: () => void;
+  onImportCases: () => void;
+  onExportCases: () => void;
+  onColumnsChange: (columns: string[]) => void;
+  visibleColumns: string[];
+  onSelectedDistribution: () => void;
+  onOneClickClose: () => void;
+  onDownloadTemplate: () => void;
 }

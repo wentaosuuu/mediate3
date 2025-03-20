@@ -1,26 +1,45 @@
+
 import React from 'react';
 import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
-export const CaseTableHeader = () => {
+// 定义列信息和标题的映射
+const columnTitles: Record<string, string> = {
+  caseNumber: '案件编号',
+  batchNumber: '批次编号',
+  borrowerNumber: '借据编号',
+  idNumber: '身份证号',
+  customerName: '客户姓名',
+  phone: '手机号',
+  productLine: '产品线',
+  receiver: '受托方',
+  adjuster: '调解员',
+  distributor: '分案员',
+  progressStatus: '跟进状态',
+  latestProgressTime: '最新跟进时间',
+  latestEditTime: '最新编辑时间',
+  caseEntryTime: '案件入库时间',
+  distributionTime: '分案时间',
+  resultTime: '结案时间'
+};
+
+interface CaseTableHeaderProps {
+  visibleColumns?: string[];
+}
+
+export const CaseTableHeader = ({ visibleColumns = [] }: CaseTableHeaderProps) => {
+  // 如果没有指定可见列，则默认显示所有列
+  const columnsToShow = visibleColumns.length > 0 
+    ? visibleColumns 
+    : Object.keys(columnTitles);
+
   return (
     <TableHeader>
       <TableRow>
-        <TableHead className="w-[120px]">案件编号</TableHead>
-        <TableHead className="w-[120px]">批次编号</TableHead>
-        <TableHead className="w-[120px]">借据编号</TableHead>
-        <TableHead className="w-[120px]">身份证号</TableHead>
-        <TableHead className="w-[100px]">客户姓名</TableHead>
-        <TableHead className="w-[120px]">手机号</TableHead>
-        <TableHead className="w-[100px]">产品线</TableHead>
-        <TableHead className="w-[100px]">受托方</TableHead>
-        <TableHead className="w-[100px]">调解员</TableHead>
-        <TableHead className="w-[100px]">分案员</TableHead>
-        <TableHead className="w-[100px]">跟进状态</TableHead>
-        <TableHead className="w-[150px]">最新跟进时间</TableHead>
-        <TableHead className="w-[150px]">最新编辑时间</TableHead>
-        <TableHead className="w-[150px]">案件入库时间</TableHead>
-        <TableHead className="w-[150px]">分案时间</TableHead>
-        <TableHead className="w-[150px]">结案时间</TableHead>
+        {columnsToShow.map(column => (
+          <TableHead key={column} className={`${column === 'customerName' ? 'w-[100px]' : 'w-[120px]'}`}>
+            {columnTitles[column]}
+          </TableHead>
+        ))}
         <TableHead className="w-[120px]">操作</TableHead>
       </TableRow>
     </TableHeader>
