@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { TimeUnitSelector } from './TimeUnitSelector';
 import { DepartmentSelector } from './DepartmentSelector';
-import { DateRange } from 'react-day-picker';
+import { DateRange } from '@/types/case';
 
 interface QuotaFormLeftProps {
   timeUnit: string;
