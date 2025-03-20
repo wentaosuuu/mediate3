@@ -24,7 +24,9 @@ import {
 } from '@/components/ui/form';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { ColumnSelector } from './ColumnSelector';
+import { DateRange } from '@/types/case';
 
+// 修改schema定义，确保DateRange类型正确
 const searchSchema = z.object({
   caseNumber: z.string().optional(),
   batchNumber: z.string().optional(),
@@ -40,19 +42,19 @@ const searchSchema = z.object({
   latestProgressTimeRange: z.object({
     from: z.date().optional(),
     to: z.date().optional()
-  }).optional(),
+  }).optional().transform(val => val ? { from: val.from || undefined, to: val.to || undefined } : undefined),
   latestEditTimeRange: z.object({
     from: z.date().optional(),
     to: z.date().optional()
-  }).optional(),
+  }).optional().transform(val => val ? { from: val.from || undefined, to: val.to || undefined } : undefined),
   caseEntryTimeRange: z.object({
     from: z.date().optional(),
     to: z.date().optional()
-  }).optional(),
+  }).optional().transform(val => val ? { from: val.from || undefined, to: val.to || undefined } : undefined),
   distributionTimeRange: z.object({
     from: z.date().optional(),
     to: z.date().optional()
-  }).optional(),
+  }).optional().transform(val => val ? { from: val.from || undefined, to: val.to || undefined } : undefined),
 });
 
 type SearchFormValues = z.infer<typeof searchSchema>;
@@ -258,7 +260,7 @@ export const CaseSearchForm = ({
               <FormItem>
                 <FormLabel>最新跟进时间</FormLabel>
                 <DateRangePicker 
-                  value={field.value}
+                  value={field.value as DateRange} 
                   onChange={field.onChange}
                 />
               </FormItem>
@@ -271,7 +273,7 @@ export const CaseSearchForm = ({
               <FormItem>
                 <FormLabel>最新编辑时间</FormLabel>
                 <DateRangePicker 
-                  value={field.value}
+                  value={field.value as DateRange}
                   onChange={field.onChange}
                 />
               </FormItem>
@@ -284,7 +286,7 @@ export const CaseSearchForm = ({
               <FormItem>
                 <FormLabel>分案时间</FormLabel>
                 <DateRangePicker 
-                  value={field.value}
+                  value={field.value as DateRange}
                   onChange={field.onChange}
                 />
               </FormItem>
@@ -297,7 +299,7 @@ export const CaseSearchForm = ({
               <FormItem>
                 <FormLabel>案件入库时间</FormLabel>
                 <DateRangePicker 
-                  value={field.value}
+                  value={field.value as DateRange}
                   onChange={field.onChange}
                 />
               </FormItem>

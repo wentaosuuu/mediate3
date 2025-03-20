@@ -1,6 +1,12 @@
 
 import { ReactNode } from "react";
 
+// 添加DateRange接口定义
+export interface DateRange {
+  from: Date | undefined;
+  to: Date | undefined;
+}
+
 export interface Case {
   id: string;
   case_number: string;
