@@ -9,7 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 export const CaseTable = ({ data, isLoading, visibleColumns = [] }: CaseTableProps) => {
   return (
     <div className="bg-white rounded-lg shadow-sm">
-      <ScrollArea className="w-full" orientation="horizontal">
+      <ScrollArea className="w-full">
         <div className="min-w-max">
           <Table>
             <CaseTableHeader visibleColumns={visibleColumns} />
