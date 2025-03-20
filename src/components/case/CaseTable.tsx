@@ -4,37 +4,38 @@ import { Table, TableBody } from '@/components/ui/table';
 import { CaseTableHeader } from './CaseTableHeader';
 import { CaseTableRow } from './CaseTableRow';
 import type { CaseTableProps } from '@/types/case';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 export const CaseTable = ({ data, isLoading, visibleColumns = [] }: CaseTableProps) => {
   return (
     <div className="bg-white rounded-lg shadow-sm">
       {/* 使用相对定位包装外层容器 */}
       <div className="relative overflow-hidden">
-        {/* 表格可滚动区域 - 只有表格内容可以滚动 */}
-        <div className="overflow-auto w-full" style={{ overflowX: 'auto', overflowY: 'hidden' }}>
-          <Table>
-            <CaseTableHeader visibleColumns={visibleColumns} />
-            <TableBody>
-              {isLoading ? (
-                <tr>
-                  <td colSpan={visibleColumns.length + 1} className="text-center py-4">
-                    加载中...
-                  </td>
-                </tr>
-              ) : data.length === 0 ? (
-                <tr>
-                  <td colSpan={visibleColumns.length + 1} className="text-center py-4 text-gray-500">
-                    暂无数据
-                  </td>
-                </tr>
-              ) : (
-                data.map((caseItem) => (
-                  <CaseTableRow key={caseItem.id} caseItem={caseItem} visibleColumns={visibleColumns} />
-                ))
-              )}
-            </TableBody>
-          </Table>
+        {/* 表格内容区域 - 只有表格数据部分可以滚动 */}
+        <div className="w-full">
+          <div className="overflow-x-auto">
+            <Table>
+              <CaseTableHeader visibleColumns={visibleColumns} />
+              <TableBody className="relative">
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={visibleColumns.length + 1} className="text-center py-4">
+                      加载中...
+                    </td>
+                  </tr>
+                ) : data.length === 0 ? (
+                  <tr>
+                    <td colSpan={visibleColumns.length + 1} className="text-center py-4 text-gray-500">
+                      暂无数据
+                    </td>
+                  </tr>
+                ) : (
+                  data.map((caseItem) => (
+                    <CaseTableRow key={caseItem.id} caseItem={caseItem} visibleColumns={visibleColumns} />
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
         
         {/* 固定在右侧的操作列 - 只在有数据时显示 */}
