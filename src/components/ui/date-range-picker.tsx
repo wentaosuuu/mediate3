@@ -11,6 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import type { DateRange as ReactDayPickerDateRange } from "react-day-picker";
 
 interface DateRangePickerProps {
   value?: DateRange;
@@ -66,8 +67,9 @@ export function DateRangePicker({ value, onChange, className }: DateRangePickerP
               from: value?.from,
               to: value?.to,
             }}
-            onSelect={(range) => {
-              onChange?.(range || undefined);
+            onSelect={(range: ReactDayPickerDateRange | undefined) => {
+              // 转换React Day Picker的DateRange到我们自定义的DateRange
+              onChange?.(range ? { from: range.from, to: range.to } : undefined);
             }}
             numberOfMonths={2}
           />
