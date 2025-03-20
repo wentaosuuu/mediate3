@@ -2,7 +2,7 @@
 import React from 'react';
 import { TimeUnitSelector } from './TimeUnitSelector';
 import { DepartmentSelector } from './DepartmentSelector';
-import { DateRange } from '@/types/case';
+import { DateRange } from '@/types/case'; // 确保从正确的路径导入
 
 interface QuotaFormLeftProps {
   timeUnit: string;

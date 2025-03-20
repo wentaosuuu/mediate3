@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DateRange } from '@/types/case';
+import { DateRange } from '@/types/case'; // 从我们自己的类型定义中导入
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 
 interface TimeUnitSelectorProps {

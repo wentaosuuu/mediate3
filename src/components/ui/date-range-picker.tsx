@@ -2,7 +2,7 @@
 import * as React from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, X } from "lucide-react";
-import { DateRange } from "@/types/case";
+import { DateRange } from "@/types/case"; // 更新为我们的类型定义
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
