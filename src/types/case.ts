@@ -1,7 +1,7 @@
 
 import { ReactNode } from "react";
 
-// 添加DateRange接口定义，确保与react-day-picker兼容
+// 修改DateRange接口定义，使其与react-day-picker兼容
 export interface DateRange {
   from: Date | undefined;
   to: Date | undefined;

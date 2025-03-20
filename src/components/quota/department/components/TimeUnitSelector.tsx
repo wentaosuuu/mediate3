@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Select,
@@ -6,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DateRange } from 'react-day-picker';
+import { DateRange } from '@/types/case';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 
 interface TimeUnitSelectorProps {
