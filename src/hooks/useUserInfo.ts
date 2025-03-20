@@ -47,6 +47,8 @@ export const useUserInfo = () => {
           return;
         }
         
+        console.log("当前登录用户ID:", user.id);
+        
         // 获取用户基本信息
         const { data: userData, error: userError } = await supabase
           .from('users')
@@ -76,6 +78,12 @@ export const useUserInfo = () => {
           role: userRole?.roles?.name || '无角色'
         });
         
+        console.log("已加载用户信息:", {
+          username: userData?.name || userData?.username,
+          department: userDept?.departments?.name,
+          role: userRole?.roles?.name
+        });
+        
       } catch (error) {
         console.error("获取用户信息失败:", error);
         // 出错时使用默认值
@@ -94,8 +102,22 @@ export const useUserInfo = () => {
     
   }, []);
 
+  // 登出功能
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      return true;
+    } catch (error) {
+      console.error("登出失败:", error);
+      toast.error("登出失败，请重试");
+      return false;
+    }
+  };
+
   return {
     userInfo,
-    isLoading
+    isLoading,
+    handleLogout
   };
 };
+

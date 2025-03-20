@@ -1,22 +1,21 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { MainContent } from '@/components/dashboard/MainContent';
 import { PurchaseForm } from '@/components/wallet/PurchaseForm';
+import { useUserInfo } from '@/hooks/useUserInfo';
 
 const Purchase = () => {
   const navigate = useNavigate();
+  const { userInfo, handleLogout } = useUserInfo();
 
-  // Mock user data - 实际项目中应该从认证系统获取
-  const mockUser = {
-    username: '张三',
-    department: '技术部',
-    role: '管理员'
-  };
-
-  const handleLogout = () => {
-    navigate('/');
+  const onLogout = async () => {
+    const success = await handleLogout();
+    if (success) {
+      navigate('/');
+    }
   };
 
   return (
@@ -30,14 +29,14 @@ const Purchase = () => {
 
       <div className="pl-64 min-h-screen">
         <TopBar
-          username={mockUser.username}
-          department={mockUser.department}
-          role={mockUser.role}
-          onLogout={handleLogout}
+          username={userInfo.username}
+          department={userInfo.department}
+          role={userInfo.role}
+          onLogout={onLogout}
           onSearch={() => {}}
           searchQuery=""
         />
-        <MainContent username={mockUser.username} currentPath="/wallet/purchase">
+        <MainContent username={userInfo.username} currentPath="/wallet/purchase">
           <PurchaseForm />
         </MainContent>
       </div>

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -7,20 +8,18 @@ import { MainContent } from '@/components/dashboard/MainContent';
 import { OrdersTable } from '@/components/wallet/OrdersTable';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useUserInfo } from '@/hooks/useUserInfo';
 
 const Orders = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { userInfo, handleLogout } = useUserInfo();
 
-  // Mock user data - 实际项目中应该从认证系统获取
-  const mockUser = {
-    username: '张三',
-    department: '技术部',
-    role: '管理员'
-  };
-
-  const handleLogout = () => {
-    navigate('/');
+  const onLogout = async () => {
+    const success = await handleLogout();
+    if (success) {
+      navigate('/');
+    }
   };
 
   // 获取订单列表数据
@@ -82,14 +81,14 @@ const Orders = () => {
 
       <div className="pl-64 min-h-screen">
         <TopBar
-          username={mockUser.username}
-          department={mockUser.department}
-          role={mockUser.role}
-          onLogout={handleLogout}
+          username={userInfo.username}
+          department={userInfo.department}
+          role={userInfo.role}
+          onLogout={onLogout}
           onSearch={() => {}}
           searchQuery=""
         />
-        <MainContent username={mockUser.username} currentPath="/wallet/orders">
+        <MainContent username={userInfo.username} currentPath="/wallet/orders">
           <OrdersTable 
             data={orders || []} 
             isLoading={isLoadingOrders} 
