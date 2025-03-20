@@ -38,7 +38,7 @@ export const CaseTableHeader = ({ visibleColumns = [] }: CaseTableHeaderProps) =
         {columnsToShow.map(column => (
           <TableHead 
             key={column} 
-            className="whitespace-nowrap min-w-[120px]"
+            className="whitespace-normal text-xs"
           >
             {columnTitles[column]}
           </TableHead>

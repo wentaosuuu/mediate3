@@ -22,22 +22,22 @@ export const CaseTableRow = ({ caseItem, visibleColumns = [] }: CaseTableRowProp
 
   // 将每个字段的渲染逻辑映射到一个对象中
   const cellRenderers: Record<string, React.ReactNode> = {
-    caseNumber: <TableCell className="w-[120px] truncate">{caseItem.case_number}</TableCell>,
-    batchNumber: <TableCell className="w-[120px] truncate">{caseItem.batch_number}</TableCell>,
-    borrowerNumber: <TableCell className="w-[120px] truncate">{caseItem.borrower_number}</TableCell>,
-    idNumber: <TableCell className="w-[120px] truncate">{caseItem.id_number}</TableCell>,
-    customerName: <TableCell className="w-[100px] truncate">{caseItem.customer_name}</TableCell>,
-    phone: <TableCell className="w-[120px] truncate">{caseItem.phone || '-'}</TableCell>,
-    productLine: <TableCell className="w-[100px] truncate">{caseItem.product_line || '-'}</TableCell>,
-    receiver: <TableCell className="w-[100px] truncate">{caseItem.receiver || '-'}</TableCell>,
-    adjuster: <TableCell className="w-[100px] truncate">{caseItem.adjuster || '-'}</TableCell>,
-    distributor: <TableCell className="w-[100px] truncate">{caseItem.distributor || '-'}</TableCell>,
-    progressStatus: <TableCell className="w-[100px] truncate">{caseItem.progress_status || '-'}</TableCell>,
-    latestProgressTime: <TableCell className="w-[150px] truncate">{formatDate(caseItem.latest_progress_time)}</TableCell>,
-    latestEditTime: <TableCell className="w-[150px] truncate">{formatDate(caseItem.latest_edit_time)}</TableCell>,
-    caseEntryTime: <TableCell className="w-[150px] truncate">{formatDate(caseItem.case_entry_time)}</TableCell>,
-    distributionTime: <TableCell className="w-[150px] truncate">{formatDate(caseItem.distribution_time)}</TableCell>,
-    resultTime: <TableCell className="w-[150px] truncate">{formatDate(caseItem.result_time)}</TableCell>
+    caseNumber: <TableCell className="text-xs">{caseItem.case_number}</TableCell>,
+    batchNumber: <TableCell className="text-xs">{caseItem.batch_number}</TableCell>,
+    borrowerNumber: <TableCell className="text-xs">{caseItem.borrower_number}</TableCell>,
+    idNumber: <TableCell className="text-xs">{caseItem.id_number}</TableCell>,
+    customerName: <TableCell className="text-xs">{caseItem.customer_name}</TableCell>,
+    phone: <TableCell className="text-xs">{caseItem.phone || '-'}</TableCell>,
+    productLine: <TableCell className="text-xs">{caseItem.product_line || '-'}</TableCell>,
+    receiver: <TableCell className="text-xs">{caseItem.receiver || '-'}</TableCell>,
+    adjuster: <TableCell className="text-xs">{caseItem.adjuster || '-'}</TableCell>,
+    distributor: <TableCell className="text-xs">{caseItem.distributor || '-'}</TableCell>,
+    progressStatus: <TableCell className="text-xs">{caseItem.progress_status || '-'}</TableCell>,
+    latestProgressTime: <TableCell className="text-xs">{formatDate(caseItem.latest_progress_time)}</TableCell>,
+    latestEditTime: <TableCell className="text-xs">{formatDate(caseItem.latest_edit_time)}</TableCell>,
+    caseEntryTime: <TableCell className="text-xs">{formatDate(caseItem.case_entry_time)}</TableCell>,
+    distributionTime: <TableCell className="text-xs">{formatDate(caseItem.distribution_time)}</TableCell>,
+    resultTime: <TableCell className="text-xs">{formatDate(caseItem.result_time)}</TableCell>
   };
 
   // 如果没有指定可见列，则默认显示所有列

@@ -7,8 +7,8 @@ import type { CaseTableProps } from '@/types/case';
 
 export const CaseTable = ({ data, isLoading, visibleColumns = [] }: CaseTableProps) => {
   return (
-    <div className="bg-white rounded-lg shadow-sm">
-      <Table>
+    <div className="bg-white rounded-lg shadow-sm w-full">
+      <Table className="w-full">
         <CaseTableHeader visibleColumns={visibleColumns} />
         <TableBody>
           {isLoading ? (
