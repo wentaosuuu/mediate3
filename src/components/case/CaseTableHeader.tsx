@@ -19,8 +19,7 @@ const columnTitles: Record<string, string> = {
   latestEditTime: '最新编辑时间',
   caseEntryTime: '案件入库时间',
   distributionTime: '分案时间',
-  resultTime: '结案时间',
-  actions: '操作' // 添加操作列
+  resultTime: '结案时间'
 };
 
 interface CaseTableHeaderProps {
@@ -39,9 +38,7 @@ export const CaseTableHeader = ({ visibleColumns = [] }: CaseTableHeaderProps) =
         {columnsToShow.map(column => (
           <TableHead 
             key={column} 
-            className={`whitespace-nowrap px-4 py-3 text-xs font-medium ${
-              column === 'actions' ? 'sticky right-0 bg-white shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)]' : ''
-            }`}
+            className="whitespace-normal text-xs"
           >
             {columnTitles[column]}
           </TableHead>

@@ -31,8 +31,7 @@ const columnTitles: Record<string, string> = {
   latestEditTime: '最新编辑时间',
   caseEntryTime: '案件入库时间',
   distributionTime: '分案时间',
-  resultTime: '结案时间',
-  actions: '操作' // 添加操作列
+  resultTime: '结案时间'
 };
 
 interface ColumnSelectorProps {
@@ -47,11 +46,6 @@ export const ColumnSelector: React.FC<ColumnSelectorProps> = ({ visibleColumns, 
 
   // 处理复选框变化
   const handleCheckboxChange = (columnId: string, checked: boolean) => {
-    // 确保'actions'列不能被取消选择
-    if (columnId === 'actions' && !checked) {
-      return;
-    }
-    
     if (checked) {
       setSelectedColumns([...selectedColumns, columnId]);
     } else {
@@ -61,11 +55,6 @@ export const ColumnSelector: React.FC<ColumnSelectorProps> = ({ visibleColumns, 
 
   // 拖拽开始
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, columnId: string) => {
-    // 不允许拖拽'actions'列
-    if (columnId === 'actions') {
-      e.preventDefault();
-      return;
-    }
     setDraggedItem(columnId);
   };
 
@@ -83,8 +72,7 @@ export const ColumnSelector: React.FC<ColumnSelectorProps> = ({ visibleColumns, 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetColumnId: string) => {
     e.preventDefault();
     
-    // 如果目标是'actions'列，不允许放置
-    if (targetColumnId === 'actions' || !draggedItem || draggedItem === targetColumnId) return;
+    if (!draggedItem || draggedItem === targetColumnId) return;
     
     const newSelectedColumns = [...selectedColumns];
     const draggedIndex = newSelectedColumns.indexOf(draggedItem);
@@ -107,13 +95,7 @@ export const ColumnSelector: React.FC<ColumnSelectorProps> = ({ visibleColumns, 
       alert('请至少选择一个字段显示');
       return;
     }
-    
-    // 确保'actions'列始终存在
-    const finalColumns = selectedColumns.includes('actions') 
-      ? selectedColumns 
-      : [...selectedColumns, 'actions'];
-      
-    onChange(finalColumns);
+    onChange(selectedColumns);
   };
 
   // 全选
@@ -123,12 +105,8 @@ export const ColumnSelector: React.FC<ColumnSelectorProps> = ({ visibleColumns, 
 
   // 全不选
   const handleSelectNone = () => {
-    // 保留'actions'列
-    setSelectedColumns(['actions']);
+    setSelectedColumns([]);
   };
-
-  // 检查某列是否可以取消选择（'actions'列不能取消）
-  const canUncheck = (columnId: string) => columnId !== 'actions';
 
   return (
     <Sheet>
@@ -161,7 +139,7 @@ export const ColumnSelector: React.FC<ColumnSelectorProps> = ({ visibleColumns, 
                 <div 
                   key={columnId}
                   className="flex items-center space-x-2 p-2 rounded hover:bg-muted/50 cursor-pointer"
-                  draggable={columnId !== 'actions'}
+                  draggable
                   onDragStart={(e) => handleDragStart(e, columnId)}
                   onDragEnd={handleDragEnd}
                   onDragOver={handleDragOver}
@@ -174,13 +152,12 @@ export const ColumnSelector: React.FC<ColumnSelectorProps> = ({ visibleColumns, 
                     id={`column-${columnId}`}
                     checked={selectedColumns.includes(columnId)}
                     onCheckedChange={(checked) => handleCheckboxChange(columnId, checked === true)}
-                    disabled={!canUncheck(columnId)}
                   />
                   <label
                     htmlFor={`column-${columnId}`}
-                    className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1 ${columnId === 'actions' ? 'font-bold' : ''}`}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1"
                   >
-                    {columnTitles[columnId]} {columnId === 'actions' ? '(必选)' : ''}
+                    {columnTitles[columnId]}
                   </label>
                 </div>
               ))}
