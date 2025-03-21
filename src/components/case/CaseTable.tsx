@@ -9,10 +9,10 @@ import type { CaseTableProps } from '@/types/case';
 export const CaseTable = ({ data, isLoading, visibleColumns = [] }: CaseTableProps) => {
   return (
     <div className="bg-white rounded-lg shadow-sm w-full">
-      {/* 使用ScrollArea组件包裹表格，使其支持横向滚动 */}
+      {/* 使用ScrollArea组件包裹表格内容，使其支持横向滚动 */}
       <ScrollArea className="w-full">
-        <div className="relative overflow-x-auto">
-          <Table className="min-w-[1200px]">
+        <div className="min-w-[1200px]">
+          <Table>
             <CaseTableHeader visibleColumns={visibleColumns} />
             <TableBody>
               {isLoading ? (

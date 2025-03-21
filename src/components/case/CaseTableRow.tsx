@@ -64,7 +64,7 @@ export const CaseTableRow = ({ caseItem, visibleColumns = [] }: CaseTableRowProp
         React.cloneElement(cellRenderers[column] as React.ReactElement, { key: column })
       ))}
       {/* 添加固定在右侧的操作列 */}
-      <TableCell className="!sticky !right-0 !bg-white shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)] whitespace-nowrap">
+      <TableCell className="sticky right-0 bg-white shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)] whitespace-nowrap">
         <div className="flex items-center space-x-2">
           <Button
             variant="ghost"

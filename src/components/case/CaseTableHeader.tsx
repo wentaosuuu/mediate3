@@ -39,14 +39,14 @@ export const CaseTableHeader = ({ visibleColumns = [] }: CaseTableHeaderProps) =
         {columnsToShow.map(column => (
           <TableHead 
             key={column} 
-            className="whitespace-normal text-xs"
+            className="whitespace-nowrap text-xs"
           >
             {columnTitles[column]}
           </TableHead>
         ))}
         {/* 添加固定在右侧的操作列 */}
         <TableHead 
-          className="!sticky !right-0 !bg-white shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)] whitespace-normal text-xs"
+          className="sticky right-0 bg-white shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)] whitespace-nowrap text-xs"
         >
           {columnTitles.actions}
         </TableHead>
