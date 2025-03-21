@@ -8,8 +8,8 @@ import type { CaseTableProps } from '@/types/case';
 
 export const CaseTable = ({ data, isLoading, visibleColumns = [] }: CaseTableProps) => {
   return (
-    <div className="bg-white rounded-lg shadow-sm w-full">
-      {/* 使用ScrollArea组件包裹表格内容，使其支持横向滚动 */}
+    <div className="bg-white rounded-lg shadow-sm w-full overflow-hidden">
+      {/* 使用ScrollArea组件包裹表格内容，只允许表格内容滚动，而页面整体不滚动 */}
       <ScrollArea className="w-full">
         <div className="min-w-[1200px]">
           <Table>
