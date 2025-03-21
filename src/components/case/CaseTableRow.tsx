@@ -41,7 +41,7 @@ export const CaseTableRow = ({ caseItem, visibleColumns = [] }: CaseTableRowProp
     distributionTime: <TableCell className="whitespace-nowrap text-xs">{formatDate(caseItem.distribution_time)}</TableCell>,
     resultTime: <TableCell className="whitespace-nowrap text-xs">{formatDate(caseItem.result_time)}</TableCell>,
     actions: (
-      <TableCell className="whitespace-nowrap text-xs">
+      <TableCell className="whitespace-nowrap text-xs sticky right-0 bg-white shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)]">
         <div className="flex space-x-2">
           <Button variant="ghost" size="icon" className="h-8 w-8">
             <FileEdit className="h-4 w-4" />

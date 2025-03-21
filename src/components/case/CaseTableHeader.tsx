@@ -39,7 +39,9 @@ export const CaseTableHeader = ({ visibleColumns = [] }: CaseTableHeaderProps) =
         {columnsToShow.map(column => (
           <TableHead 
             key={column} 
-            className="whitespace-nowrap px-4 py-3 text-xs font-medium"
+            className={`whitespace-nowrap px-4 py-3 text-xs font-medium ${
+              column === 'actions' ? 'sticky right-0 bg-white shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)]' : ''
+            }`}
           >
             {columnTitles[column]}
           </TableHead>
