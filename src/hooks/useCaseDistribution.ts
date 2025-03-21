@@ -52,7 +52,8 @@ export const useCaseDistribution = () => {
     'caseNumber', 'batchNumber', 'borrowerNumber', 'idNumber', 
     'customerName', 'phone', 'productLine', 'receiver', 
     'adjuster', 'distributor', 'progressStatus', 'latestProgressTime',
-    'latestEditTime', 'caseEntryTime', 'distributionTime', 'resultTime'
+    'latestEditTime', 'caseEntryTime', 'distributionTime', 'resultTime',
+    'actions' // 确保actions列始终存在
   ]);
 
   // 处理普通搜索（顶部栏）
@@ -79,6 +80,10 @@ export const useCaseDistribution = () => {
 
   // 处理列显示设置的包装函数
   const updateColumnVisibility = (columns: string[]) => {
+    // 确保actions列始终存在
+    if (!columns.includes('actions')) {
+      columns.push('actions');
+    }
     handleColumnVisibilityChange(columns, setVisibleColumns);
   };
 

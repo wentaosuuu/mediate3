@@ -31,7 +31,8 @@ const columnTitles: Record<string, string> = {
   latestEditTime: '最新编辑时间',
   caseEntryTime: '案件入库时间',
   distributionTime: '分案时间',
-  resultTime: '结案时间'
+  resultTime: '结案时间',
+  actions: '操作'
 };
 
 interface ColumnSelectorProps {
@@ -40,8 +41,9 @@ interface ColumnSelectorProps {
 }
 
 export const ColumnSelector: React.FC<ColumnSelectorProps> = ({ visibleColumns, onChange }) => {
-  // 本地状态，用于临时保存用户的选择
-  const [selectedColumns, setSelectedColumns] = useState<string[]>(visibleColumns);
+  // 本地状态，用于临时保存用户的选择 (排除操作列，因为操作列总是显示的)
+  const filteredVisibleColumns = visibleColumns.filter(col => col !== 'actions');
+  const [selectedColumns, setSelectedColumns] = useState<string[]>(filteredVisibleColumns);
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
 
   // 处理复选框变化
@@ -95,18 +97,23 @@ export const ColumnSelector: React.FC<ColumnSelectorProps> = ({ visibleColumns, 
       alert('请至少选择一个字段显示');
       return;
     }
-    onChange(selectedColumns);
+    // 保存用户选择的列 + 操作列
+    onChange([...selectedColumns, 'actions']);
   };
 
   // 全选
   const handleSelectAll = () => {
-    setSelectedColumns(Object.keys(columnTitles));
+    // 全选所有列，但不包括操作列
+    setSelectedColumns(Object.keys(columnTitles).filter(col => col !== 'actions'));
   };
 
   // 全不选
   const handleSelectNone = () => {
     setSelectedColumns([]);
   };
+
+  // 获取所有可以配置的列 (不包括操作列)
+  const configurableColumns = Object.keys(columnTitles).filter(col => col !== 'actions');
 
   return (
     <Sheet>
@@ -120,7 +127,7 @@ export const ColumnSelector: React.FC<ColumnSelectorProps> = ({ visibleColumns, 
         <SheetHeader>
           <SheetTitle>自定义显示字段</SheetTitle>
           <SheetDescription>
-            选择要在表格中显示的字段，可拖动调整顺序。
+            选择要在表格中显示的字段，可拖动调整顺序。操作列始终显示。
           </SheetDescription>
         </SheetHeader>
         <div className="mt-6 space-y-4">
@@ -163,7 +170,7 @@ export const ColumnSelector: React.FC<ColumnSelectorProps> = ({ visibleColumns, 
               ))}
               
               {/* 显示未选中的列 */}
-              {Object.keys(columnTitles)
+              {configurableColumns
                 .filter(columnId => !selectedColumns.includes(columnId))
                 .map(columnId => (
                   <div 
