@@ -18,7 +18,7 @@ const Index = () => {
           </div>
         </div>
         <div className="text-center text-text-light text-sm mt-12">
-          @云宝宝大数据产业发展有限责任公司 版权所有22222
+          @云宝宝大数据产业发展有限责任公司 版权所有
           <br />
           桂公网安备 45010302001104号ICP备17005801号-1
         </div>
