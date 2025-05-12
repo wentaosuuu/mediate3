@@ -8,6 +8,8 @@ import { CaseDistributionLayout } from '@/components/case/CaseDistributionLayout
 import { useCaseDistribution } from '@/hooks/useCaseDistribution';
 import { useUserInfo } from '@/hooks/useUserInfo';
 import { Toaster } from 'sonner';
+import { NewCaseDialog } from '@/components/case/dialogs/NewCaseDialog';
+import { ImportCasesDialog } from '@/components/case/dialogs/ImportCasesDialog';
 
 const CaseDistribution = () => {
   const navigate = useNavigate();
@@ -20,6 +22,8 @@ const CaseDistribution = () => {
     caseStatus,
     visibleColumns,
     userInfo,
+    isAddDialogOpen,
+    isImportDialogOpen,
     handleSearch,
     handleSearchCases,
     handleReset,
@@ -31,7 +35,11 @@ const CaseDistribution = () => {
     handleOneClickClose,
     handleDownloadTemplate,
     setSelectedDepartment,
-    setCaseStatus
+    setCaseStatus,
+    setIsAddDialogOpen,
+    setIsImportDialogOpen,
+    handleAddCaseSuccess,
+    handleImportCasesSuccess
   } = useCaseDistribution();
 
   const handleMenuClick = (path: string) => {
@@ -80,6 +88,21 @@ const CaseDistribution = () => {
             onColumnsChange={handleColumnVisibilityChange}
             onSelectedDistribution={handleSelectedDistribution}
             onOneClickClose={handleOneClickClose}
+            onDownloadTemplate={handleDownloadTemplate}
+          />
+          
+          {/* 新增案件弹窗 */}
+          <NewCaseDialog 
+            open={isAddDialogOpen} 
+            onOpenChange={setIsAddDialogOpen}
+            onSuccess={handleAddCaseSuccess}
+          />
+          
+          {/* 导入案件弹窗 */}
+          <ImportCasesDialog 
+            open={isImportDialogOpen} 
+            onOpenChange={setIsImportDialogOpen}
+            onSuccess={handleImportCasesSuccess}
             onDownloadTemplate={handleDownloadTemplate}
           />
         </MainContent>

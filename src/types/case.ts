@@ -55,3 +55,16 @@ export interface CaseSearchFormProps {
   onOneClickClose: () => void;
   onDownloadTemplate: () => void;
 }
+
+export interface NewCaseDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess: (newCase: Case) => void;
+}
+
+export interface ImportCasesDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess: (cases: Case[]) => void;
+  onDownloadTemplate: () => void;
+}

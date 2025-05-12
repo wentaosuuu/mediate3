@@ -4,13 +4,13 @@ import { Case } from '@/types/case';
 import { toast } from 'sonner';
 import { useUserInfo } from './useUserInfo';
 import { 
-  handleAddCase, 
-  handleImportCases, 
   handleExportCases, 
   handleSelectedDistribution, 
   handleOneClickClose, 
   handleDownloadTemplate,
-  handleColumnVisibilityChange
+  handleColumnVisibilityChange,
+  addNewCase,
+  importCases
 } from '@/utils/caseManagementUtils';
 
 interface SearchParams {
@@ -55,6 +55,10 @@ export const useCaseDistribution = () => {
     'latestEditTime', 'caseEntryTime', 'distributionTime', 'resultTime',
     'actions' // 确保actions列始终存在
   ]);
+  
+  // 弹窗状态控制
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
 
   // 处理普通搜索（顶部栏）
   const handleSearch = (query: string) => {
@@ -86,6 +90,26 @@ export const useCaseDistribution = () => {
     }
     handleColumnVisibilityChange(columns, setVisibleColumns);
   };
+  
+  // 处理新增案件
+  const handleAddCase = () => {
+    setIsAddDialogOpen(true);
+  };
+  
+  // 处理导入案件
+  const handleImportCases = () => {
+    setIsImportDialogOpen(true);
+  };
+  
+  // 处理新增单个案件成功
+  const handleAddCaseSuccess = (newCase: Case) => {
+    addNewCase(newCase, cases, setCases);
+  };
+  
+  // 处理批量导入案件成功
+  const handleImportCasesSuccess = (importedCases: Case[]) => {
+    importCases(importedCases, cases, setCases);
+  };
 
   return {
     searchQuery,
@@ -96,17 +120,23 @@ export const useCaseDistribution = () => {
     caseStatus,
     visibleColumns,
     userInfo,
+    isAddDialogOpen,
+    isImportDialogOpen,
     handleSearch,
     handleSearchCases,
     handleReset,
-    handleAddCase, // 直接从工具函数导出
-    handleImportCases, // 直接从工具函数导出
-    handleExportCases, // 直接从工具函数导出
-    handleColumnVisibilityChange: updateColumnVisibility, // 使用包装函数
-    handleSelectedDistribution, // 直接从工具函数导出
-    handleOneClickClose, // 直接从工具函数导出
-    handleDownloadTemplate, // 直接从工具函数导出
+    handleAddCase,
+    handleImportCases,
+    handleExportCases: () => handleExportCases(cases),
+    handleColumnVisibilityChange: updateColumnVisibility,
+    handleSelectedDistribution,
+    handleOneClickClose,
+    handleDownloadTemplate,
     setSelectedDepartment,
-    setCaseStatus
+    setCaseStatus,
+    setIsAddDialogOpen,
+    setIsImportDialogOpen,
+    handleAddCaseSuccess,
+    handleImportCasesSuccess
   };
 };
