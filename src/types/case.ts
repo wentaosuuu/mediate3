@@ -1,4 +1,3 @@
-
 import { ReactNode } from "react";
 
 // 修改DateRange接口定义，使其与react-day-picker兼容
@@ -25,6 +24,7 @@ export interface Case {
   case_entry_time: string | null;
   distribution_time: string | null;
   result_time: string | null;
+  tenant_id?: string; // 添加 tenant_id 字段，设为可选，因为我们在前端可能不总是提供它
 }
 
 export interface CaseTableProps {

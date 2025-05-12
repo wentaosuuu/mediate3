@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Case } from '@/types/case';
 import { toast } from 'sonner';
@@ -144,10 +143,16 @@ export const useCaseDistribution = () => {
   // 处理新增单个案件成功
   const handleAddCaseSuccess = async (newCase: Case) => {
     try {
+      // 确保案件对象包含tenant_id
+      const caseWithTenant = {
+        ...newCase,
+        tenant_id: userInfo.tenantId || 'default-tenant' // 使用当前用户的租户ID或默认值
+      };
+      
       // 保存新案件到数据库
       const { data, error } = await supabase
         .from('cases')
-        .insert([newCase])
+        .insert([caseWithTenant])
         .select();
         
       if (error) {
@@ -171,10 +176,16 @@ export const useCaseDistribution = () => {
   // 处理批量导入案件成功
   const handleImportCasesSuccess = async (importedCases: Case[]) => {
     try {
+      // 确保每个案件对象都包含tenant_id
+      const casesWithTenant = importedCases.map(caseItem => ({
+        ...caseItem,
+        tenant_id: userInfo.tenantId || 'default-tenant' // 使用当前用户的租户ID或默认值
+      }));
+      
       // 保存导入的案件到数据库
       const { data, error } = await supabase
         .from('cases')
-        .insert(importedCases)
+        .insert(casesWithTenant)
         .select();
         
       if (error) {
