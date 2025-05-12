@@ -1,7 +1,7 @@
-
 import * as XLSX from 'xlsx';
 import { Case } from '@/types/case';
 import { excelColumnMapping } from '@/components/case/form-config/caseFormConfig';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * 从Excel文件中读取案件数据
@@ -29,9 +29,10 @@ export const readExcelFile = async (file: File): Promise<Case[]> => {
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
         
         // 转换为Case对象数组
-        const cases = jsonData.map((row: any, index) => {
+        const cases = jsonData.map((row: any) => {
+          // 使用标准UUID格式而非临时ID
           const caseItem: Partial<Case> = {
-            id: `temp-${Date.now()}-${index}`, // 临时ID，实际应用中由后端生成
+            id: uuidv4(), // 使用uuid库生成标准UUID
             latest_progress_time: new Date().toISOString(),
             latest_edit_time: new Date().toISOString(),
             case_entry_time: new Date().toISOString(),
