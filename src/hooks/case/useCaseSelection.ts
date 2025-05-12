@@ -15,7 +15,7 @@ export const useCaseSelection = (
 ) => {
   // 处理单个案件选择
   const handleSelectCase = useCallback((caseId: string, isSelected: boolean) => {
-    setSelectedCases(prev => ({
+    setSelectedCases((prev: Record<string, boolean>) => ({
       ...prev,
       [caseId]: isSelected
     }));

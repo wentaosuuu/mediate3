@@ -5,7 +5,7 @@ import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { MainContent } from '@/components/dashboard/MainContent';
 import { CaseDistributionLayout } from '@/components/case/CaseDistributionLayout';
-import { useCaseDistribution } from '@/hooks/useCaseDistribution';
+import { useCaseDistribution } from '@/hooks/case/useCaseDistribution';
 import { useUserInfo } from '@/hooks/useUserInfo';
 import { Toaster } from 'sonner';
 import { NewCaseDialog } from '@/components/case/dialogs/NewCaseDialog';

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -11,7 +10,7 @@ import {
   Filter,
   Search
 } from 'lucide-react';
-import { ColumnSelector } from '../ColumnSelector';
+import { ColumnSelector } from '../column-selection';
 
 interface FormActionButtonsProps {
   visibleColumns: string[];
