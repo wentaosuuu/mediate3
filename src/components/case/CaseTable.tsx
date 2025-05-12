@@ -1,29 +1,58 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody } from '@/components/ui/table';
 import { CaseTableHeader } from './CaseTableHeader';
 import { CaseTableRow } from './CaseTableRow';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { CaseTableProps } from '@/types/case';
+import { Case } from '@/types/case';
 
 export const CaseTable = ({ data, isLoading, visibleColumns = [] }: CaseTableProps) => {
+  // 添加选中案件状态管理
+  const [selectedCases, setSelectedCases] = useState<Record<string, boolean>>({});
+  
+  // 处理单个案件选择
+  const handleSelectCase = (caseId: string, isSelected: boolean) => {
+    setSelectedCases(prev => ({
+      ...prev,
+      [caseId]: isSelected
+    }));
+  };
+  
+  // 处理全选/取消全选
+  const handleSelectAll = (isSelected: boolean) => {
+    const newSelectedCases: Record<string, boolean> = {};
+    data.forEach(caseItem => {
+      newSelectedCases[caseItem.id] = isSelected;
+    });
+    setSelectedCases(newSelectedCases);
+  };
+  
+  // 检查是否全选
+  const isAllSelected = data.length > 0 && data.every(caseItem => selectedCases[caseItem.id]);
+
   return (
     <div className="bg-white rounded-lg shadow-sm w-full overflow-hidden">
-      {/* 使用ScrollArea组件包裹表格内容，只允许表格内容滚动，而页面整体不滚动 */}
+      {/* 使用响应式容器并设置最大宽度，确保在大屏幕上不会过宽 */}
       <ScrollArea className="w-full">
-        <div className="min-w-[1200px]">
+        <div className="min-w-[1200px] max-w-full">
           <Table>
-            <CaseTableHeader visibleColumns={visibleColumns} />
+            <CaseTableHeader 
+              visibleColumns={visibleColumns} 
+              onSelectAll={handleSelectAll}
+              isAllSelected={isAllSelected}
+              showSelection={true}
+            />
             <TableBody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={visibleColumns.length + 1} className="text-center py-4">
+                  <td colSpan={(visibleColumns?.length || 0) + 2} className="text-center py-4">
                     加载中...
                   </td>
                 </tr>
               ) : data.length === 0 ? (
                 <tr>
-                  <td colSpan={visibleColumns.length + 1} className="text-center py-4 text-gray-500">
+                  <td colSpan={(visibleColumns?.length || 0) + 2} className="text-center py-4 text-gray-500">
                     暂无数据
                   </td>
                 </tr>
@@ -32,7 +61,10 @@ export const CaseTable = ({ data, isLoading, visibleColumns = [] }: CaseTablePro
                   <CaseTableRow 
                     key={caseItem.id} 
                     caseItem={caseItem} 
-                    visibleColumns={visibleColumns} 
+                    visibleColumns={visibleColumns}
+                    isSelected={selectedCases[caseItem.id] || false}
+                    onSelectChange={(isSelected) => handleSelectCase(caseItem.id, isSelected)}
+                    showSelection={true}
                   />
                 ))
               )}

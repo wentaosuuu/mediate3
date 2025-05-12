@@ -5,13 +5,23 @@ import { format } from 'date-fns';
 import { Case } from '@/types/case';
 import { Button } from '@/components/ui/button';
 import { FileEdit, Trash2 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface CaseTableRowProps {
   caseItem: Case;
   visibleColumns?: string[];
+  isSelected?: boolean;
+  onSelectChange?: (isSelected: boolean) => void;
+  showSelection?: boolean;
 }
 
-export const CaseTableRow = ({ caseItem, visibleColumns = [] }: CaseTableRowProps) => {
+export const CaseTableRow = ({ 
+  caseItem, 
+  visibleColumns = [], 
+  isSelected = false,
+  onSelectChange,
+  showSelection = false
+}: CaseTableRowProps) => {
   const formatDate = (date: string | null) => {
     if (!date) return '-';
     try {
@@ -19,6 +29,13 @@ export const CaseTableRow = ({ caseItem, visibleColumns = [] }: CaseTableRowProp
     } catch (error) {
       console.error('日期格式化错误:', error);
       return '-';
+    }
+  };
+
+  // 处理选择变更
+  const handleSelectChange = (checked: boolean) => {
+    if (onSelectChange) {
+      onSelectChange(checked);
     }
   };
 
@@ -60,6 +77,18 @@ export const CaseTableRow = ({ caseItem, visibleColumns = [] }: CaseTableRowProp
 
   return (
     <TableRow>
+      {/* 添加选择框列 */}
+      {showSelection && (
+        <TableCell className="text-center">
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={handleSelectChange}
+            aria-label={`选择案件 ${caseItem.case_number}`}
+            className="mx-auto"
+          />
+        </TableCell>
+      )}
+      
       {columnsToShow.map(column => (
         React.cloneElement(cellRenderers[column] as React.ReactElement, { key: column })
       ))}

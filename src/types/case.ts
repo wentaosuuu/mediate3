@@ -54,6 +54,7 @@ export interface CaseSearchFormProps {
   onSelectedDistribution: () => void;
   onOneClickClose: () => void;
   onDownloadTemplate: () => void;
+  selectedCasesCount?: number; // 添加选中案件数量字段
 }
 
 export interface NewCaseDialogProps {

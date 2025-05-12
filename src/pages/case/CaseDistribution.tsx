@@ -21,6 +21,7 @@ const CaseDistribution = () => {
     selectedDepartment,
     caseStatus,
     visibleColumns,
+    selectedCasesCount,
     userInfo,
     isAddDialogOpen,
     isImportDialogOpen,
@@ -78,6 +79,7 @@ const CaseDistribution = () => {
             visibleColumns={visibleColumns}
             selectedDepartment={selectedDepartment}
             caseStatus={caseStatus}
+            selectedCasesCount={selectedCasesCount}
             onDepartmentSelect={setSelectedDepartment}
             onStatusChange={setCaseStatus}
             onSearch={handleSearchCases}

@@ -12,6 +12,7 @@ interface CaseDistributionLayoutProps {
   visibleColumns: string[];
   selectedDepartment: string;
   caseStatus: string;
+  selectedCasesCount?: number;
   onDepartmentSelect: (departmentId: string) => void;
   onStatusChange: (status: string) => void;
   onSearch: (values: any) => void;
@@ -31,6 +32,7 @@ export const CaseDistributionLayout: React.FC<CaseDistributionLayoutProps> = ({
   visibleColumns,
   selectedDepartment,
   caseStatus,
+  selectedCasesCount = 0,
   onDepartmentSelect,
   onStatusChange,
   onSearch,
@@ -65,6 +67,7 @@ export const CaseDistributionLayout: React.FC<CaseDistributionLayoutProps> = ({
             onSelectedDistribution={onSelectedDistribution}
             onOneClickClose={onOneClickClose}
             onDownloadTemplate={onDownloadTemplate}
+            selectedCasesCount={selectedCasesCount}
           />
           <CaseTable 
             data={cases} 

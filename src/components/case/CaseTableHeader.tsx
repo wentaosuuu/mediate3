@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
 
 // 定义列信息和标题的映射
 const columnTitles: Record<string, string> = {
@@ -25,17 +26,44 @@ const columnTitles: Record<string, string> = {
 
 interface CaseTableHeaderProps {
   visibleColumns?: string[];
+  onSelectAll?: (isSelected: boolean) => void;
+  isAllSelected?: boolean;
+  showSelection?: boolean;
 }
 
-export const CaseTableHeader = ({ visibleColumns = [] }: CaseTableHeaderProps) => {
+export const CaseTableHeader = ({ 
+  visibleColumns = [], 
+  onSelectAll, 
+  isAllSelected = false,
+  showSelection = false
+}: CaseTableHeaderProps) => {
   // 如果没有指定可见列，则默认显示所有列（除了操作列，操作列单独处理）
   const columnsToShow = visibleColumns.length > 0 
     ? visibleColumns.filter(col => col !== 'actions')
     : Object.keys(columnTitles).filter(col => col !== 'actions');
+    
+  // 处理全选/取消全选
+  const handleSelectAllChange = (checked: boolean) => {
+    if (onSelectAll) {
+      onSelectAll(checked);
+    }
+  };
 
   return (
     <TableHeader>
       <TableRow>
+        {/* 添加选择列 */}
+        {showSelection && (
+          <TableHead className="w-12 text-center">
+            <Checkbox
+              checked={isAllSelected}
+              onCheckedChange={handleSelectAllChange}
+              aria-label="全选"
+              className="mx-auto"
+            />
+          </TableHead>
+        )}
+        
         {columnsToShow.map(column => (
           <TableHead 
             key={column} 
