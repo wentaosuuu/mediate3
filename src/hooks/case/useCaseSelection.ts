@@ -11,11 +11,11 @@ import {
  */
 export const useCaseSelection = (
   selectedCases: Record<string, boolean>,
-  setSelectedCases: (cases: Record<string, boolean>) => void
+  setSelectedCases: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
 ) => {
   // 处理单个案件选择
   const handleSelectCase = useCallback((caseId: string, isSelected: boolean) => {
-    setSelectedCases((prev: Record<string, boolean>) => ({
+    setSelectedCases(prev => ({
       ...prev,
       [caseId]: isSelected
     }));
