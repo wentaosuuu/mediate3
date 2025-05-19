@@ -24,7 +24,8 @@ export interface Case {
   case_entry_time: string | null;
   distribution_time: string | null;
   result_time: string | null;
-  tenant_id?: string; // 添加 tenant_id 字段，设为可选，因为我们在前端可能不总是提供它
+  tenant_id?: string; // 租户ID
+  user_id?: string;   // 用户ID，添加这个字段
 }
 
 export interface CaseTableProps {

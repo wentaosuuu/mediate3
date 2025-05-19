@@ -55,21 +55,22 @@ export const useCaseData = (
   // 处理新增单个案件成功
   const handleAddCaseSuccess = useCallback(async (newCase: Case) => {
     try {
-      // 确保案件对象包含tenant_id
-      const caseWithTenant = {
+      // 确保案件对象包含tenant_id和user_id
+      const caseWithMetadata = {
         ...newCase,
-        tenant_id: userInfo.tenantId || 'default-tenant' // 使用当前用户的租户ID或默认值
+        tenant_id: userInfo.tenantId || 'default-tenant',
+        user_id: userInfo.userId // 添加用户ID
       };
       
       // 保存新案件到数据库
       const { data, error } = await supabase
         .from('cases')
-        .insert([caseWithTenant])
+        .insert([caseWithMetadata])
         .select();
         
       if (error) {
         console.error('添加案件失败:', error);
-        toast.error('添加案件失败');
+        toast.error('添加案件失败: ' + error.message);
         return;
       }
       
@@ -83,26 +84,29 @@ export const useCaseData = (
       console.error('添加案件异常:', error);
       toast.error('添加案件失败，发生异常');
     }
-  }, [cases, setCases, userInfo.tenantId]);
+  }, [cases, setCases, userInfo]);
   
   // 处理批量导入案件成功
   const handleImportCasesSuccess = useCallback(async (importedCases: Case[]) => {
     try {
-      // 确保每个案件对象都包含tenant_id
-      const casesWithTenant = importedCases.map(caseItem => ({
+      // 确保每个案件对象都包含tenant_id和user_id
+      const casesWithMetadata = importedCases.map(caseItem => ({
         ...caseItem,
-        tenant_id: userInfo.tenantId || 'default-tenant' // 使用当前用户的租户ID或默认值
+        tenant_id: userInfo.tenantId || 'default-tenant',
+        user_id: userInfo.userId // 添加用户ID
       }));
+      
+      console.log('导入的案件数据:', casesWithMetadata);
       
       // 保存导入的案件到数据库
       const { data, error } = await supabase
         .from('cases')
-        .insert(casesWithTenant)
+        .insert(casesWithMetadata)
         .select();
         
       if (error) {
         console.error('导入案件失败:', error);
-        toast.error('导入案件失败');
+        toast.error('导入案件失败: ' + error.message);
         return;
       }
       
@@ -115,7 +119,7 @@ export const useCaseData = (
       console.error('导入案件异常:', error);
       toast.error('导入案件失败，发生异常');
     }
-  }, [cases, setCases, userInfo.tenantId]);
+  }, [cases, setCases, userInfo]);
 
   // 初始加载案件数据
   useEffect(() => {
