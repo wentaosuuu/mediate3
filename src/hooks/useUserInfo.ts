@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@supabase/auth-helpers-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,15 +11,16 @@ export const useUserInfo = () => {
   const [username, setUsername] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [department, setDepartment] = useState<string | null>(null);
-	const [tenantId, setTenantId] = useState<string | null>(null);
+  const [tenantId, setTenantId] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       if (user) {
         try {
+          // 确保从正确的表中获取用户信息
           const { data: profile, error } = await supabase
-            .from('profiles')
+            .from('users')
             .select('username, role, department, tenant_id')
             .eq('id', user.id)
             .single();
@@ -29,7 +31,7 @@ export const useUserInfo = () => {
             setUsername(profile.username);
             setRole(profile.role);
             setDepartment(profile.department);
-						setTenantId(profile.tenant_id);
+            setTenantId(profile.tenant_id);
           }
         } catch (error) {
           console.error('获取用户信息异常:', error);
