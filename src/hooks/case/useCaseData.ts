@@ -22,6 +22,8 @@ export const useCaseData = (
   const fetchCases = useCallback(async () => {
     setIsLoading(true);
     try {
+      console.log('获取案件数据，用户ID:', userInfo.userId);
+      
       const { data, error } = await supabase
         .from('cases')
         .select('*')
@@ -40,7 +42,7 @@ export const useCaseData = (
     } finally {
       setIsLoading(false);
     }
-  }, [setCases, setIsLoading]);
+  }, [setCases, setIsLoading, userInfo.userId]);
 
   // 处理高级搜索
   const handleSearchCases = useCallback((params: SearchParams) => {
@@ -61,6 +63,8 @@ export const useCaseData = (
         tenant_id: userInfo.tenantId || 'default-tenant',
         user_id: userInfo.userId // 添加用户ID
       };
+      
+      console.log('准备添加案件:', caseWithMetadata);
       
       // 保存新案件到数据库
       const { data, error } = await supabase
@@ -89,6 +93,11 @@ export const useCaseData = (
   // 处理批量导入案件成功
   const handleImportCasesSuccess = useCallback(async (importedCases: Case[]) => {
     try {
+      if (!importedCases || importedCases.length === 0) {
+        toast.error('导入的案件数据为空');
+        return;
+      }
+      
       // 确保每个案件对象都包含tenant_id和user_id
       const casesWithMetadata = importedCases.map(caseItem => ({
         ...caseItem,
@@ -115,16 +124,18 @@ export const useCaseData = (
         importCases(data, cases, setCases);
         toast.success(`成功导入 ${data.length} 个案件`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('导入案件异常:', error);
-      toast.error('导入案件失败，发生异常');
+      toast.error(`导入案件失败: ${error?.message || '未知错误'}`);
     }
   }, [cases, setCases, userInfo]);
 
   // 初始加载案件数据
   useEffect(() => {
-    fetchCases();
-  }, [fetchCases]);
+    if (userInfo.userId) {
+      fetchCases();
+    }
+  }, [fetchCases, userInfo.userId]);
 
   return {
     fetchCases,

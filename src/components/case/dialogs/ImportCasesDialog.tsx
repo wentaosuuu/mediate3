@@ -61,19 +61,25 @@ export const ImportCasesDialog: React.FC<ImportCasesDialogProps> = ({
         return;
       }
 
+      console.log('Excel解析得到的案件数据:', cases);
+      
       // 通知父组件导入成功
       onSuccess(cases);
       
       // 重置状态并关闭对话框
       setFile(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
-      onOpenChange(false);
       
       // 显示成功提示
-      toast.success(`成功导入 ${cases.length} 条案件记录`);
-    } catch (error) {
-      console.error('导入案件失败:', error);
-      setUploadError('导入案件失败，请检查文件格式是否正确');
+      toast.success(`Excel解析成功，准备导入 ${cases.length} 条案件记录`);
+      
+      // 延迟关闭对话框
+      setTimeout(() => {
+        onOpenChange(false);
+      }, 1500);
+    } catch (error: any) {
+      console.error('解析Excel失败:', error);
+      setUploadError(`导入案件失败: ${error?.message || '请检查文件格式是否正确'}`);
     } finally {
       setIsUploading(false);
     }
@@ -84,8 +90,18 @@ export const ImportCasesDialog: React.FC<ImportCasesDialogProps> = ({
     fileInputRef.current?.click();
   };
 
+  // 对话框关闭时重置状态
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      setFile(null);
+      setUploadError(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+    onOpenChange(open);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>导入案件</DialogTitle>
@@ -149,7 +165,7 @@ export const ImportCasesDialog: React.FC<ImportCasesDialogProps> = ({
           <Button 
             type="button" 
             variant="outline" 
-            onClick={() => onOpenChange(false)}
+            onClick={() => handleOpenChange(false)}
             disabled={isUploading}
           >
             取消
@@ -159,7 +175,7 @@ export const ImportCasesDialog: React.FC<ImportCasesDialogProps> = ({
             onClick={handleUpload}
             disabled={!file || isUploading}
           >
-            {isUploading ? '正在导入...' : '确认导入'}
+            {isUploading ? '正在处理...' : '确认导入'}
           </Button>
         </DialogFooter>
       </DialogContent>

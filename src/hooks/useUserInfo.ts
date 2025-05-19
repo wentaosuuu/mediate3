@@ -19,19 +19,20 @@ export const useUserInfo = () => {
       if (user) {
         try {
           // 确保从正确的表中获取用户信息
-          const { data: profile, error } = await supabase
+          const { data, error } = await supabase
             .from('users')
-            .select('username, role, department, tenant_id')
+            .select('*')  // 先使用通配符查询所有字段
             .eq('id', user.id)
             .single();
 
           if (error) {
             console.error('获取用户信息失败:', error);
-          } else if (profile) {
-            setUsername(profile.username);
-            setRole(profile.role);
-            setDepartment(profile.department);
-            setTenantId(profile.tenant_id);
+          } else if (data) {
+            // 安全地设置字段值，避免类型错误
+            setUsername(data.username || null);
+            setRole(data.role || null);
+            setDepartment(data.department || null);
+            setTenantId(data.tenant_id || null);
           }
         } catch (error) {
           console.error('获取用户信息异常:', error);
