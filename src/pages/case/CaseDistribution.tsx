@@ -13,7 +13,10 @@ import { ImportCasesDialog } from '@/components/case/dialogs/ImportCasesDialog';
 
 const CaseDistribution = () => {
   const navigate = useNavigate();
-  const { handleLogout } = useUserInfo();
+  
+  // 使用useUserInfo钩子获取用户信息
+  const { userInfo, handleLogout } = useUserInfo();
+  
   const { 
     searchQuery,
     cases,
@@ -22,7 +25,6 @@ const CaseDistribution = () => {
     caseStatus,
     visibleColumns,
     selectedCasesCount,
-    userInfo,
     isAddDialogOpen,
     isImportDialogOpen,
     handleSearch,

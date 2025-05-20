@@ -12,7 +12,7 @@ const Users = () => {
   const navigate = useNavigate();
   
   // 使用useUserInfo钩子获取用户信息
-  const { userInfo, handleLogout, isInitialized } = useUserInfo();
+  const { userInfo, handleLogout } = useUserInfo();
 
   const onLogout = async () => {
     const success = await handleLogout();
