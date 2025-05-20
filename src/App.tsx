@@ -22,6 +22,8 @@ import NotFound from './components/NotFound';
 import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { MainContent } from '@/components/dashboard/MainContent';
+import { useUserInfo } from '@/hooks/useUserInfo';
+import { useNavigate } from 'react-router-dom';
 
 function App() {
   return (
@@ -95,19 +97,19 @@ function App() {
 
 // 开发中页面组件
 const UnderDevelopmentPage = ({ title }: { title: string }) => {
-  // Mock user data - 实际项目中应该从认证系统获取
-  const mockUser = {
-    username: '张三',
-    department: '技术部',
-    role: '管理员'
-  };
-  
-  const navigate = (path: string) => {
-    window.location.href = path;
+  // 使用useUserInfo钩子获取用户信息
+  const { userInfo, handleLogout, isInitialized } = useUserInfo();
+  const navigate = useNavigate();
+
+  const onNavigate = (path: string) => {
+    navigate(path);
   };
 
-  const handleLogout = () => {
-    navigate('/');
+  const onLogout = async () => {
+    const success = await handleLogout();
+    if (success) {
+      navigate('/');
+    }
   };
 
   return (
@@ -115,20 +117,20 @@ const UnderDevelopmentPage = ({ title }: { title: string }) => {
       <div className="fixed left-0 top-0 h-full w-64 z-30">
         <Navigation
           currentPath={window.location.pathname}
-          onMenuClick={(path) => navigate(path)}
+          onMenuClick={(path) => onNavigate(path)}
         />
       </div>
 
       <div className="pl-64 min-h-screen">
         <TopBar
-          username={mockUser.username}
-          department={mockUser.department}
-          role={mockUser.role}
-          onLogout={handleLogout}
+          username={userInfo.username}
+          department={userInfo.department}
+          role={userInfo.role}
+          onLogout={onLogout}
           onSearch={() => {}}
           searchQuery=""
         />
-        <MainContent username={mockUser.username} currentPath={window.location.pathname}>
+        <MainContent username={userInfo.username} currentPath={window.location.pathname}>
           <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
             <div className="text-center">
               <h1 className="text-2xl font-bold mb-2 text-gray-700">{title}</h1>

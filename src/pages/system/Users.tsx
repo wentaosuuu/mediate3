@@ -1,92 +1,24 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { MainContent } from '@/components/dashboard/MainContent';
 import UsersManagement from './users/UsersManagement';
 import { Toaster } from 'sonner';
-import { supabase } from "@/integrations/supabase/client";
+import { useUserInfo } from '@/hooks/useUserInfo';
 
 const Users = () => {
   const navigate = useNavigate();
   
-  // 用户信息状态
-  const [userInfo, setUserInfo] = useState({
-    username: '加载中...',
-    department: '加载中...',
-    role: '加载中...'
-  });
+  // 使用useUserInfo钩子获取用户信息
+  const { userInfo, handleLogout, isInitialized } = useUserInfo();
 
-  // 获取用户部门和角色信息
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        // 获取当前登录用户
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        
-        if (authError) throw authError;
-        
-        if (!user) {
-          console.warn("未找到登录用户，使用模拟数据");
-          // 如果没有登录用户，使用模拟数据（开发模式）
-          setUserInfo({
-            username: '张三',
-            department: '云宝宝',
-            role: '云宝人员'
-          });
-          return;
-        }
-        
-        // 获取用户基本信息
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('id, username, name')
-          .eq('id', user.id)
-          .single();
-          
-        if (userError) throw userError;
-        
-        // 获取用户部门信息
-        const { data: userDept, error: deptError } = await supabase
-          .from('user_departments')
-          .select('departments:department_id(name)')
-          .eq('user_id', user.id)
-          .maybeSingle();
-          
-        // 获取用户角色信息  
-        const { data: userRole, error: roleError } = await supabase
-          .from('user_roles')
-          .select('roles:role_id(name)')
-          .eq('user_id', user.id)
-          .maybeSingle();
-          
-        setUserInfo({
-          username: userData?.name || userData?.username || '用户', // 优先使用姓名字段
-          department: userDept?.departments?.name || '无部门',
-          role: userRole?.roles?.name || '无角色'
-        });
-        
-      } catch (error) {
-        console.error("获取用户信息失败:", error);
-        // 出错时使用默认值
-        setUserInfo({
-          username: '张三',
-          department: '云宝宝',
-          role: '云宝人员'
-        });
-      }
-    };
-    
-    // 调用获取用户信息函数
-    fetchUserInfo();
-    
-  }, []);
-
-  const handleLogout = async () => {
-    // 退出登录时清除supabase session
-    await supabase.auth.signOut();
-    navigate('/');
+  const onLogout = async () => {
+    const success = await handleLogout();
+    if (success) {
+      navigate('/');
+    }
   };
 
   return (
@@ -103,7 +35,7 @@ const Users = () => {
           username={userInfo.username}
           department={userInfo.department}
           role={userInfo.role}
-          onLogout={handleLogout}
+          onLogout={onLogout}
           onSearch={() => {}}
           searchQuery=""
         />
