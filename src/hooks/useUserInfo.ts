@@ -18,21 +18,45 @@ export const useUserInfo = () => {
     const fetchUserInfo = async () => {
       if (user) {
         try {
-          // 确保从正确的表中获取用户信息
-          const { data, error } = await supabase
+          // 获取用户基本信息
+          const { data: userData, error: userError } = await supabase
             .from('users')
-            .select('*')  // 先使用通配符查询所有字段
+            .select('*')
             .eq('id', user.id)
             .single();
 
-          if (error) {
-            console.error('获取用户信息失败:', error);
-          } else if (data) {
-            // 安全地设置字段值，避免类型错误
-            setUsername(data.username || null);
-            setRole(data.role || null);
-            setDepartment(data.department || null);
-            setTenantId(data.tenant_id || null);
+          if (userError) {
+            console.error('获取用户基本信息失败:', userError);
+          } else if (userData) {
+            // 设置用户名和租户ID
+            setUsername(userData.username || userData.name || null);
+            setTenantId(userData.tenant_id || null);
+            
+            // 获取用户角色信息
+            const { data: roleData, error: roleError } = await supabase
+              .from('user_roles')
+              .select('roles:role_id(name)')
+              .eq('user_id', user.id)
+              .maybeSingle();
+              
+            if (roleError) {
+              console.error('获取用户角色失败:', roleError);
+            } else if (roleData?.roles) {
+              setRole(roleData.roles.name || '普通用户');
+            }
+            
+            // 获取用户部门信息
+            const { data: deptData, error: deptError } = await supabase
+              .from('user_departments')
+              .select('departments:department_id(name)')
+              .eq('user_id', user.id)
+              .maybeSingle();
+              
+            if (deptError) {
+              console.error('获取用户部门失败:', deptError);
+            } else if (deptData?.departments) {
+              setDepartment(deptData.departments.name || '未分配');
+            }
           }
         } catch (error) {
           console.error('获取用户信息异常:', error);
