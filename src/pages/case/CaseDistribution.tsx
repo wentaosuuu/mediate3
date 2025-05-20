@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
@@ -15,7 +15,11 @@ const CaseDistribution = () => {
   const navigate = useNavigate();
   
   // 使用useUserInfo钩子获取用户信息
-  const { userInfo, handleLogout } = useUserInfo();
+  const { userInfo, handleLogout, isInitialized } = useUserInfo();
+  
+  useEffect(() => {
+    console.log("CaseDistribution - 当前用户信息:", userInfo);
+  }, [userInfo]);
   
   const { 
     searchQuery,

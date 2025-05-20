@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Register from './pages/Register';
@@ -100,6 +100,10 @@ const UnderDevelopmentPage = ({ title }: { title: string }) => {
   // 使用useUserInfo钩子获取用户信息
   const { userInfo, handleLogout, isInitialized } = useUserInfo();
   const navigate = useNavigate();
+  
+  useEffect(() => {
+    console.log("UnderDevelopmentPage - 当前用户信息:", userInfo);
+  }, [userInfo]);
 
   const onNavigate = (path: string) => {
     navigate(path);
