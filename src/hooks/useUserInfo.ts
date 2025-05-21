@@ -13,11 +13,13 @@ export const useUserInfo = () => {
   const [department, setDepartment] = useState<string | null>(null);
   const [tenantId, setTenantId] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
-      if (user) {
-        try {
+      setIsLoading(true);
+      try {
+        if (user) {
           console.log('开始获取用户信息，用户ID:', user.id);
           
           // 获取用户基本信息
@@ -25,24 +27,26 @@ export const useUserInfo = () => {
             .from('users')
             .select('*')
             .eq('id', user.id)
-            .single();
+            .maybeSingle();
 
           if (userError) {
             console.error('获取用户基本信息失败:', userError);
             setIsInitialized(true);
+            setIsLoading(false);
             return;
           }
           
           if (!userData) {
             console.error('未找到用户信息');
             setIsInitialized(true);
+            setIsLoading(false);
             return;
           }
           
           console.log('获取到用户基本信息:', userData);
           
           // 设置用户名和租户ID
-          setUsername(userData.username || userData.name || user.email || null);
+          setUsername(userData.username || userData.name || user.email || '未知用户');
           setTenantId(userData.tenant_id || null);
           
           // 获取用户角色信息 - 使用联表查询直接获取角色名称
@@ -85,18 +89,20 @@ export const useUserInfo = () => {
             setDepartment('未分配');
           }
 
-          console.log('用户信息加载完成，用户名:', userData.username || userData.name || user.email);
-        } catch (error) {
-          console.error('获取用户信息异常:', error);
-        } finally {
-          setIsInitialized(true);
+          console.log('用户信息加载完成，用户名:', username);
+        } else {
+          // 用户未登录，重置所有状态
+          console.log('用户未登录，重置状态');
+          setUsername(null);
+          setRole(null);
+          setDepartment(null);
+          setTenantId(null);
         }
-      } else {
-        setUsername(null);
-        setRole(null);
-        setDepartment(null);
-        setTenantId(null);
+      } catch (error) {
+        console.error('获取用户信息异常:', error);
+      } finally {
         setIsInitialized(true);
+        setIsLoading(false);
       }
     };
 
@@ -113,8 +119,10 @@ export const useUserInfo = () => {
     }
   };
 
+  // 确保邮箱存在
   const email = user?.email || '';
 
+  // 构造用户信息对象
   const userInfo = {
     isLoggedIn: !!user,
     userId: user?.id || '',
@@ -128,6 +136,7 @@ export const useUserInfo = () => {
   return {
     userInfo,
     handleLogout,
-    isInitialized
+    isInitialized,
+    isLoading
   };
 };

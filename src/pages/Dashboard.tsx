@@ -12,7 +12,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   
   // 使用useUserInfo钩子获取用户信息
-  const { userInfo, handleLogout, isInitialized } = useUserInfo();
+  const { userInfo, handleLogout, isInitialized, isLoading } = useUserInfo();
 
   useEffect(() => {
     console.log("Dashboard - 当前用户信息:", userInfo);
@@ -35,7 +35,7 @@ const Dashboard = () => {
   };
 
   // 等待用户信息初始化完成
-  if (!isInitialized) {
+  if (!isInitialized || isLoading) {
     return <div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
         <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
