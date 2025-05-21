@@ -50,12 +50,11 @@ export const useUserInfo = () => {
           setTenantId(userData.tenant_id || null);
           
           // 获取用户角色信息 - 使用联表查询直接获取角色名称
-          // 使用 maybeSingle 替代 single，并使用 limit(1) 避免多个结果的情况
           const { data: roleData, error: roleError } = await supabase
             .from('user_roles')
             .select(`
               role_id,
-              roles(name)
+              roles(id, name)
             `)
             .eq('user_id', user.id)
             .limit(1);
@@ -71,12 +70,11 @@ export const useUserInfo = () => {
           }
           
           // 获取用户部门信息 - 使用联表查询直接获取部门名称
-          // 使用 maybeSingle 替代 single，并使用 limit(1) 避免多个结果的情况
           const { data: deptData, error: deptError } = await supabase
             .from('user_departments')
             .select(`
               department_id,
-              departments(name)
+              departments(id, name)
             `)
             .eq('user_id', user.id)
             .limit(1);
@@ -108,6 +106,7 @@ export const useUserInfo = () => {
       }
     };
 
+    // 确保只在用户状态变化或组件加载时获取信息
     fetchUserInfo();
   }, [user]);
 
@@ -121,15 +120,12 @@ export const useUserInfo = () => {
     }
   };
 
-  // 确保邮箱存在
-  const email = user?.email || '';
-
   // 构造用户信息对象
   const userInfo = {
     isLoggedIn: !!user,
     userId: user?.id || '',
     email: user?.email || '',
-    username: username || email || '未登录用户',
+    username: username || (user?.email?.split('@')[0]) || '未登录用户',
     role: role || '普通用户',
     department: department || '未分配',
     tenantId: tenantId || '',
