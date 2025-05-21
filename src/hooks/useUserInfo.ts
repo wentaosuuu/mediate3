@@ -39,11 +39,13 @@ export const useUserInfo = () => {
             return;
           }
           
+          console.log('获取到用户基本信息:', userData);
+          
           // 设置用户名和租户ID
           setUsername(userData.username || userData.name || user.email || null);
           setTenantId(userData.tenant_id || null);
           
-          // 获取用户角色信息 - 直接使用更简单的查询
+          // 获取用户角色信息 - 使用联表查询直接获取角色名称
           const { data: roleData, error: roleError } = await supabase
             .from('user_roles')
             .select(`
@@ -51,22 +53,19 @@ export const useUserInfo = () => {
               roles:roles(name)
             `)
             .eq('user_id', user.id)
-            .single();
+            .limit(1);
             
-          if (roleError && roleError.code !== 'PGRST116') {
-            // PGRST116是未找到数据的错误，我们不把它当作真正的错误
+          if (roleError) {
             console.error('获取用户角色失败:', roleError);
-          }
-          
-          if (roleData && roleData.roles) {
-            console.log('找到用户角色:', roleData.roles);
-            setRole(roleData.roles.name);
+          } else if (roleData && roleData.length > 0 && roleData[0].roles) {
+            console.log('找到用户角色:', roleData[0].roles.name);
+            setRole(roleData[0].roles.name);
           } else {
             console.log('未找到用户角色信息，设置为默认值');
             setRole('普通用户');
           }
           
-          // 获取用户部门信息 - 直接使用更简单的查询
+          // 获取用户部门信息 - 使用联表查询直接获取部门名称
           const { data: deptData, error: deptError } = await supabase
             .from('user_departments')
             .select(`
@@ -74,26 +73,29 @@ export const useUserInfo = () => {
               departments:departments(name)
             `)
             .eq('user_id', user.id)
-            .single();
+            .limit(1);
             
-          if (deptError && deptError.code !== 'PGRST116') {
-            // PGRST116是未找到数据的错误，我们不把它当作真正的错误
+          if (deptError) {
             console.error('获取用户部门失败:', deptError);
-          }
-          
-          if (deptData && deptData.departments) {
-            console.log('找到用户部门:', deptData.departments);
-            setDepartment(deptData.departments.name);
+          } else if (deptData && deptData.length > 0 && deptData[0].departments) {
+            console.log('找到用户部门:', deptData[0].departments.name);
+            setDepartment(deptData[0].departments.name);
           } else {
             console.log('未找到用户部门信息，设置为默认值');
             setDepartment('未分配');
           }
+
+          console.log('用户信息加载完成，用户名:', userData.username || userData.name || user.email);
         } catch (error) {
           console.error('获取用户信息异常:', error);
         } finally {
           setIsInitialized(true);
         }
       } else {
+        setUsername(null);
+        setRole(null);
+        setDepartment(null);
+        setTenantId(null);
         setIsInitialized(true);
       }
     };

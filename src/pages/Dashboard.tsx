@@ -34,6 +34,16 @@ const Dashboard = () => {
     navigate(path);
   };
 
+  // 等待用户信息初始化完成
+  if (!isInitialized) {
+    return <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+        <p className="mt-4 text-gray-600">加载用户信息中...</p>
+      </div>
+    </div>
+  }
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       <div className="fixed left-0 top-0 h-full w-64 z-30">
