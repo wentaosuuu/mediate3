@@ -50,11 +50,12 @@ export const useUserInfo = () => {
           setTenantId(userData.tenant_id || null);
           
           // 获取用户角色信息 - 使用联表查询直接获取角色名称
+          // 使用 maybeSingle 替代 single，并使用 limit(1) 避免多个结果的情况
           const { data: roleData, error: roleError } = await supabase
             .from('user_roles')
             .select(`
               role_id,
-              roles:roles(name)
+              roles(name)
             `)
             .eq('user_id', user.id)
             .limit(1);
@@ -70,11 +71,12 @@ export const useUserInfo = () => {
           }
           
           // 获取用户部门信息 - 使用联表查询直接获取部门名称
+          // 使用 maybeSingle 替代 single，并使用 limit(1) 避免多个结果的情况
           const { data: deptData, error: deptError } = await supabase
             .from('user_departments')
             .select(`
               department_id,
-              departments:departments(name)
+              departments(name)
             `)
             .eq('user_id', user.id)
             .limit(1);
