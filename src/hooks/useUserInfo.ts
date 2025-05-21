@@ -57,13 +57,13 @@ export const useUserInfo = () => {
               roles(id, name)
             `)
             .eq('user_id', user.id)
-            .limit(1);
+            .maybeSingle();
             
           if (roleError) {
             console.error('获取用户角色失败:', roleError);
-          } else if (roleData && roleData.length > 0 && roleData[0].roles) {
-            console.log('找到用户角色:', roleData[0].roles.name);
-            setRole(roleData[0].roles.name);
+          } else if (roleData && roleData.roles) {
+            console.log('找到用户角色:', roleData.roles.name);
+            setRole(roleData.roles.name);
           } else {
             console.log('未找到用户角色信息，设置为默认值');
             setRole('普通用户');
@@ -77,13 +77,13 @@ export const useUserInfo = () => {
               departments(id, name)
             `)
             .eq('user_id', user.id)
-            .limit(1);
+            .maybeSingle();
             
           if (deptError) {
             console.error('获取用户部门失败:', deptError);
-          } else if (deptData && deptData.length > 0 && deptData[0].departments) {
-            console.log('找到用户部门:', deptData[0].departments.name);
-            setDepartment(deptData[0].departments.name);
+          } else if (deptData && deptData.departments) {
+            console.log('找到用户部门:', deptData.departments.name);
+            setDepartment(deptData.departments.name);
           } else {
             console.log('未找到用户部门信息，设置为默认值');
             setDepartment('未分配');
