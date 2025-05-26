@@ -31,25 +31,21 @@ export const useUserInfo = () => {
 
           if (userError) {
             console.error('获取用户基本信息失败:', userError);
-            setIsInitialized(true);
-            setIsLoading(false);
-            return;
+          } else if (userData) {
+            console.log('获取到用户基本信息:', userData);
+            
+            // 设置用户名和租户ID
+            const displayName = userData.username || userData.name || user.email?.split('@')[0] || '用户';
+            setUsername(displayName);
+            setTenantId(userData.tenant_id || null);
+            console.log('设置用户名为:', displayName);
+          } else {
+            console.log('未找到用户基本信息，使用默认值');
+            const displayName = user.email?.split('@')[0] || '用户';
+            setUsername(displayName);
           }
           
-          if (!userData) {
-            console.error('未找到用户信息');
-            setIsInitialized(true);
-            setIsLoading(false);
-            return;
-          }
-          
-          console.log('获取到用户基本信息:', userData);
-          
-          // 设置用户名和租户ID
-          setUsername(userData.username || userData.name || user.email || '未知用户');
-          setTenantId(userData.tenant_id || null);
-          
-          // 获取用户角色信息 - 使用联表查询直接获取角色名称
+          // 获取用户角色信息
           const { data: roleData, error: roleError } = await supabase
             .from('user_roles')
             .select(`
@@ -61,6 +57,7 @@ export const useUserInfo = () => {
             
           if (roleError) {
             console.error('获取用户角色失败:', roleError);
+            setRole('普通用户');
           } else if (roleData && roleData.roles) {
             console.log('找到用户角色:', roleData.roles.name);
             setRole(roleData.roles.name);
@@ -69,7 +66,7 @@ export const useUserInfo = () => {
             setRole('普通用户');
           }
           
-          // 获取用户部门信息 - 使用联表查询直接获取部门名称
+          // 获取用户部门信息
           const { data: deptData, error: deptError } = await supabase
             .from('user_departments')
             .select(`
@@ -81,6 +78,7 @@ export const useUserInfo = () => {
             
           if (deptError) {
             console.error('获取用户部门失败:', deptError);
+            setDepartment('未分配');
           } else if (deptData && deptData.departments) {
             console.log('找到用户部门:', deptData.departments.name);
             setDepartment(deptData.departments.name);
@@ -89,7 +87,7 @@ export const useUserInfo = () => {
             setDepartment('未分配');
           }
 
-          console.log('用户信息加载完成，用户名:', username);
+          console.log('用户信息加载完成');
         } else {
           // 用户未登录，重置所有状态
           console.log('用户未登录，重置状态');
@@ -100,15 +98,20 @@ export const useUserInfo = () => {
         }
       } catch (error) {
         console.error('获取用户信息异常:', error);
+        // 设置默认值以防出错
+        if (user) {
+          setUsername(user.email?.split('@')[0] || '用户');
+          setRole('普通用户');
+          setDepartment('未分配');
+        }
       } finally {
         setIsInitialized(true);
         setIsLoading(false);
       }
     };
 
-    // 确保只在用户状态变化或组件加载时获取信息
     fetchUserInfo();
-  }, [user]);
+  }, [user?.id]); // 依赖 user.id 而不是整个 user 对象
 
   const handleLogout = async () => {
     try {
@@ -125,11 +128,13 @@ export const useUserInfo = () => {
     isLoggedIn: !!user,
     userId: user?.id || '',
     email: user?.email || '',
-    username: username || (user?.email?.split('@')[0]) || '未登录用户',
+    username: username || (user ? (user.email?.split('@')[0] || '用户') : '未登录用户'),
     role: role || '普通用户',
     department: department || '未分配',
     tenantId: tenantId || '',
   };
+
+  console.log('当前返回的用户信息:', userInfo);
 
   return {
     userInfo,
