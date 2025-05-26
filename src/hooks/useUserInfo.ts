@@ -34,13 +34,13 @@ export const useUserInfo = () => {
           } else if (userData) {
             console.log('获取到用户基本信息:', userData);
             
-            // 设置用户名和租户ID
-            const displayName = userData.username || userData.name || user.email?.split('@')[0] || '用户';
+            // 优先使用 name 字段，其次是 username，最后是邮箱前缀
+            const displayName = userData.name || userData.username || user.email?.split('@')[0] || '用户';
             setUsername(displayName);
             setTenantId(userData.tenant_id || null);
             console.log('设置用户名为:', displayName);
           } else {
-            console.log('未找到用户基本信息，使用默认值');
+            console.log('未找到用户基本信息，使用邮箱前缀');
             const displayName = user.email?.split('@')[0] || '用户';
             setUsername(displayName);
           }
@@ -123,14 +123,14 @@ export const useUserInfo = () => {
     }
   };
 
-  // 构造用户信息对象
+  // 构造用户信息对象 - 修复这里的逻辑
   const userInfo = {
     isLoggedIn: !!user,
     userId: user?.id || '',
     email: user?.email || '',
-    username: username || (user ? (user.email?.split('@')[0] || '用户') : '未登录用户'),
-    role: role || '普通用户',
-    department: department || '未分配',
+    username: username || '未登录用户', // 直接使用 username 状态
+    role: role || '普通用户', // 直接使用 role 状态
+    department: department || '未分配', // 直接使用 department 状态
     tenantId: tenantId || '',
   };
 
