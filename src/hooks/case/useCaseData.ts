@@ -57,11 +57,17 @@ export const useCaseData = (
   // 处理新增单个案件成功
   const handleAddCaseSuccess = useCallback(async (newCase: Case) => {
     try {
-      // 确保案件对象包含tenant_id和user_id
+      // 验证必需的用户信息
+      if (!userInfo.userId) {
+        toast.error('用户信息不完整，请重新登录');
+        return;
+      }
+
+      // 确保案件对象包含必要的元数据
       const caseWithMetadata = {
         ...newCase,
         tenant_id: userInfo.tenantId || 'default-tenant',
-        user_id: userInfo.userId // 添加用户ID
+        user_id: userInfo.userId
       };
       
       console.log('准备添加案件:', caseWithMetadata);
@@ -74,7 +80,7 @@ export const useCaseData = (
         
       if (error) {
         console.error('添加案件失败:', error);
-        toast.error('添加案件失败: ' + error.message);
+        toast.error(`添加案件失败: ${error.message}`);
         return;
       }
       
@@ -97,33 +103,87 @@ export const useCaseData = (
         toast.error('导入的案件数据为空');
         return;
       }
-      
-      // 确保每个案件对象都包含tenant_id和user_id
-      const casesWithMetadata = importedCases.map(caseItem => ({
-        ...caseItem,
-        tenant_id: userInfo.tenantId || 'default-tenant',
-        user_id: userInfo.userId // 添加用户ID
-      }));
-      
-      console.log('导入的案件数据:', casesWithMetadata);
-      
-      // 保存导入的案件到数据库
-      const { data, error } = await supabase
-        .from('cases')
-        .insert(casesWithMetadata)
-        .select();
-        
-      if (error) {
-        console.error('导入案件失败:', error);
-        toast.error('导入案件失败: ' + error.message);
+
+      // 验证必需的用户信息
+      if (!userInfo.userId) {
+        toast.error('用户信息不完整，请重新登录');
         return;
       }
       
-      // 更新本地状态
-      if (data && data.length > 0) {
-        importCases(data, cases, setCases);
-        toast.success(`成功导入 ${data.length} 个案件`);
+      // 确保每个案件对象都包含必要的元数据，并过滤掉无效数据
+      const validCases = importedCases
+        .filter(caseItem => {
+          // 验证必需字段
+          if (!caseItem.case_number || !caseItem.batch_number || 
+              !caseItem.borrower_number || !caseItem.id_number || 
+              !caseItem.customer_name) {
+            console.warn('跳过无效案件数据:', caseItem);
+            return false;
+          }
+          return true;
+        })
+        .map(caseItem => ({
+          ...caseItem,
+          tenant_id: userInfo.tenantId || 'default-tenant',
+          user_id: userInfo.userId,
+          // 确保时间字段有默认值
+          latest_progress_time: caseItem.latest_progress_time || new Date().toISOString(),
+          latest_edit_time: caseItem.latest_edit_time || new Date().toISOString(),
+          case_entry_time: caseItem.case_entry_time || new Date().toISOString()
+        }));
+
+      if (validCases.length === 0) {
+        toast.error('没有有效的案件数据可导入');
+        return;
       }
+      
+      console.log('准备导入的有效案件数据:', validCases);
+      
+      // 分批插入数据以避免请求过大
+      const batchSize = 50;
+      const batches = [];
+      for (let i = 0; i < validCases.length; i += batchSize) {
+        batches.push(validCases.slice(i, i + batchSize));
+      }
+
+      let allInsertedCases: Case[] = [];
+      let successCount = 0;
+      let errorCount = 0;
+
+      for (const batch of batches) {
+        try {
+          const { data, error } = await supabase
+            .from('cases')
+            .insert(batch)
+            .select();
+            
+          if (error) {
+            console.error('批次导入失败:', error);
+            errorCount += batch.length;
+          } else if (data) {
+            allInsertedCases.push(...data);
+            successCount += data.length;
+          }
+        } catch (error) {
+          console.error('批次导入异常:', error);
+          errorCount += batch.length;
+        }
+      }
+      
+      // 更新本地状态
+      if (allInsertedCases.length > 0) {
+        importCases(allInsertedCases, cases, setCases);
+      }
+
+      // 显示结果
+      if (successCount > 0 && errorCount === 0) {
+        toast.success(`成功导入 ${successCount} 个案件`);
+      } else if (successCount > 0 && errorCount > 0) {
+        toast.warning(`成功导入 ${successCount} 个案件，${errorCount} 个案件导入失败`);
+      } else {
+        toast.error('所有案件导入失败，请检查数据格式');
+      }
+      
     } catch (error: any) {
       console.error('导入案件异常:', error);
       toast.error(`导入案件失败: ${error?.message || '未知错误'}`);

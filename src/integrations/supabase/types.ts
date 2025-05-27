@@ -50,6 +50,7 @@ export type Database = {
           tenant_id: string
           total_periods: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           actual_repayment?: string | null
@@ -91,6 +92,7 @@ export type Database = {
           tenant_id: string
           total_periods?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           actual_repayment?: string | null
@@ -132,6 +134,7 @@ export type Database = {
           tenant_id?: string
           total_periods?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
