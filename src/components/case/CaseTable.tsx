@@ -7,25 +7,37 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import type { CaseTableProps } from '@/types/case';
 import { Case } from '@/types/case';
 
-export const CaseTable = ({ data, isLoading, visibleColumns = [] }: CaseTableProps) => {
-  // 添加选中案件状态管理
-  const [selectedCases, setSelectedCases] = useState<Record<string, boolean>>({});
+interface ExtendedCaseTableProps extends CaseTableProps {
+  onCaseEdit?: (caseData: Case) => void;
+  onCaseDelete?: (caseData: Case) => void;
+  onCaseSelect?: (caseId: string, isSelected: boolean) => void;
+  onSelectAll?: (isSelected: boolean) => void;
+  selectedCases?: Record<string, boolean>;
+}
+
+export const CaseTable = ({ 
+  data, 
+  isLoading, 
+  visibleColumns = [],
+  onCaseEdit,
+  onCaseDelete,
+  onCaseSelect,
+  onSelectAll,
+  selectedCases = {}
+}: ExtendedCaseTableProps) => {
   
   // 处理单个案件选择
   const handleSelectCase = (caseId: string, isSelected: boolean) => {
-    setSelectedCases(prev => ({
-      ...prev,
-      [caseId]: isSelected
-    }));
+    if (onCaseSelect) {
+      onCaseSelect(caseId, isSelected);
+    }
   };
   
   // 处理全选/取消全选
   const handleSelectAll = (isSelected: boolean) => {
-    const newSelectedCases: Record<string, boolean> = {};
-    data.forEach(caseItem => {
-      newSelectedCases[caseItem.id] = isSelected;
-    });
-    setSelectedCases(newSelectedCases);
+    if (onSelectAll) {
+      onSelectAll(isSelected);
+    }
   };
   
   // 检查是否全选
@@ -65,6 +77,8 @@ export const CaseTable = ({ data, isLoading, visibleColumns = [] }: CaseTablePro
                     isSelected={selectedCases[caseItem.id] || false}
                     onSelectChange={(isSelected) => handleSelectCase(caseItem.id, isSelected)}
                     showSelection={true}
+                    onEdit={onCaseEdit}
+                    onDelete={onCaseDelete}
                   />
                 ))
               )}

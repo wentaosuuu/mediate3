@@ -86,6 +86,7 @@ export const useCaseDistribution = () => {
     handleAddCaseSuccess: caseData.handleAddCaseSuccess,
     handleImportCasesSuccess: caseData.handleImportCasesSuccess,
     handleSelectCase: caseSelection.handleSelectCase,
-    handleSelectAll: caseSelection.handleSelectAll
+    handleSelectAll: caseSelection.handleSelectAll,
+    handleDeleteCase: caseData.handleDeleteCase
   };
 };

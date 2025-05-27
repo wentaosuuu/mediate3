@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navigation } from '@/components/dashboard/Navigation';
 import { TopBar } from '@/components/dashboard/TopBar';
@@ -10,12 +10,34 @@ import { useUserInfo } from '@/hooks/useUserInfo';
 import { Toaster } from 'sonner';
 import { NewCaseDialog } from '@/components/case/dialogs/NewCaseDialog';
 import { ImportCasesDialog } from '@/components/case/dialogs/ImportCasesDialog';
+import { CaseDetailDialog } from '@/components/case/dialogs/CaseDetailDialog';
+import { CaseDistributionDialog } from '@/components/case/dialogs/CaseDistributionDialog';
+import { ImportErrorDialog } from '@/components/case/dialogs/ImportErrorDialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Case } from '@/types/case';
+import { toast } from 'sonner';
 
 const CaseDistribution = () => {
   const navigate = useNavigate();
   
   // 使用useUserInfo钩子获取用户信息
   const { userInfo, handleLogout, isInitialized } = useUserInfo();
+  
+  // 对话框状态
+  const [selectedCaseForDetail, setSelectedCaseForDetail] = useState<Case | null>(null);
+  const [isDistributionDialogOpen, setIsDistributionDialogOpen] = useState(false);
+  const [isImportErrorDialogOpen, setIsImportErrorDialogOpen] = useState(false);
+  const [importErrors, setImportErrors] = useState<Array<{row: number, field: string, value: string, message: string}>>([]);
+  const [caseToDelete, setCaseToDelete] = useState<Case | null>(null);
   
   useEffect(() => {
     console.log("CaseDistribution - 当前用户信息:", userInfo);
@@ -46,7 +68,11 @@ const CaseDistribution = () => {
     setIsAddDialogOpen,
     setIsImportDialogOpen,
     handleAddCaseSuccess,
-    handleImportCasesSuccess
+    handleImportCasesSuccess,
+    handleSelectCase,
+    handleSelectAll,
+    selectedCases,
+    handleDeleteCase
   } = useCaseDistribution();
 
   const handleMenuClick = (path: string) => {
@@ -58,6 +84,50 @@ const CaseDistribution = () => {
     if (success) {
       navigate('/');
     }
+  };
+
+  // 处理案件详情查看
+  const handleCaseEdit = (caseData: Case) => {
+    setSelectedCaseForDetail(caseData);
+  };
+
+  // 处理案件删除
+  const handleCaseDelete = (caseData: Case) => {
+    setCaseToDelete(caseData);
+  };
+
+  // 确认删除案件
+  const confirmDeleteCase = async () => {
+    if (caseToDelete && handleDeleteCase) {
+      const success = await handleDeleteCase(caseToDelete.id);
+      if (success) {
+        setCaseToDelete(null);
+      }
+    }
+  };
+
+  // 处理选中分案
+  const handleDistributionClick = () => {
+    if (selectedCasesCount === 0) {
+      toast.error('请先选择要分案的案件');
+      return;
+    }
+    setIsDistributionDialogOpen(true);
+  };
+
+  // 确认分案
+  const handleDistributionConfirm = (distributorId: string) => {
+    const distributorName = ['张三', '李四', '王五', '赵六'][parseInt(distributorId) - 1];
+    toast.success(`已将 ${selectedCasesCount} 个案件分配给${distributorName}`);
+    // 这里可以添加实际的分案逻辑
+  };
+
+  // 处理导入案件成功，带错误处理
+  const handleImportSuccess = (cases: Case[]) => {
+    handleImportCasesSuccess(cases, (errors) => {
+      setImportErrors(errors);
+      setIsImportErrorDialogOpen(true);
+    });
   };
 
   // 等待用户信息初始化完成
@@ -104,9 +174,14 @@ const CaseDistribution = () => {
             onImportCases={handleImportCases}
             onExportCases={handleExportCases}
             onColumnsChange={handleColumnVisibilityChange}
-            onSelectedDistribution={handleSelectedDistribution}
+            onSelectedDistribution={handleDistributionClick}
             onOneClickClose={handleOneClickClose}
             onDownloadTemplate={handleDownloadTemplate}
+            onCaseEdit={handleCaseEdit}
+            onCaseDelete={handleCaseDelete}
+            onCaseSelect={handleSelectCase}
+            onSelectAll={handleSelectAll}
+            selectedCases={selectedCases}
           />
           
           {/* 新增案件弹窗 */}
@@ -120,9 +195,50 @@ const CaseDistribution = () => {
           <ImportCasesDialog 
             open={isImportDialogOpen} 
             onOpenChange={setIsImportDialogOpen}
-            onSuccess={handleImportCasesSuccess}
+            onSuccess={handleImportSuccess}
             onDownloadTemplate={handleDownloadTemplate}
           />
+
+          {/* 案件详情弹窗 */}
+          <CaseDetailDialog
+            open={!!selectedCaseForDetail}
+            onOpenChange={(open) => !open && setSelectedCaseForDetail(null)}
+            caseData={selectedCaseForDetail}
+          />
+
+          {/* 选中分案弹窗 */}
+          <CaseDistributionDialog
+            open={isDistributionDialogOpen}
+            onOpenChange={setIsDistributionDialogOpen}
+            selectedCasesCount={selectedCasesCount}
+            onConfirm={handleDistributionConfirm}
+          />
+
+          {/* 导入错误弹窗 */}
+          <ImportErrorDialog
+            open={isImportErrorDialogOpen}
+            onOpenChange={setIsImportErrorDialogOpen}
+            errors={importErrors}
+            totalRows={importErrors.length}
+          />
+
+          {/* 删除确认对话框 */}
+          <AlertDialog open={!!caseToDelete} onOpenChange={(open) => !open && setCaseToDelete(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>确认删除</AlertDialogTitle>
+                <AlertDialogDescription>
+                  您确定要删除案件"{caseToDelete?.case_number}"吗？此操作不可撤销。
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>取消</AlertDialogCancel>
+                <AlertDialogAction onClick={confirmDeleteCase}>
+                  确认删除
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </MainContent>
       </div>
       

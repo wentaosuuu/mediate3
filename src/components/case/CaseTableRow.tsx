@@ -13,6 +13,8 @@ interface CaseTableRowProps {
   isSelected?: boolean;
   onSelectChange?: (isSelected: boolean) => void;
   showSelection?: boolean;
+  onEdit?: (caseData: Case) => void;
+  onDelete?: (caseData: Case) => void;
 }
 
 export const CaseTableRow = ({ 
@@ -20,7 +22,9 @@ export const CaseTableRow = ({
   visibleColumns = [], 
   isSelected = false,
   onSelectChange,
-  showSelection = false
+  showSelection = false,
+  onEdit,
+  onDelete
 }: CaseTableRowProps) => {
   const formatDate = (date: string | null) => {
     if (!date) return '-';
@@ -36,6 +40,22 @@ export const CaseTableRow = ({
   const handleSelectChange = (checked: boolean) => {
     if (onSelectChange) {
       onSelectChange(checked);
+    }
+  };
+
+  // 处理编辑操作
+  const handleEdit = () => {
+    console.log('查看案件详情:', caseItem.id);
+    if (onEdit) {
+      onEdit(caseItem);
+    }
+  };
+
+  // 处理删除操作
+  const handleDelete = () => {
+    console.log('删除案件:', caseItem.id);
+    if (onDelete) {
+      onDelete(caseItem);
     }
   };
 
@@ -64,17 +84,6 @@ export const CaseTableRow = ({
     ? visibleColumns.filter(col => col !== 'actions')
     : Object.keys(cellRenderers);
 
-  // 处理案件操作的函数
-  const handleEdit = () => {
-    console.log('编辑案件:', caseItem.id);
-    // 这里可以添加编辑案件的逻辑
-  };
-
-  const handleDelete = () => {
-    console.log('删除案件:', caseItem.id);
-    // 这里可以添加删除案件的逻辑
-  };
-
   return (
     <TableRow>
       {/* 添加选择框列 */}
@@ -92,6 +101,7 @@ export const CaseTableRow = ({
       {columnsToShow.map(column => (
         React.cloneElement(cellRenderers[column] as React.ReactElement, { key: column })
       ))}
+      
       {/* 添加固定在右侧的操作列 */}
       <TableCell className="sticky right-0 bg-white shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)] whitespace-nowrap">
         <div className="flex items-center space-x-2">
@@ -100,6 +110,7 @@ export const CaseTableRow = ({
             size="icon"
             onClick={handleEdit}
             className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+            title="查看详情"
           >
             <FileEdit className="h-4 w-4" />
           </Button>
@@ -108,6 +119,7 @@ export const CaseTableRow = ({
             size="icon"
             onClick={handleDelete}
             className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+            title="删除案件"
           >
             <Trash2 className="h-4 w-4" />
           </Button>

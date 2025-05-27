@@ -24,6 +24,11 @@ interface CaseDistributionLayoutProps {
   onSelectedDistribution: () => void;
   onOneClickClose: () => void;
   onDownloadTemplate: () => void;
+  onCaseEdit?: (caseData: Case) => void;
+  onCaseDelete?: (caseData: Case) => void;
+  onCaseSelect?: (caseId: string, isSelected: boolean) => void;
+  onSelectAll?: (isSelected: boolean) => void;
+  selectedCases?: Record<string, boolean>;
 }
 
 export const CaseDistributionLayout: React.FC<CaseDistributionLayoutProps> = ({
@@ -43,7 +48,12 @@ export const CaseDistributionLayout: React.FC<CaseDistributionLayoutProps> = ({
   onColumnsChange,
   onSelectedDistribution,
   onOneClickClose,
-  onDownloadTemplate
+  onDownloadTemplate,
+  onCaseEdit,
+  onCaseDelete,
+  onCaseSelect,
+  onSelectAll,
+  selectedCases = {}
 }) => {
   return (
     <>
@@ -73,6 +83,11 @@ export const CaseDistributionLayout: React.FC<CaseDistributionLayoutProps> = ({
             data={cases} 
             isLoading={isLoading} 
             visibleColumns={visibleColumns}
+            onCaseEdit={onCaseEdit}
+            onCaseDelete={onCaseDelete}
+            onCaseSelect={onCaseSelect}
+            onSelectAll={onSelectAll}
+            selectedCases={selectedCases}
           />
         </div>
       </div>

@@ -54,6 +54,57 @@ export const useCaseData = (
     }, 1000);
   }, [setIsLoading]);
 
+  // 检查重复案件
+  const checkDuplicateCases = useCallback(async (casesToImport: Case[]) => {
+    try {
+      const caseNumbers = casesToImport.map(c => c.case_number);
+      const borrowerNumbers = casesToImport.map(c => c.borrower_number);
+      
+      const { data: existingCases, error } = await supabase
+        .from('cases')
+        .select('case_number, borrower_number')
+        .or(`case_number.in.(${caseNumbers.join(',')}),borrower_number.in.(${borrowerNumbers.join(',')})`);
+      
+      if (error) {
+        console.error('检查重复案件失败:', error);
+        return [];
+      }
+      
+      const duplicates: Array<{row: number, field: string, value: string, message: string}> = [];
+      
+      casesToImport.forEach((caseItem, index) => {
+        const existingCase = existingCases?.find(existing => 
+          existing.case_number === caseItem.case_number || 
+          existing.borrower_number === caseItem.borrower_number
+        );
+        
+        if (existingCase) {
+          if (existingCase.case_number === caseItem.case_number) {
+            duplicates.push({
+              row: index + 2,
+              field: '案件编号',
+              value: caseItem.case_number,
+              message: '案件编号已存在'
+            });
+          }
+          if (existingCase.borrower_number === caseItem.borrower_number) {
+            duplicates.push({
+              row: index + 2,
+              field: '借据编号',
+              value: caseItem.borrower_number,
+              message: '借据编号已存在'
+            });
+          }
+        }
+      });
+      
+      return duplicates;
+    } catch (error) {
+      console.error('检查重复案件异常:', error);
+      return [];
+    }
+  }, []);
+
   // 处理新增单个案件成功
   const handleAddCaseSuccess = useCallback(async (newCase: Case) => {
     try {
@@ -97,7 +148,10 @@ export const useCaseData = (
   }, [cases, setCases, userInfo]);
   
   // 处理批量导入案件成功
-  const handleImportCasesSuccess = useCallback(async (importedCases: Case[]) => {
+  const handleImportCasesSuccess = useCallback(async (
+    importedCases: Case[], 
+    onError?: (errors: Array<{row: number, field: string, value: string, message: string}>) => void
+  ) => {
     try {
       if (!importedCases || importedCases.length === 0) {
         toast.error('导入的案件数据为空');
@@ -107,6 +161,15 @@ export const useCaseData = (
       // 验证必需的用户信息
       if (!userInfo.userId) {
         toast.error('用户信息不完整，请重新登录');
+        return;
+      }
+      
+      // 检查重复案件
+      const duplicateErrors = await checkDuplicateCases(importedCases);
+      if (duplicateErrors.length > 0) {
+        if (onError) {
+          onError(duplicateErrors);
+        }
         return;
       }
       
@@ -188,7 +251,32 @@ export const useCaseData = (
       console.error('导入案件异常:', error);
       toast.error(`导入案件失败: ${error?.message || '未知错误'}`);
     }
-  }, [cases, setCases, userInfo]);
+  }, [cases, setCases, userInfo, checkDuplicateCases]);
+
+  // 删除案件
+  const handleDeleteCase = useCallback(async (caseId: string) => {
+    try {
+      const { error } = await supabase
+        .from('cases')
+        .delete()
+        .eq('id', caseId);
+      
+      if (error) {
+        console.error('删除案件失败:', error);
+        toast.error(`删除案件失败: ${error.message}`);
+        return false;
+      }
+      
+      // 更新本地状态
+      setCases(cases.filter(c => c.id !== caseId));
+      toast.success('案件删除成功');
+      return true;
+    } catch (error) {
+      console.error('删除案件异常:', error);
+      toast.error('删除案件失败，发生异常');
+      return false;
+    }
+  }, [cases, setCases]);
 
   // 初始加载案件数据
   useEffect(() => {
@@ -201,6 +289,7 @@ export const useCaseData = (
     fetchCases,
     handleSearchCases,
     handleAddCaseSuccess,
-    handleImportCasesSuccess
+    handleImportCasesSuccess,
+    handleDeleteCase
   };
 };
