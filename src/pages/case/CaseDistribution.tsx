@@ -24,7 +24,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Case } from '@/types/case';
-import { toast } from 'sonner';
 
 const CaseDistribution = () => {
   const navigate = useNavigate();
@@ -34,7 +33,6 @@ const CaseDistribution = () => {
   
   // 对话框状态
   const [selectedCaseForDetail, setSelectedCaseForDetail] = useState<Case | null>(null);
-  const [isDistributionDialogOpen, setIsDistributionDialogOpen] = useState(false);
   const [isImportErrorDialogOpen, setIsImportErrorDialogOpen] = useState(false);
   const [importErrors, setImportErrors] = useState<Array<{row: number, field: string, value: string, message: string}>>([]);
   const [caseToDelete, setCaseToDelete] = useState<Case | null>(null);
@@ -53,6 +51,7 @@ const CaseDistribution = () => {
     selectedCasesCount,
     isAddDialogOpen,
     isImportDialogOpen,
+    isDistributionDialogOpen,
     handleSearch,
     handleSearchCases,
     handleReset,
@@ -67,12 +66,14 @@ const CaseDistribution = () => {
     setCaseStatus,
     setIsAddDialogOpen,
     setIsImportDialogOpen,
+    setIsDistributionDialogOpen,
     handleAddCaseSuccess,
     handleImportCasesSuccess,
     handleSelectCase,
     handleSelectAll,
     selectedCases,
-    handleDeleteCase
+    handleDeleteCase,
+    handleDistributionConfirm
   } = useCaseDistribution();
 
   const handleMenuClick = (path: string) => {
@@ -104,22 +105,6 @@ const CaseDistribution = () => {
         setCaseToDelete(null);
       }
     }
-  };
-
-  // 处理选中分案
-  const handleDistributionClick = () => {
-    if (selectedCasesCount === 0) {
-      toast.error('请先选择要分案的案件');
-      return;
-    }
-    setIsDistributionDialogOpen(true);
-  };
-
-  // 确认分案
-  const handleDistributionConfirm = (distributorId: string) => {
-    const distributorName = ['张三', '李四', '王五', '赵六'][parseInt(distributorId) - 1];
-    toast.success(`已将 ${selectedCasesCount} 个案件分配给${distributorName}`);
-    // 这里可以添加实际的分案逻辑
   };
 
   // 处理导入案件成功，带错误处理
@@ -174,7 +159,7 @@ const CaseDistribution = () => {
             onImportCases={handleImportCases}
             onExportCases={handleExportCases}
             onColumnsChange={handleColumnVisibilityChange}
-            onSelectedDistribution={handleDistributionClick}
+            onSelectedDistribution={handleSelectedDistribution}
             onOneClickClose={handleOneClickClose}
             onDownloadTemplate={handleDownloadTemplate}
             onCaseEdit={handleCaseEdit}

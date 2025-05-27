@@ -6,6 +6,7 @@ import { useCaseSelection } from './useCaseSelection';
 import { useCaseData } from './useCaseData';
 import { useColumnVisibility } from './useColumnVisibility';
 import { useCaseActions } from './useCaseActions';
+import { useCaseDistributionActions } from './useCaseDistributionActions';
 
 /**
  * 案件分发管理钩子 - 整合所有案件分发相关的功能
@@ -43,6 +44,13 @@ export const useCaseDistribution = () => {
     caseState.cases
   );
 
+  // 使用案件分发操作钩子
+  const distributionActions = useCaseDistributionActions(
+    caseState.cases,
+    caseState.setCases,
+    caseState.setSelectedCases
+  );
+
   // 处理普通搜索（顶部栏）
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -59,6 +67,22 @@ export const useCaseDistribution = () => {
     selectAllFunction(caseState.cases);
   };
 
+  // 处理选中分案点击
+  const handleSelectedDistribution = () => {
+    const selectedIds = caseSelection.getSelectedCaseIds();
+    if (selectedIds.length === 0) {
+      return;
+    }
+    distributionActions.setIsDistributionDialogOpen(true);
+  };
+
+  // 处理分案确认
+  const handleDistributionConfirm = (distributorId: string) => {
+    const selectedIds = caseSelection.getSelectedCaseIds();
+    distributionActions.handleDistributionConfirm(distributorId, selectedIds);
+    distributionActions.setIsDistributionDialogOpen(false);
+  };
+
   return {
     // 状态
     searchQuery,
@@ -73,6 +97,7 @@ export const useCaseDistribution = () => {
     isAddDialogOpen: caseState.isAddDialogOpen,
     isImportDialogOpen: caseState.isImportDialogOpen,
     selectedCases: caseState.selectedCases,
+    isDistributionDialogOpen: distributionActions.isDistributionDialogOpen,
     
     // 方法
     handleSearch,
@@ -82,17 +107,19 @@ export const useCaseDistribution = () => {
     handleImportCases: caseActions.handleImportCases,
     handleExportCases: caseActions.handleExport,
     handleColumnVisibilityChange: columnVisibility.updateColumnVisibility,
-    handleSelectedDistribution: caseSelection.handleSelectedDistribution,
+    handleSelectedDistribution,
     handleOneClickClose: caseSelection.handleOneClickClose,
     handleDownloadTemplate: caseActions.handleDownload,
     setSelectedDepartment: caseState.setSelectedDepartment,
     setCaseStatus: caseState.setCaseStatus,
     setIsAddDialogOpen: caseState.setIsAddDialogOpen,
     setIsImportDialogOpen: caseState.setIsImportDialogOpen,
+    setIsDistributionDialogOpen: distributionActions.setIsDistributionDialogOpen,
     handleAddCaseSuccess: caseData.handleAddCaseSuccess,
     handleImportCasesSuccess: caseData.handleImportCasesSuccess,
     handleSelectCase: caseSelection.handleSelectCase,
     handleSelectAll: wrappedHandleSelectAll,
-    handleDeleteCase: caseData.handleDeleteCase
+    handleDeleteCase: caseData.handleDeleteCase,
+    handleDistributionConfirm
   };
 };
