@@ -21,13 +21,16 @@ export const useCaseSelection = (
     }));
   }, [setSelectedCases]);
 
-  // 处理全选/取消全选
-  const handleSelectAll = useCallback((cases: any[], isSelected: boolean) => {
-    const newSelectedCases: Record<string, boolean> = {};
-    cases.forEach(caseItem => {
-      newSelectedCases[caseItem.id] = isSelected;
-    });
-    setSelectedCases(newSelectedCases);
+  // 处理全选/取消全选 - 修改签名以匹配组件期望
+  const handleSelectAll = useCallback((isSelected: boolean) => {
+    // 我们需要从父组件获取cases数据，所以这里返回一个curry函数
+    return (cases: any[]) => {
+      const newSelectedCases: Record<string, boolean> = {};
+      cases.forEach(caseItem => {
+        newSelectedCases[caseItem.id] = isSelected;
+      });
+      setSelectedCases(newSelectedCases);
+    };
   }, [setSelectedCases]);
 
   // 获取选中的案件IDs

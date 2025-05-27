@@ -53,6 +53,12 @@ export const useCaseDistribution = () => {
     caseState.setSearchParams({});
   };
 
+  // 创建一个包装的handleSelectAll函数，传递cases数据
+  const wrappedHandleSelectAll = (isSelected: boolean) => {
+    const selectAllFunction = caseSelection.handleSelectAll(isSelected);
+    selectAllFunction(caseState.cases);
+  };
+
   return {
     // 状态
     searchQuery,
@@ -86,7 +92,7 @@ export const useCaseDistribution = () => {
     handleAddCaseSuccess: caseData.handleAddCaseSuccess,
     handleImportCasesSuccess: caseData.handleImportCasesSuccess,
     handleSelectCase: caseSelection.handleSelectCase,
-    handleSelectAll: caseSelection.handleSelectAll,
+    handleSelectAll: wrappedHandleSelectAll,
     handleDeleteCase: caseData.handleDeleteCase
   };
 };
