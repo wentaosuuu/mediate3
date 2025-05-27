@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -41,6 +42,8 @@ export const useLoginForm = () => {
     }
 
     try {
+      console.log('开始登录流程...');
+      
       // 1. 首先检查租户注册信息
       const { data: registrationData, error: registrationError } = await supabase
         .from("tenant_registrations")
@@ -90,6 +93,8 @@ export const useLoginForm = () => {
         return;
       }
 
+      console.log('登录成功，用户ID:', signInData.user.id);
+
       // 3. 登录成功后更新用户记录
       const { error: userError } = await supabase
         .from("users")
@@ -105,8 +110,13 @@ export const useLoginForm = () => {
         // 继续执行，不影响登录流程
       }
 
+      console.log('登录流程完成，准备跳转');
       toast.success("登录成功");
-      navigate("/dashboard");
+      
+      // 等待一下确保状态更新完成
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 500);
       
     } catch (error) {
       console.error("Login attempt failed:", error);
