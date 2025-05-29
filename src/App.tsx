@@ -5,6 +5,7 @@ import Index from './pages/Index';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import CaseDistribution from './pages/case/CaseDistribution';
+import MediationCenter from './pages/mediation/MediationCenter';
 import SmsService from './pages/mediation/SmsService';
 import SmsRecords from './pages/mediation/SmsRecords';
 import DepartmentQuota from './pages/quota/DepartmentQuota';
@@ -33,6 +34,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/case/distribution" element={<CaseDistribution />} />
+        <Route path="/mediation/center" element={<MediationCenter />} />
         <Route path="/mediation/sms" element={<SmsService />} />
         <Route path="/mediation/sms-records" element={<SmsRecords />} />
         <Route path="/quota/department" element={<DepartmentQuota />} />
@@ -61,7 +63,6 @@ function App() {
         <Route path="/case/*" element={<UnderDevelopmentPage title="案件管理" />} />
         
         {/* 未开发页面路由 - 调解管理 */}
-        <Route path="/mediation/center" element={<UnderDevelopmentPage title="调解中心" />} />
         <Route path="/mediation/debtor" element={<UnderDevelopmentPage title="债务人管理" />} />
         <Route path="/mediation/case-info" element={<UnderDevelopmentPage title="案件公示信息" />} />
         <Route path="/mediation/case-info-manage" element={<UnderDevelopmentPage title="案件公示信息管理" />} />
