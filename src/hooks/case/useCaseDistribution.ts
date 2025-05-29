@@ -59,6 +59,7 @@ export const useCaseDistribution = () => {
   // 重置搜索条件
   const handleReset = () => {
     caseState.setSearchParams({});
+    caseData.resetSearch(); // 使用新的重置方法
   };
 
   // 创建一个包装的handleSelectAll函数，传递cases数据

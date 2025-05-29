@@ -1,5 +1,4 @@
-
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Case } from '@/types/case';
 import { toast } from 'sonner';
@@ -17,6 +16,9 @@ export const useCaseData = (
 ) => {
   // 获取用户信息
   const { userInfo } = useUserInfo();
+  
+  // 存储原始案件数据（未过滤的完整数据）
+  const [originalCases, setOriginalCases] = useState<Case[]>([]);
 
   // 获取案件数据
   const fetchCases = useCallback(async () => {
@@ -35,7 +37,9 @@ export const useCaseData = (
         return;
       }
       
-      setCases(data || []);
+      const casesData = data || [];
+      setOriginalCases(casesData); // 保存原始数据
+      setCases(casesData); // 设置显示数据
     } catch (error) {
       console.error('获取案件数据异常:', error);
       toast.error('获取案件数据发生异常');
@@ -44,15 +48,82 @@ export const useCaseData = (
     }
   }, [setCases, setIsLoading, userInfo.userId]);
 
-  // 处理高级搜索
+  // 本地搜索过滤函数
+  const filterCases = useCallback((searchParams: SearchParams) => {
+    let filteredCases = [...originalCases];
+
+    // 遍历搜索参数并进行本地过滤
+    Object.entries(searchParams).forEach(([key, value]) => {
+      if (!value || value === '') return;
+
+      filteredCases = filteredCases.filter(caseItem => {
+        switch (key) {
+          case 'caseNumber':
+            return caseItem.case_number?.toLowerCase().includes(value.toLowerCase());
+          case 'batchNumber':
+            return caseItem.batch_number?.toLowerCase().includes(value.toLowerCase());
+          case 'borrowerNumber':
+            return caseItem.borrower_number?.toLowerCase().includes(value.toLowerCase());
+          case 'idNumber':
+            return caseItem.id_number?.toLowerCase().includes(value.toLowerCase());
+          case 'customerName':
+            return caseItem.customer_name?.toLowerCase().includes(value.toLowerCase());
+          case 'phone':
+            return caseItem.phone?.toLowerCase().includes(value.toLowerCase());
+          case 'productLine':
+            return caseItem.product_line?.toLowerCase().includes(value.toLowerCase());
+          case 'receiver':
+            return caseItem.receiver?.toLowerCase().includes(value.toLowerCase());
+          case 'adjuster':
+            return caseItem.adjuster?.toLowerCase().includes(value.toLowerCase());
+          case 'distributor':
+            return caseItem.distributor?.toLowerCase().includes(value.toLowerCase());
+          case 'progressStatus':
+            return caseItem.progress_status?.toLowerCase().includes(value.toLowerCase());
+          // 时间范围过滤
+          case 'latestProgressStartTime':
+            return !caseItem.latest_progress_time || new Date(caseItem.latest_progress_time) >= new Date(value);
+          case 'latestProgressEndTime':
+            return !caseItem.latest_progress_time || new Date(caseItem.latest_progress_time) <= new Date(value);
+          case 'latestEditStartTime':
+            return !caseItem.latest_edit_time || new Date(caseItem.latest_edit_time) >= new Date(value);
+          case 'latestEditEndTime':
+            return !caseItem.latest_edit_time || new Date(caseItem.latest_edit_time) <= new Date(value);
+          case 'caseEntryStartTime':
+            return !caseItem.case_entry_time || new Date(caseItem.case_entry_time) >= new Date(value);
+          case 'caseEntryEndTime':
+            return !caseItem.case_entry_time || new Date(caseItem.case_entry_time) <= new Date(value);
+          case 'distributionStartTime':
+            return !caseItem.distribution_time || new Date(caseItem.distribution_time) >= new Date(value);
+          case 'distributionEndTime':
+            return !caseItem.distribution_time || new Date(caseItem.distribution_time) <= new Date(value);
+          default:
+            return true;
+        }
+      });
+    });
+
+    return filteredCases;
+  }, [originalCases]);
+
+  // 处理高级搜索 - 改为本地过滤
   const handleSearchCases = useCallback((params: SearchParams) => {
     setIsLoading(true);
-    // 模拟API调用，实际项目中应替换为真实的API调用
+    
+    // 使用本地过滤
+    const filteredCases = filterCases(params);
+    setCases(filteredCases);
+    
     setTimeout(() => {
       setIsLoading(false);
-      toast.success('搜索完成');
-    }, 1000);
-  }, [setIsLoading]);
+      toast.success(`搜索完成，找到 ${filteredCases.length} 个案件`);
+    }, 300);
+  }, [filterCases, setCases, setIsLoading]);
+
+  // 重置搜索 - 恢复显示所有原始数据
+  const resetSearch = useCallback(() => {
+    setCases(originalCases);
+  }, [originalCases, setCases]);
 
   // 检查重复案件
   const checkDuplicateCases = useCallback(async (casesToImport: Case[]) => {
@@ -137,7 +208,9 @@ export const useCaseData = (
       
       const savedCase = data?.[0];
       if (savedCase) {
-        // 更新本地状态
+        // 更新原始数据和显示数据
+        const newOriginalCases = [savedCase, ...originalCases];
+        setOriginalCases(newOriginalCases);
         addNewCase(savedCase, cases, setCases);
         toast.success('案件添加成功');
       }
@@ -145,7 +218,7 @@ export const useCaseData = (
       console.error('添加案件异常:', error);
       toast.error('添加案件失败，发生异常');
     }
-  }, [cases, setCases, userInfo]);
+  }, [cases, setCases, userInfo, originalCases]);
   
   // 处理批量导入案件成功
   const handleImportCasesSuccess = useCallback(async (
@@ -233,8 +306,10 @@ export const useCaseData = (
         }
       }
       
-      // 更新本地状态
+      // 更新原始数据和显示数据
       if (allInsertedCases.length > 0) {
+        const newOriginalCases = [...allInsertedCases, ...originalCases];
+        setOriginalCases(newOriginalCases);
         importCases(allInsertedCases, cases, setCases);
       }
 
@@ -251,7 +326,7 @@ export const useCaseData = (
       console.error('导入案件异常:', error);
       toast.error(`导入案件失败: ${error?.message || '未知错误'}`);
     }
-  }, [cases, setCases, userInfo, checkDuplicateCases]);
+  }, [cases, setCases, userInfo, checkDuplicateCases, originalCases]);
 
   // 删除案件
   const handleDeleteCase = useCallback(async (caseId: string) => {
@@ -267,7 +342,9 @@ export const useCaseData = (
         return false;
       }
       
-      // 更新本地状态
+      // 更新原始数据和显示数据
+      const newOriginalCases = originalCases.filter(c => c.id !== caseId);
+      setOriginalCases(newOriginalCases);
       setCases(cases.filter(c => c.id !== caseId));
       toast.success('案件删除成功');
       return true;
@@ -276,7 +353,7 @@ export const useCaseData = (
       toast.error('删除案件失败，发生异常');
       return false;
     }
-  }, [cases, setCases]);
+  }, [cases, setCases, originalCases]);
 
   // 初始加载案件数据
   useEffect(() => {
@@ -290,6 +367,7 @@ export const useCaseData = (
     handleSearchCases,
     handleAddCaseSuccess,
     handleImportCasesSuccess,
-    handleDeleteCase
+    handleDeleteCase,
+    resetSearch
   };
 };
