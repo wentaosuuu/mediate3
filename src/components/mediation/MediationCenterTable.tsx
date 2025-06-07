@@ -53,7 +53,7 @@ export const MediationCenterTable = ({
   const isIndeterminate = data.some(caseItem => selectedCases[caseItem.id]) && !isAllSelected;
 
   return (
-    <div className="overflow-auto">
+    <div className="w-full">
       <Table>
         <TableHeader>
           <TableRow>
@@ -65,32 +65,32 @@ export const MediationCenterTable = ({
                 aria-label="全选"
               />
             </TableHead>
-            <TableHead>案件编号</TableHead>
-            <TableHead>批次编号</TableHead>
-            <TableHead>借据编号</TableHead>
-            <TableHead>身份证号</TableHead>
-            <TableHead>客户姓名</TableHead>
-            <TableHead>手机号</TableHead>
+            <TableHead className="w-24">案件编号</TableHead>
+            <TableHead className="w-24">批次编号</TableHead>
+            <TableHead className="w-28">借据编号</TableHead>
+            <TableHead className="w-32">身份证号</TableHead>
+            <TableHead className="w-20">客户姓名</TableHead>
+            <TableHead className="w-24">手机号</TableHead>
             <TableHead>产品线</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.map((caseItem) => (
             <TableRow key={caseItem.id}>
-              <TableCell>
+              <TableCell className="w-12">
                 <Checkbox
                   checked={selectedCases[caseItem.id] || false}
                   onCheckedChange={(checked) => onSelectCase(caseItem.id, checked === true)}
                   aria-label={`选择案件 ${caseItem.case_number}`}
                 />
               </TableCell>
-              <TableCell className="font-medium">{caseItem.case_number}</TableCell>
-              <TableCell>{caseItem.batch_number}</TableCell>
-              <TableCell>{caseItem.borrower_number}</TableCell>
-              <TableCell>{caseItem.id_number}</TableCell>
-              <TableCell>{caseItem.customer_name}</TableCell>
-              <TableCell>{caseItem.phone || '-'}</TableCell>
-              <TableCell>{caseItem.product_line || '-'}</TableCell>
+              <TableCell className="font-medium text-sm truncate">{caseItem.case_number}</TableCell>
+              <TableCell className="text-sm truncate">{caseItem.batch_number}</TableCell>
+              <TableCell className="text-sm truncate">{caseItem.borrower_number}</TableCell>
+              <TableCell className="text-sm truncate">{caseItem.id_number}</TableCell>
+              <TableCell className="text-sm truncate">{caseItem.customer_name}</TableCell>
+              <TableCell className="text-sm truncate">{caseItem.phone || '-'}</TableCell>
+              <TableCell className="text-sm truncate">{caseItem.product_line || '-'}</TableCell>
             </TableRow>
           ))}
         </TableBody>
