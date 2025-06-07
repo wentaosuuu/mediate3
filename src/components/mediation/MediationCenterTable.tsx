@@ -50,7 +50,6 @@ export const MediationCenterTable = ({
   }
 
   const isAllSelected = data.length > 0 && data.every(caseItem => selectedCases[caseItem.id]);
-  const isIndeterminate = data.some(caseItem => selectedCases[caseItem.id]) && !isAllSelected;
 
   return (
     <div className="w-full">
@@ -60,7 +59,6 @@ export const MediationCenterTable = ({
             <TableHead className="w-12">
               <Checkbox
                 checked={isAllSelected}
-                indeterminate={isIndeterminate}
                 onCheckedChange={(checked) => onSelectAll(checked === true)}
                 aria-label="全选"
               />
