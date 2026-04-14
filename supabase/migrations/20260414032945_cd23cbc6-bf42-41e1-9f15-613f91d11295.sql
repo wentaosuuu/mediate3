@@ -1,0 +1,1 @@
+UPDATE public.tenant_registrations SET tenant_id = '123456' WHERE username = 'user111';
